@@ -33,11 +33,18 @@ public class EnchantmentRecipe implements EmiRecipe {
 	public static final int HEIGHT = 124;
 
 	private final EnchantmentInfo info;
+	private final List<EmiStack> books;
 	private final List<EmiIngredient> inputs = new ArrayList<>();
 	private PagedWidgets pages;
 
 	public EnchantmentRecipe(EnchantmentInfo info) {
 		this.info = info;
+		this.books = allBooks(info);
+		// One input per own book: EMI sorts a "uses" lookup by the size of the smallest input holding the stack, so
+		// the page of the book itself (size 1) comes before the pages that list the book as an exclusion
+		for (EmiStack book : books) {
+			inputs.add(book);
+		}
 		if (EnchantingSettings.showForItems) {
 			for (List<EmiStack> column : info.validItems()) {
 				if (!column.isEmpty()) {
@@ -78,7 +85,23 @@ public class EnchantmentRecipe implements EmiRecipe {
 
 	@Override
 	public List<EmiStack> getOutputs() {
-		return info.books();
+		return books;
+	}
+
+	/** Own books also count as catalysts: the lookup of a book's uses lists its own page next to the pages that exclude it. */
+	@Override
+	public List<EmiIngredient> getCatalysts() {
+		return List.of(EmiIngredient.of(books));
+	}
+
+	/** The books of all listed levels, including the ones above the maximum level. */
+	private static List<EmiStack> allBooks(EnchantmentInfo info) {
+		if (info.aboveMaxBooks().isEmpty()) {
+			return info.books();
+		}
+		List<EmiStack> books = new ArrayList<>(info.books());
+		books.addAll(info.aboveMaxBooks());
+		return books;
 	}
 
 	@Override

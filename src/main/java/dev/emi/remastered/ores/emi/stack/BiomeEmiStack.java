@@ -19,6 +19,7 @@ import net.minecraft.client.texture.MissingSprite;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.component.ComponentChanges;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKeys;
@@ -102,7 +103,8 @@ public class BiomeEmiStack extends EmiStack {
 
 	@Override
 	public Identifier getId() {
-		return getBiomeRegistry().getId(biome);
+		Registry<Biome> registry = getBiomeRegistry();
+		return registry == null ? null : registry.getId(biome);
 	}
 
 	@Override
@@ -153,7 +155,8 @@ public class BiomeEmiStack extends EmiStack {
 	}
 
 	private static Registry<Biome> getBiomeRegistry() {
-		return MinecraftClient.getInstance().world.getRegistryManager().get(RegistryKeys.BIOME);
+		ClientWorld world = MinecraftClient.getInstance().world;
+		return world == null ? null : world.getRegistryManager().get(RegistryKeys.BIOME);
 	}
 
 	// The type id is saved in players' favourites, keep it
@@ -165,7 +168,8 @@ public class BiomeEmiStack extends EmiStack {
 
 		@Override
 		public EmiStack create(Identifier id, ComponentChanges componentChanges, long amount) {
-			Biome biome = getBiomeRegistry().get(id);
+			Registry<Biome> registry = getBiomeRegistry();
+			Biome biome = registry == null ? null : registry.get(id);
 			if (biome == null) {
 				return EmiStack.EMPTY;
 			}
