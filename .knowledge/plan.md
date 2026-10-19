@@ -69,7 +69,7 @@ Status: open / in progress / in review / done. `||` = can run in parallel.
 | KB7 | Favourite remainder counts (port aMelonRind/emi 2508321, e7fd7d9) | Sonnet long | done (merged; kb7 tour before 2/2 -> after 3/3, 5 tests) |
 | T2 | Regression: server smoke + all tours on merged remastered, findings list | Sonnet long | done (lead evaluated: 22/23 tours ok, all-steps fails only its intentional bedrock step; server smoke clean; tour fixes fx3/p8 merged; findings -> FX-SER, LOOT-VAN, screenshot review T2-SHOTS) |
 | T2-SHOTS | Read-only screenshot review of all T2 tour shots, findings table | Sonnet short | in progress |
-| FX-SER | Unknown stack type (disabled plugin/removed mod) logs 1 WARN per type instead of ERROR+NPE per entry (EmiIngredientSerializers) | Sonnet short | in progress (worktree fx-ser, port 25671) |
+| FX-SER | Unknown stack type (disabled plugin/removed mod) logs 1 WARN per type instead of ERROR+NPE per entry (EmiIngredientSerializers) | Sonnet short | done (merged; plugin-manager tour: 1 WARN per unknown type, 0 ERROR, emi.json entries kept byte-identical; 3 tests) |
 | LOOT-VAN | Code-placed vanilla chest tables mapped by structure type (desert pyramid, fortress, stronghold, ...) in StructureLookup | Sonnet short | in progress (worktree loot-van, port 25670) |
 | DOC3 | KNOWN_BUGS (KB7, KB43, KB44) + TOUR_REPORT statuses after wave 6, CREDITS for KB7 port | Sonnet short | done (merged; T2 findings may need a follow-up) |
 | -- | Later: KB13 (Sodium vertex path, needs pack measurement), T1-29 core string | - | open |
