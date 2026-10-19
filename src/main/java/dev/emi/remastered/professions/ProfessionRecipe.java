@@ -9,6 +9,7 @@ import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
+import dev.emi.remastered.professions.trade.TradeIds;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.Screen;
@@ -41,7 +42,7 @@ public class ProfessionRecipe implements EmiRecipe {
 	@Override
 	@Nullable
 	public Identifier getId() {
-		return entry.id();
+		return Identifier.of(ProfessionsCategories.NAMESPACE, TradeIds.professionPath(entry.id().getNamespace(), entry.id().getPath()));
 	}
 
 	@Override

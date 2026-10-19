@@ -4,7 +4,9 @@
   "package": "dev.emi.remastered.professions.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [],
-  "client": [],
+  "client": [
+    "SellMapFactoryAccessor"
+  ],
   "server": [],
   "injectors": {
     "defaultRequire": 1
