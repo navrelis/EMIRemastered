@@ -17,6 +17,7 @@ import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.config.SidebarType;
 import dev.emi.emi.registry.EmiStackList;
 import dev.emi.emi.screen.EmiScreenManager;
+import dev.emi.remastered.runtime.PreservedEntries;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 
@@ -24,6 +25,9 @@ public class EmiSidebars {
 	public static List<EmiIngredient> craftables = List.of();
 	public static List<EmiIngredient> lookupHistory = Lists.newArrayList();
 	public static List<EmiIngredient> craftHistory = Lists.newArrayList();
+	// EMI Remastered: history entries that could not be read stay in emi.json (KB3)
+	private static final PreservedEntries unreadLookups = new PreservedEntries();
+	private static final PreservedEntries unreadCrafts = new PreservedEntries();
 
 	public static List<? extends EmiIngredient> getStacks(SidebarType type) {
 		return switch (type) {
@@ -75,7 +79,7 @@ public class EmiSidebars {
 				arr.add(el);
 			}
 		}
-		json.add("lookup_history", arr);
+		json.add("lookup_history", limit(unreadLookups.mergeInto(arr), 1024)); // EMI Remastered
 
 		arr = new JsonArray();
 		for (int i = 0; i < 1024; i++) {
@@ -88,33 +92,61 @@ public class EmiSidebars {
 				arr.add(recipe.getId().toString());
 			}
 		}
-		json.add("craft_history", arr);
+		json.add("craft_history", limit(unreadCrafts.mergeInto(arr), 1024)); // EMI Remastered
+	}
+
+	// EMI Remastered
+	private static JsonArray limit(JsonArray arr, int max) {
+		while (arr.size() > max) {
+			arr.remove(arr.size() - 1);
+		}
+		return arr;
 	}
 
 	public static void load(JsonObject json) {
 		lookupHistory.clear();
+		unreadLookups.clear(); // EMI Remastered: entries that do not load are kept verbatim (KB3)
 		if (JsonHelper.hasArray(json, "lookup_history")) {
+			JsonElement previous = null;
+			int index = 0;
 			for (JsonElement el : JsonHelper.getArray(json, "lookup_history")) {
-				EmiIngredient stack = EmiIngredientSerializer.getDeserialized(el);
+				EmiIngredient stack = EmiIngredientSerializer.getDeserialized(el.deepCopy());
 				if (!stack.isEmpty()) {
 					lookupHistory.add(stack);
+				} else {
+					unreadLookups.keep(el, previous, index);
 				}
+				previous = el;
+				index++;
 			}
 		}
 
 		craftHistory.clear();
+		unreadCrafts.clear(); // EMI Remastered
 		if (JsonHelper.hasArray(json, "craft_history")) {
+			JsonElement previous = null;
+			int index = 0;
 			for (JsonElement el : JsonHelper.getArray(json, "craft_history")) {
+				boolean read = false;
 				if (JsonHelper.isString(el)) {
 					String s = el.getAsString();
 					if (Identifier.tryParse(s) instanceof Identifier id) {
 						EmiRecipe recipe = EmiApi.getRecipeManager().getRecipe(id);
 						if (recipe != null) {
 							craftHistory.add(new EmiFavorite.Craftable(recipe));
+							read = true;
 						}
 					}
 				}
+				if (!read) {
+					unreadCrafts.keep(el, previous, index);
+				}
+				previous = el;
+				index++;
 			}
+		}
+		if (!unreadLookups.isEmpty() || !unreadCrafts.isEmpty()) {
+			EmiLog.warn("Keeping " + (unreadLookups.size() + unreadCrafts.size()) + " sidebar history entries that could not be read (missing mod or invalid data)");
 		}
 	}
 }
