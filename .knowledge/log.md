@@ -105,3 +105,4 @@
 2026-10-19 | delegated: PACK-CLI (Opus long, precision: real vs dev-artefact mixin failures), PACK-SRV (Sonnet long), BRAND (Sonnet short), LOGO (Opus long, visual quality)
 2026-10-19 | BRAND review (lead) | accepted after 1 correction (DE names, 'author'); every claim traced to README/CHANGELOG/CREDITS/KNOWN_BUGS; merged
 2026-10-19 | LOGO review (lead) | accepted: 3 concepts, picked slot+gem+magnifier (no resemblance to EMI icon), 16-colour icon, banner with hand-drawn font; lead viewed renders; merged, build green (jar icon = new)
+2026-10-19 | PACK-SRV review (lead) | accepted: release jar on production Knot server with copied pack (560 mods) clean; Initialized 12 modules; no dev.emi lines in 283 WARN/6 ERROR; removed for server only: certain_questing_additions (InvalidInjection into FTB Quests client method), miningspeedtooltips (client API in main entrypoint) - pack issues, not ours
