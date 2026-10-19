@@ -8,6 +8,7 @@ import java.util.Optional;
 import dev.emi.remastered.distractionfree.DistractionFreeModule;
 import dev.emi.remastered.effects.EffectsModule;
 import dev.emi.remastered.enchanting.EnchantingModule;
+import dev.emi.remastered.info.InfoModule;
 import dev.emi.remastered.letsdo.LetsDoModule;
 import dev.emi.remastered.loot.LootModule;
 import dev.emi.remastered.ores.OresModule;
@@ -30,6 +31,7 @@ public final class Modules {
 	public static final ProfessionsModule PROFESSIONS = register(new ProfessionsModule());
 	public static final LetsDoModule LETSDO = register(new LetsDoModule());
 	public static final DistractionFreeModule DISTRACTION_FREE = register(new DistractionFreeModule());
+	public static final InfoModule INFO = register(new InfoModule());
 
 	private Modules() {
 	}

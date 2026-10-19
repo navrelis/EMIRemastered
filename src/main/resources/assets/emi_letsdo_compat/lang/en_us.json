@@ -1,3 +1,33 @@
 {
-  "config.emi.group.letsdo": "Let's Do"
+  "config.emi.group.letsdo": "Let's Do",
+
+  "emi.category.emi_letsdo_compat.fondue_fill": "Fill Fondue with Cheese",
+  "emi.category.emi_letsdo_compat.fondue_use": "Filled Fondue Use",
+  "emi.category.emi_letsdo_compat.cake_cut": "Cutting Cake",
+  "emi.category.emi_letsdo_compat.grape_mashing": "Grape Mashing",
+  "emi.category.meadow.cheese": "Cheese Forming",
+  "emi.category.meadow.cooking": "Cooking Cauldron",
+  "emi.category.meadow.woodcutting": "Woodcutting",
+  "emi.category.herbalbrews.cauldron_brewing": "Cauldron Brewing",
+  "emi.category.herbalbrews.cooking": "Kettle Brewing",
+  "emi.category.beachparty.mini_fridge_mixing": "Mini Fridge Mixing",
+  "emi.category.beachparty.tiki_bar_mixing": "Tiki Bar Mixing",
+
+  "tag.item.meadow.bread": "Bread",
+  "tag.item.meadow.cheese": "Cheese",
+  "tag.item.meadow.cheese_wheels": "Cheese Wheels",
+  "tag.item.herbalbrews.container_items": "Bottles",
+  "tag.item.herbalbrews.small_water_fill": "Small Water Containers",
+  "tag.item.herbalbrews.large_water_fill": "Large Water Containers",
+  "tag.item.herbalbrews.heat_items": "Heat Sources",
+  "tag.item.bakery.knives": "Knives",
+
+  "emi_letsdo_compat.grape_mashing.click": "§e§l[RIGHT CLICK]§r the pot while holding §5§ngrapes§r in your hand.",
+  "emi_letsdo_compat.grape_mashing.jump": "§e§l[JUMP]§r on the pot to crush the §5§ngrapes§r.",
+  "emi_letsdo_compat.grape_mashing.bottle": "§e§l[USE]§r a bottle to grab the §5§njuice§r.",
+  "emi_letsdo_compat.fondue.heat": "The fondue pot has to stand on a heat source.",
+  "emi_letsdo_compat.fondue_fill.full": "Fills the pot completely (3 of 3).",
+  "emi_letsdo_compat.fondue_fill.part": "Adds 1 of 3 portions; the pot holds 3.",
+  "emi_letsdo_compat.fondue_use.portion": "Dip the item into the pot: uses 1 of 3 portions.",
+  "emi_letsdo_compat.cake_cut.knife": "Right click the cake with a knife: 4 cuts, one slice each."
 }

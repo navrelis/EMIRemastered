@@ -1,0 +1,22 @@
+{
+  "sources": [
+    { "effect": "minecraft:poison", "entities": ["minecraft:cave_spider", "minecraft:bee"], "text": "info.emiffect.source.melee" },
+    { "effect": "minecraft:wither", "entities": ["minecraft:wither_skeleton"], "text": "info.emiffect.source.melee" },
+    { "effects": ["minecraft:poison", "minecraft:slowness", "minecraft:weakness", "minecraft:instant_damage"], "entities": ["minecraft:witch"], "text": "info.emiffect.source.thrown" },
+    { "effect": "minecraft:slowness", "entities": ["minecraft:stray"], "text": "info.emiffect.source.arrows" },
+    { "effect": "minecraft:dolphins_grace", "entities": ["minecraft:dolphin"], "text": "info.emiffect.source.swim" },
+
+    { "effect": "minecraft:regeneration", "stacks": ["item:minecraft:totem_of_undying"], "text": "info.emiffect.source.totem", "amplifier": 1, "duration": 900 },
+    { "effect": "minecraft:absorption", "stacks": ["item:minecraft:totem_of_undying"], "text": "info.emiffect.source.totem", "amplifier": 1, "duration": 100 },
+    { "effect": "minecraft:fire_resistance", "stacks": ["item:minecraft:totem_of_undying"], "text": "info.emiffect.source.totem", "amplifier": 0, "duration": 800 },
+    { "effect": "minecraft:glowing", "stacks": ["item:minecraft:spectral_arrow"], "text": "info.emiffect.source.spectral_arrow", "amplifier": 0, "duration": 200 },
+
+    { "effect": "minecraft:bad_omen", "text": "info.emiffect.source.patrol_captain" },
+    { "effect": "minecraft:raid_omen", "stacks": [{ "type": "emiffect:effect", "id": "minecraft:bad_omen" }], "text": "info.emiffect.source.village_omen" },
+    { "effect": "minecraft:trial_omen", "stacks": [{ "type": "emiffect:effect", "id": "minecraft:bad_omen" }], "text": "info.emiffect.source.trial_omen" },
+    { "effect": "minecraft:hero_of_the_village", "text": "info.emiffect.source.raid_victory" },
+
+    { "kind": "cure", "effects": ["*"], "stacks": ["item:minecraft:milk_bucket"], "text": "info.emiffect.cure.all" },
+    { "kind": "cure", "effect": "minecraft:poison", "stacks": ["item:minecraft:honey_bottle"], "text": "info.emiffect.cure.single" }
+  ]
+}
