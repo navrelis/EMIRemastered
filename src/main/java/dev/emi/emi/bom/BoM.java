@@ -10,7 +10,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
-import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiResolutionRecipe;
@@ -19,7 +18,9 @@ import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.TagEmiIngredient;
 import dev.emi.emi.api.stack.serializer.EmiIngredientSerializer;
 import dev.emi.emi.data.RecipeDefaults;
+import dev.emi.emi.runtime.EmiLog;
 import dev.emi.emi.runtime.EmiPersistentData;
+import dev.emi.remastered.runtime.PreservedEntries;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
@@ -31,6 +32,11 @@ public class BoM {
 	public static Map<EmiIngredient, EmiRecipe> addedRecipes = Maps.newHashMap();
 	public static Set<EmiRecipe> disabledRecipes = Sets.newHashSet();
 	public static boolean craftingMode = false;
+	// EMI Remastered: recipe defaults that could not be read stay in emi.json (KB3)
+	private static final PreservedEntries unreadAdded = new PreservedEntries();
+	private static final PreservedEntries unreadDisabled = new PreservedEntries();
+	private static JsonObject unreadResolutions = new JsonObject();
+	private static JsonObject unreadTags = new JsonObject();
 
 	public static void setDefaults(RecipeDefaults defaults) {
 		BoM.defaults = defaults;
@@ -79,55 +85,94 @@ public class BoM {
 				disabled.add(recipe.getId().toString());
 			}
 		}
+		// EMI Remastered: write back what could not be read (KB3)
+		PreservedEntries.mergeObject(addedTags, unreadTags);
+		PreservedEntries.mergeObject(resolutions, unreadResolutions);
 		JsonObject obj = new JsonObject();
-		obj.add("added", added);
+		obj.add("added", unreadAdded.mergeInto(added));
 		obj.add("tags", addedTags);
 		obj.add("resolutions", resolutions);
-		obj.add("disabled", disabled);
+		obj.add("disabled", unreadDisabled.mergeInto(disabled));
 		return obj;
 	}
 
 	public static void loadAdded(JsonObject object) {
 		addedRecipes.clear();
 		disabledRecipes.clear();
+		// EMI Remastered: ids of missing recipes and stacks that do not load are kept verbatim (KB3); an unknown id
+		// no longer puts null into disabledRecipes and a malformed entry no longer aborts the whole section
+		unreadAdded.clear();
+		unreadDisabled.clear();
+		unreadResolutions = new JsonObject();
+		unreadTags = new JsonObject();
 		JsonArray disabled = JsonHelper.getArray(object, "disabled", new JsonArray());
+		JsonElement previous = null;
+		int index = 0;
 		for (JsonElement el : disabled) {
-			Identifier id = EmiPort.id(el.getAsString());
-			EmiRecipe recipe = EmiApi.getRecipeManager().getRecipe(id);
-			disabledRecipes.add(recipe);
+			EmiRecipe recipe = recipeOf(el);
+			if (recipe != null) {
+				disabledRecipes.add(recipe);
+			} else {
+				unreadDisabled.keep(el, previous, index);
+			}
+			previous = el;
+			index++;
 		}
 		JsonArray added = JsonHelper.getArray(object, "added", new JsonArray());
+		previous = null;
+		index = 0;
 		for (JsonElement el : added) {
-			Identifier id = EmiPort.id(el.getAsString());
-			EmiRecipe recipe = EmiApi.getRecipeManager().getRecipe(id);
-			if (recipe != null && !disabledRecipes.contains(recipe)) {
+			EmiRecipe recipe = recipeOf(el);
+			if (recipe == null) {
+				unreadAdded.keep(el, previous, index);
+			} else if (!disabledRecipes.contains(recipe)) {
 				for (EmiStack output : recipe.getOutputs()) {
 					addedRecipes.put(output, recipe);
 				}
 			}
+			previous = el;
+			index++;
 		}
 		JsonObject resolutions = JsonHelper.getObject(object, "resolutions", new JsonObject());
 		for (String key : resolutions.keySet()) {
-			Identifier id = EmiPort.id(key);
-			EmiRecipe recipe = EmiApi.getRecipeManager().getRecipe(id);
+			EmiRecipe recipe = recipeOf(new JsonPrimitive(key));
 			if (recipe != null && JsonHelper.hasArray(resolutions, key)) {
 				JsonArray arr = JsonHelper.getArray(resolutions, key);
 				for (JsonElement el : arr) {
-					EmiIngredient stack = EmiIngredientSerializer.getDeserialized(el);
+					EmiIngredient stack = EmiIngredientSerializer.getDeserialized(el.deepCopy());
 					if (!stack.isEmpty()) {
 						addedRecipes.put(stack, recipe);
+					} else {
+						PreservedEntries.keepInObject(unreadResolutions, key, el);
 					}
 				}
+			} else {
+				unreadResolutions.add(key, resolutions.get(key));
 			}
 		}
 		JsonObject addedTags = JsonHelper.getObject(object, "tags", new JsonObject());
 		for (String key : addedTags.keySet()) {
 			EmiIngredient tag = EmiIngredientSerializer.getDeserialized(new JsonPrimitive(key));
-			EmiIngredient stack = EmiIngredientSerializer.getDeserialized(addedTags.get(key));
+			EmiIngredient stack = EmiIngredientSerializer.getDeserialized(addedTags.get(key).deepCopy());
 			if (!tag.isEmpty() && !stack.isEmpty() && stack.getEmiStacks().size() == 1 && tag.getEmiStacks().containsAll(stack.getEmiStacks())) {
 				addedRecipes.put(tag, new EmiResolutionRecipe(tag, stack.getEmiStacks().get(0)));
+			} else {
+				unreadTags.add(key, addedTags.get(key));
 			}
 		}
+		int unread = unreadAdded.size() + unreadDisabled.size() + unreadResolutions.size() + unreadTags.size();
+		if (unread > 0) {
+			EmiLog.warn("Keeping " + unread + " recipe defaults that could not be read (missing mod or invalid data)");
+		}
+	}
+
+	// EMI Remastered: null for a missing recipe or a malformed id instead of an exception
+	private static EmiRecipe recipeOf(JsonElement el) {
+		if (!JsonHelper.isString(el)) {
+			return null;
+		}
+		Identifier id = Identifier.tryParse(el.getAsString());
+		return id == null ? null : EmiApi.getRecipeManager().getRecipe(id);
 	}
 
 	public static void reload() {
