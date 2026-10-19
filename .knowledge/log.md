@@ -60,3 +60,4 @@
 2026-10-19 | auto-handoff: wave 5 agents stopped; see F:\Coding\EMI_Remastered\handoff-2026-10-19-827bbbd2.md
 2026-10-19 | session 4: handoff matches repo (remastered=origin=9aa35e85); agent rules copied to new scratchpad (client launches allowed via gradle run configs, no KNOWN_BUGS edits by agents)
 2026-10-19 | wave 5 re-delegated in existing worktrees: Q3 bench+KB2/KB12 (Opus long), FX1 (Opus long), T1, FX2, P8, B2 (Sonnet long), FX3 (Sonnet); ports 25640-25646
+2026-10-19 | FX2 review (lead) | accepted: KB5 creative namespaces drop fallback, KB6 port 4c22e3b0 + EmiTagKey cache concurrent (CME on first block-tag search), KB8 cropped remainder index (+6 tests), KB9 long clamp, KB10 ThreadLocal bake flag, KB11 remastered mixins exempt, hasFocusedTextField; merged, build green. KB rows: 5,6,8,9,10,11 fixed
