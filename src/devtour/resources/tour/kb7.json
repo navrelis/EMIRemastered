@@ -1,0 +1,28 @@
+{
+  "description": "KB7: recipe tree remainder counts. Activator rail needs 3 sticks (2 directly, 1 in the redstone torch) but the stick recipe makes 4 per batch, so the torch's stick is served by the remainder of the first stick node. The stick recipe favourite must show 3 remaining with an empty inventory, 2 of 3 with one stick in the inventory and disappear with three.",
+  "warmupTicks": 60,
+  "settleTicks": 15,
+  "stepTimeoutSeconds": 30,
+  "worldJoinTimeoutSeconds": 120,
+  "timeoutSeconds": 300,
+  "steps": [
+    { "type": "resize", "w": 1280, "h": 720 },
+    { "type": "set_gui_scale", "n": 2 },
+    { "type": "command", "text": "/clear @p", "waitTicks": 5 },
+    { "type": "open_inventory" },
+    { "type": "call", "class": "dev.emi.remastered.devtour.Kb7Tour", "method": "goalActivatorRail" },
+    { "type": "wait", "ticks": 40 },
+    { "type": "call", "class": "dev.emi.remastered.devtour.Kb7Tour", "method": "report" },
+    { "type": "screenshot", "name": "empty-inventory" },
+    { "type": "hover", "x": 49, "y": 29 },
+    { "type": "screenshot", "name": "empty-inventory-stick-tooltip" },
+    { "type": "command", "text": "/give @p minecraft:stick 1", "waitTicks": 40 },
+    { "type": "call", "class": "dev.emi.remastered.devtour.Kb7Tour", "method": "report" },
+    { "type": "screenshot", "name": "one-stick-stick-tooltip" },
+    { "type": "hover", "x": 300, "y": 300 },
+    { "type": "screenshot", "name": "one-stick" },
+    { "type": "command", "text": "/give @p minecraft:stick 2", "waitTicks": 40 },
+    { "type": "call", "class": "dev.emi.remastered.devtour.Kb7Tour", "method": "report" },
+    { "type": "screenshot", "name": "three-sticks" }
+  ]
+}

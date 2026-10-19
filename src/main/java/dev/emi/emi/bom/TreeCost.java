@@ -14,12 +14,15 @@ import dev.emi.emi.api.stack.EmiStack;
 public class TreeCost {
 	public Map<EmiIngredient, FlatMaterialCost> costs = Maps.newHashMap();
 	public Map<EmiIngredient, ChanceMaterialCost> chanceCosts = Maps.newHashMap();
+	// EMI Remastered: KB7 (port of aMelonRind/emi 2508321): player inventory is tracked apart from recipe remainders
+	public Map<EmiStack, FlatMaterialCost> invs = Maps.newHashMap();
 	public Map<EmiStack, FlatMaterialCost> remainders = Maps.newHashMap();
 	public Map<EmiStack, ChanceMaterialCost> chanceRemainders = Maps.newHashMap();
 
 	public void calculate(MaterialNode node, long batches) {
 		costs.clear();
 		chanceCosts.clear();
+		invs.clear();
 		remainders.clear();
 		chanceRemainders.clear();
 		calculateCost(node, batches * node.amount, ChanceState.DEFAULT, false);
@@ -28,11 +31,13 @@ public class TreeCost {
 	public void calculateProgress(MaterialNode node, long batches, EmiPlayerInventory inventory) {
 		costs.clear();
 		chanceCosts.clear();
+		invs.clear();
 		remainders.clear();
 		chanceRemainders.clear();
 		for (EmiStack stack : inventory.inventory.values()) {
 			stack = stack.copy();
-			remainders.put(stack, new FlatMaterialCost(stack, stack.getAmount()));
+			// EMI Remastered: KB7 (port of aMelonRind/emi 2508321)
+			invs.put(stack, new FlatMaterialCost(stack, stack.getAmount()));
 		}
 		calculateCost(node, batches * node.amount, ChanceState.DEFAULT, true);
 	}
@@ -122,34 +127,45 @@ public class TreeCost {
 		return given;
 	}
 
-	private long getRemainder(EmiStack stack, long desired, boolean catalyst) {
-		FlatMaterialCost remainder = remainders.get(stack);
-		if (remainder != null) {
-			if (remainder.amount >= desired) {
+	// EMI Remastered: KB7 (port of aMelonRind/emi 2508321)
+	private long getFrom(Map<EmiStack, FlatMaterialCost> collection, EmiStack stack, long desired, boolean catalyst) {
+		FlatMaterialCost value = collection.get(stack);
+		if (value != null) {
+			if (value.amount >= desired) {
 				if (!catalyst) {
-					remainder.amount -= desired;
-					if (remainder.amount == 0) {
-						remainders.remove(stack);
+					value.amount -= desired;
+					if (value.amount == 0) {
+						collection.remove(stack);
 					}
 				}
 				return desired;
 			} else {
 				if (!catalyst) {
-					remainders.remove(stack);
+					collection.remove(stack);
 				}
-				return remainder.amount;
+				return value.amount;
 			}
 		}
 		return 0;
 	}
 
-	private void complete(MaterialNode node) {
+	private long getInventory(EmiStack stack, long desired, boolean catalyst) {
+		return getFrom(invs, stack, desired, catalyst);
+	}
+
+	private long getRemainder(EmiStack stack, long desired, boolean catalyst) {
+		return getFrom(remainders, stack, desired, catalyst);
+	}
+
+	// EMI Remastered: KB7 (port of aMelonRind/emi e7fd7d9)
+	private void complete(MaterialNode node, long usedRemainder) {
 		node.progress = ProgressState.COMPLETED;
 		node.totalNeeded = 0;
 		node.neededBatches = 0;
+		node.usedRemainder = usedRemainder;
 		if (node.children != null) {
 			for (MaterialNode child : node.children) {
-				complete(child);
+				complete(child, 0);
 			}
 		}
 	}
@@ -159,6 +175,8 @@ public class TreeCost {
 			node.progress = ProgressState.UNSTARTED;
 			node.totalNeeded = 0;
 			node.neededBatches = 0;
+			// EMI Remastered: KB7 (port of aMelonRind/emi e7fd7d9)
+			node.usedRemainder = 0;
 		}
 		boolean catalyst = node.catalyst;
 		if (catalyst) {
@@ -173,30 +191,38 @@ public class TreeCost {
 			return;
 		}
 		long original = amount;
+		// EMI Remastered: KB7 (port of aMelonRind/emi e7fd7d9)
+		long usedRemainder = 0;
 		List<EmiStack> ingredientStacks = node.ingredient.getEmiStacks();
 		for (int i = 0; i < ingredientStacks.size(); i++) {
+			// EMI Remastered: KB7 (port of aMelonRind/emi 2508321)
+			amount -= getInventory(ingredientStacks.get(i), amount, catalyst);
 			if (chance.chanced()) {
 				double desired = amount * chance.chance();
 				double given = getChancedRemainder(ingredientStacks.get(i), desired, catalyst, chance);
 				if (given > 0) {
 					double scaled = given / chance.chance();
+					usedRemainder += (long) scaled;
 					amount -= (long) scaled;
 					if (amount > 0) {
 						chance = new ChanceState((float) ((amount - (scaled % 1)) * chance.chance() / amount), true);
 					}
 				}
 			} else {
-				amount -= getRemainder(ingredientStacks.get(i), amount, catalyst);
+				long used = getRemainder(ingredientStacks.get(i), amount, catalyst);
+				usedRemainder += used;
+				amount -= used;
 			}
 		}
 		if (amount == 0) {
 			if (trackProgress) {
-				complete(node);
+				complete(node, usedRemainder);
 			}
 			return;
 		}
 		if (trackProgress && amount != original) {
 			node.progress = ProgressState.PARTIAL;
+			node.usedRemainder = usedRemainder;
 		}
 		
 		long effectiveCrafts = amount;
