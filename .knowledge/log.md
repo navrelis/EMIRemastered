@@ -41,3 +41,11 @@
 2026-10-19 | A7 mobs (Sonnet) | code done, build+server green; client checks pending
 2026-10-19 | wave 3 delegated (Sonnet, no client launches until D13 fix): A2 enchanting extras, Q2 bug survey, A5+B1 stats module, B5 advancement provider, X1 /emiexport
 2026-10-19 | auto-handoff: all agents stopped; partial work uncommitted in worktrees; see F:\Coding\EMI_Remastered\handoff-2026-10-19-5b513619.md
+2026-10-19 | session 3: handoff matches repo; WIP commits + merge of remastered into Q1b, Q3, A7, A8, A9, tools (conflicts in Steps/DEVTOUR for Q1b, Modules/fabric.mod.json/lang/ModulesTest for A7+tools left to agents); empty worktrees fast-forwarded
+2026-10-19 | wave 4 delegated: Q1b finish no-grab (Sonnet short, only agent allowed client launches), Q3 continue (Opus long), A8, A9, A7, tools continue (Sonnet), A2, A5+B1, B5, X1 (Sonnet, fresh), Q2 survey (Sonnet); all others: no client launches
+2026-10-19 | A7 review (lead) | accepted: conflicts resolved (mobs after info), payload emi_mobs:spawns canSend-guarded, client data cleared on disconnect, server-safe, spawn-egg info provider; merged eab051f, build green, pushed. Client tour pending (mobs.json)
+2026-10-19 | B3+B4 review (lead) | code accepted: tools mixin HEAD hooks gated by module switch, own text-field guard (core hasFocusedTextField returns after first container: separate fix task), icon slot; re-merge after mobs -> correction sent (order info, mobs, tools; icon slot 10)
+2026-10-19 | B3+B4 tools merged (lead): re-merge resolved (info, mobs, tools; tools icon slot 10), build green
+2026-10-19 | X1 review (lead) | accepted: /emiexport client command, render-thread slices (10 ms/tick), compute() bypasses page cache, abort on reload/leave, async write; merged, build green, pushed. Client run pending (tour export.json via call step)
+2026-10-19 | B5 review (lead) | correction: listener replay calls setListener(null) and would drop other mods listeners -> use accessor on progress map
+2026-10-19 | A8 review (lead) | correction: structure prefetch on server thread at start -> background build with join/timeout, skip when setting off
