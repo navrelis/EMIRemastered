@@ -57,3 +57,4 @@ Owner statement (2026-10-19): he asked the authors for permission to use and cha
 - Never force-push; no secrets.
 - Owner (2026-10-19): never start Minecraft with sound.
 - Owner (2026-10-19, session 5): Phase 4 = once the owner has closed the game, lead backs up the 8 jars to mods_backup/ and installs the new jar; the OWNER launches the pack; lead then reads latest.log and reload times.
+- Owner (2026-10-19 ~21:30): 'no you do all' - the lead's team launches the real pack itself for the Phase 4 check (supersedes 'owner launches'). Safeguards: muted, test copy of a world, offline name, options.txt/emi.json backed up and restored, game lock.

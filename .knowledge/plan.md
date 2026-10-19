@@ -1,6 +1,6 @@
 # Plan
 
-Usage tally (work units: short = 1, long = 2): Opus 29 (F1, F2, Q3 x6, A1 x2, FX1 x4, FOCUS1 x4 = two delegations, PACK-CLI x2, LOGO x2) / Sonnet 113 -> Opus 20 % (sessions 4+5 re-delegations counted again)
+Usage tally (work units: short = 1, long = 2): Opus 31 (PACK-REAL x2, F1, F2, Q3 x6, A1 x2, FX1 x4, FOCUS1 x4 = two delegations, PACK-CLI x2, LOGO x2) / Sonnet 113 -> Opus 21 % (sessions 4+5 re-delegations counted again)
 
 Status: open / in progress / in review / done. `||` = can run in parallel.
 
@@ -76,8 +76,9 @@ Status: open / in progress / in review / done. `||` = can run in parallel.
 | PACK-SRV | Production dedicated server (release jar + copied pack mods, local files only): loading, provides, server-side modules | Sonnet long | done (production server, loader 0.19.5, 560 mods: started 21 s world/99 s total, clean stop, 0 emi warnings/errors, no provides conflicts; 993 structures, 433 of 789 chest tables with a structure, lookup 10.6 s off-thread; 2 other client-only pack mods crash any dedicated server: certain_questing_additions, miningspeedtooltips) |
 | BRAND | docs/DESCRIPTION.md (summary EN/DE, tagline, CurseForge/Modrinth description), fabric.mod.json description | Sonnet short | done (merged; summary 187 chars, DE 181, tagline 55; one correction: product names untranslated, 'author') |
 | LOGO | Pixel-art logo, banner, mod icon from a deterministic Pillow generator | Opus long | done (merged; slot + gem + magnifier + sparkle, 32 px grid x16, banner 192x48 x8, byte-identical regeneration; lead viewed icon dark/light + banner) |
+| PACK-REAL | Owner-authorised launch of the real pack (copied world, offline, muted, options/emi.json backed up and restored), log check | Opus long | in progress |
 | -- | Later: KB13 (Sodium vertex path, needs pack measurement), T1-29 core string | - | open |
 
 ## Phase 4 Acceptance
 Pack install under game lock, end-to-end check, report, push.
-- Jar swap: done 2026-10-19 21:1x (owner's client closed; 8 jars in mods_backup/, EMIRemastered jar in mods/, lock created and removed). Owner launch + log check: pending (owner offline).
+- Jar swap: done 2026-10-19 21:1x (owner's client closed; 8 jars in mods_backup/, EMIRemastered jar in mods/, lock created and removed). Owner changed the decision (2026-10-19 ~21:30, 'no you do all'): the lead's team launches the real pack (PACK-REAL). Newest jar (33d82605 build) installed before the launch.
