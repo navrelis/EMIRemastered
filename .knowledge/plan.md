@@ -1,6 +1,6 @@
 # Plan
 
-Usage tally (work units: short = 1, long = 2): Opus 17 (F1, F2, Q3 x4, A1 x2, FX1 x2) / Sonnet 75 -> Opus 18 %
+Usage tally (work units: short = 1, long = 2): Opus 21 (F1, F2, Q3 x6, A1 x2, FX1 x4) / Sonnet 84 -> Opus 20 % (session 4 re-delegation of interrupted wave 5 counted again)
 
 Status: open / in progress / in review / done. `||` = can run in parallel.
 
@@ -28,7 +28,7 @@ Status: open / in progress / in review / done. `||` = can run in parallel.
 | Q1 | Dev-client screenshot tour + log check harness | Sonnet long | done |
 | Q1b | Tour steps + D12 mute enforcement + D13 no-grab/no-focus dev mixin on all client runs (blocks every client check) | Sonnet short | done (merged; 4 muted no-grab launches clean; client ban lifted) |
 | Q2 | Known bugs (EMI repair AIOOBE, upstream issues of each module) | Sonnet | done (docs/KNOWN_BUGS.md: 22 open rows; fixes in FX1-FX3, Q3) |
-| Q3 | A12 reload performance, before/after numbers | Opus long | in progress (code reviewed; benchmark runs + KB2, KB12) |
+| Q3 | A12 reload performance, before/after numbers | Opus long | in progress (session 4: bench + KB2/KB12 + DEVTOUR docs; code accepted, not merged) |
 
 ## Phase 3 Features (after the module each builds on is merged)
 | ID | Task | Builds on | Model | Status |
@@ -44,7 +44,7 @@ Status: open / in progress / in review / done. `||` = can run in parallel.
 | A10 | Distraction-free extras (in P1) | P1 | Sonnet | done (P1) |
 | A11 | Unified config + plugin manager (in F2) | F2 | Opus | done |
 | A12 | Reload performance (Q3) | - | Opus | in progress (Q3) |
-| B2 | `world` module: biome pages (climate, tags, spawns, ores) + structure pages (server sync) | P5, A7 | Sonnet long | in progress |
+| B2 | `world` module: biome pages (climate, tags, spawns, ores) + structure pages (server sync) | P5, A7 | Sonnet long | in progress (session 4) |
 | B3 | Tag browser screen (all tags, search, members) | F2 | Sonnet | done (merged; client tour pending after Q1b) |
 | B4 | Copy recipe as text/JSON bind | F2 | Sonnet short | done (with B3) |
 | B5 | Advancement links in item info (icon/display) | A1 | Sonnet short | done (merged; client tour in T1) |
@@ -54,11 +54,12 @@ Status: open / in progress / in review / done. `||` = can run in parallel.
 ## Phase 3b Verification and fixes (session 3)
 | ID | Task | Model | Status |
 |---|---|---|---|
-| T1 | Batched client tours of all merged features + jump icons mobs/stats -> docs/TOUR_REPORT.md | Sonnet long | in progress |
-| FX1 | KB1, KB3, KB14, KB15, KB38: reload lifecycle (world gone, disconnect, daemon threads), keep unparsable emi.json entries, debounced hide save | Opus long | in progress |
-| FX2 | KB5, KB6, KB8, KB9, KB10, KB11 + hasFocusedTextField (EMI core, small) | Sonnet long | in progress |
-| FX3 | KB17, KB18, KB22, KB23, KB28, KB29 (loot, ores, enchanting) | Sonnet | in progress |
-| P8 | Info providers: villager trades (professions), effects | Sonnet long | in progress |
+| T1 | Batched client tours of all merged features + jump icons mobs/stats -> docs/TOUR_REPORT.md | Sonnet long | in progress (session 4) |
+| FX1 | KB1, KB3, KB14, KB15, KB38: reload lifecycle (world gone, disconnect, daemon threads), keep unparsable emi.json entries, debounced hide save | Opus long | in progress (session 4) |
+| FX2 | KB5, KB6, KB8, KB9, KB10, KB11 + hasFocusedTextField (EMI core, small) | Sonnet long | in progress (session 4) |
+| FX3 | KB17, KB18, KB22, KB23, KB28, KB29 (loot, ores, enchanting) | Sonnet | in progress (session 4) |
+| P8 | Info providers: villager trades (professions), effects | Sonnet long | in progress (session 4) |
+| KBdoc | Update docs/KNOWN_BUGS.md rows from FX1-FX3/Q3 reports (agents do not edit it, avoids conflicts) | Sonnet short | open (after FX1-FX3, Q3) |
 | -- | Later: KB7, KB13; world icon slot 12; README/CREDITS | - | open |
 
 ## Phase 4 Acceptance

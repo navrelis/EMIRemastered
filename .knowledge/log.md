@@ -57,3 +57,6 @@
 2026-10-19 | Q1b review (lead) | accepted: mixins cancel lockCursor/unlockCursor/setCursorParameters/raw mouse/fullscreen, no-focus hints, never pause on lost focus; devtour on all client runs, not in release jar (0 entries); 4 tour launches clean; merged, pushed. Client ban lifted (D13 fix in place)
 2026-10-19 | Q3 code review (lead) | accepted: tag index (skips only tags with no shared value), RecipeBuckets (identity adjacency when allDistinct), repair fix; benchmark + KB2/KB12 sent
 2026-10-19 | wave 5 delegated: T1 tours+icons (Sonnet long), FX1 reload/persistence (Opus long), FX2 core small fixes (Sonnet), FX3 module fixes (Sonnet), P8 trades/effects providers (Sonnet), B2 world module (Sonnet long); client launches allowed (one per agent)
+2026-10-19 | auto-handoff: wave 5 agents stopped; see F:\Coding\EMI_Remastered\handoff-2026-10-19-827bbbd2.md
+2026-10-19 | session 4: handoff matches repo (remastered=origin=9aa35e85); agent rules copied to new scratchpad (client launches allowed via gradle run configs, no KNOWN_BUGS edits by agents)
+2026-10-19 | wave 5 re-delegated in existing worktrees: Q3 bench+KB2/KB12 (Opus long), FX1 (Opus long), T1, FX2, P8, B2 (Sonnet long), FX3 (Sonnet); ports 25640-25646
