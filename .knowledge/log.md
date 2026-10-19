@@ -118,3 +118,4 @@
 2026-10-19 | POLISH re-delegated (Sonnet long) || PACK-REAL2 (Opus long) || DOC4 (Sonnet short)
 2026-10-19 | DOC4 review (lead) | accepted, committed on wip/doc4; merge after POLISH (mobs speed wording may change)
 2026-10-19 | PACK-REAL2 review (lead) | accepted: LOOT-ASYNC verified in real pack (join 4 s); cleanup verified; cosmetic: summary log counts 433/789 chestTables while 563 tables delivered (report only)
+2026-10-19 | POLISH review (lead) | accepted, merged; DOC4 merged; build 381 tests green; final jar 829b63e1 installed (lock); report written
