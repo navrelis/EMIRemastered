@@ -807,5 +807,7 @@
   "config.emi.modules.letsdo": "Let's Do (Let's Do EMI Compat)",
   "config.emi.tooltip.modules.letsdo": "Shows recipes of the Let's Do mods (Vinery, Meadow, Bakery, ...).",
   "config.emi.modules.distraction_free": "Distraction-Free Recipes",
-  "config.emi.tooltip.modules.distraction_free": "Hides EMI's index until you search for something."
+  "config.emi.tooltip.modules.distraction_free": "Hides EMI's index until you search for something.",
+  "config.emi.modules.info": "Item Info",
+  "config.emi.tooltip.modules.info": "A key (default I) on any stack opens an overview: how to get it, what it is used for and its details."
 }
