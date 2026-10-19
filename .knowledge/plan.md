@@ -74,7 +74,7 @@ Status: open / in progress / in review / done. `||` = can run in parallel.
 | DOC3 | KNOWN_BUGS (KB7, KB43, KB44) + TOUR_REPORT statuses after wave 6, CREDITS for KB7 port | Sonnet short | done (merged; T2 findings may need a follow-up) |
 | PACK-CLI | Pack-mirror dev client (pack mods copied into run/mods, hidden, muted): mixins of other mods into EMI, EMI plugins, reload times, modded Item Info | Opus long | in progress (worktree pack-cli, port 25672) |
 | PACK-SRV | Production dedicated server (release jar + copied pack mods, local files only): loading, provides, server-side modules | Sonnet long | in progress (scratch dir, port 25673) |
-| BRAND | docs/DESCRIPTION.md (summary EN/DE, tagline, CurseForge/Modrinth description), fabric.mod.json description | Sonnet short | in progress (worktree brand) |
+| BRAND | docs/DESCRIPTION.md (summary EN/DE, tagline, CurseForge/Modrinth description), fabric.mod.json description | Sonnet short | done (merged; summary 187 chars, DE 181, tagline 55; one correction: product names untranslated, 'author') |
 | LOGO | Pixel-art logo, banner, mod icon from a deterministic Pillow generator | Opus long | in progress (worktree logo) |
 | -- | Later: KB13 (Sodium vertex path, needs pack measurement), T1-29 core string | - | open |
 
