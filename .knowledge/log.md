@@ -104,3 +104,4 @@
 2026-10-19 | Phase 4 jar swap (lead) | pack client closed, game lock taken, 8 jars -> mods_backup/, EMIRemastered-1.21.1-2.0.0-Fabric.jar (build of 5a075026) -> mods/, lock removed; owner launch pending (owner decision: owner launches)
 2026-10-19 | delegated: PACK-CLI (Opus long, precision: real vs dev-artefact mixin failures), PACK-SRV (Sonnet long), BRAND (Sonnet short), LOGO (Opus long, visual quality)
 2026-10-19 | BRAND review (lead) | accepted after 1 correction (DE names, 'author'); every claim traced to README/CHANGELOG/CREDITS/KNOWN_BUGS; merged
+2026-10-19 | LOGO review (lead) | accepted: 3 concepts, picked slot+gem+magnifier (no resemblance to EMI icon), 16-colour icon, banner with hand-drawn font; lead viewed renders; merged, build green (jar icon = new)
