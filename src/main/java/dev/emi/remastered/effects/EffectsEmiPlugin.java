@@ -1,5 +1,6 @@
 package dev.emi.remastered.effects;
 
+import dev.emi.emi.api.EmiInitRegistry;
 import dev.emi.emi.api.EmiRegistry;
 import dev.emi.remastered.module.ModuleEmiPlugin;
 import dev.emi.remastered.module.Modules;
@@ -13,6 +14,11 @@ public class EffectsEmiPlugin extends ModuleEmiPlugin {
 
 	public EffectsEmiPlugin() {
 		super(Modules.EFFECTS, PLUGIN_ID);
+	}
+
+	@Override
+	protected void initializeContent(EmiInitRegistry registry) {
+		EffectsContent.initialize(registry);
 	}
 
 	@Override
