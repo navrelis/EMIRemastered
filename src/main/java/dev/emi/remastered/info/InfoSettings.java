@@ -31,6 +31,10 @@ public final class InfoSettings {
 	@ConfigValue("info.show-no-source")
 	public static boolean showNoSource = true;
 
+	@Comment("Lists advancements whose icon is the item in the Item Info screen.")
+	@ConfigValue("info.show-advancements")
+	public static boolean showAdvancements = true;
+
 	private InfoSettings() {
 	}
 }

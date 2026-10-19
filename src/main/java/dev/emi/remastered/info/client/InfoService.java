@@ -17,6 +17,7 @@ import dev.emi.remastered.info.core.GenerationCache;
 import dev.emi.remastered.info.core.ProviderOrdering;
 import dev.emi.remastered.info.core.ReloadGeneration;
 import dev.emi.remastered.info.providers.BuiltinProviders;
+import dev.emi.remastered.info.providers.advancement.AdvancementIndex;
 import dev.emi.remastered.module.Module;
 import dev.emi.remastered.module.Modules;
 import net.minecraft.text.Text;
@@ -42,7 +43,7 @@ public final class InfoService {
 		}
 		BuiltinProviders.ensureRegistered();
 		long generation = GENERATION.update(EmiApi.getRecipeManager(), List.of(ItemInfoRegistry.getVersion(),
-			ModuleConfigs.snapshotSwitches(), InfoSettings.showNoSource));
+			ModuleConfigs.snapshotSwitches(), InfoSettings.showNoSource, AdvancementIndex.stamp()));
 		if (GENERATION.wasReloaded()) {
 			FAILED.clear();
 			for (ItemInfoProvider provider : ItemInfoRegistry.getProviders()) {
