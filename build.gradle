@@ -161,6 +161,13 @@ processResources {
 	}
 }
 
+// credits and licence texts at the root of the release jar (devtour is never packaged)
+tasks.named("jar") {
+	from("CREDITS.md")
+	from("LICENSE")
+	from("src/main/resources/assets/emi_ores/LICENSE-LGPL-3.0.txt")
+}
+
 tasks.named("processDevtourResources") {
 	def modVersion = project.version.toString()
 	inputs.property "version", modVersion
