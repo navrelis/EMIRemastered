@@ -28,7 +28,7 @@ Status: open / in progress / in review / done. `||` = can run in parallel.
 | Q1 | Dev-client screenshot tour + log check harness | Sonnet long | done |
 | Q1b | Tour steps + D12 mute enforcement + D13 no-grab/no-focus dev mixin on all client runs (blocks every client check) | Sonnet short | done (merged; 4 muted no-grab launches clean; client ban lifted) |
 | Q2 | Known bugs (EMI repair AIOOBE, upstream issues of each module) | Sonnet | done (docs/KNOWN_BUGS.md: 22 open rows; fixes in FX1-FX3, Q3) |
-| Q3 | A12 reload performance, before/after numbers | Opus long | in progress (session 4: bench + KB2/KB12 + DEVTOUR docs; code accepted, not merged) |
+| Q3 | A12 reload performance, before/after numbers | Opus long | done (merged; warm reload -40..58 %, join -21 %, heap -60 MB; KB2, KB4, KB12) |
 
 ## Phase 3 Features (after the module each builds on is merged)
 | ID | Task | Builds on | Model | Status |
@@ -43,7 +43,7 @@ Status: open / in progress / in review / done. `||` = can run in parallel.
 | A9 | Ores: modded dimensions, compact biome list, Y-range highlight | P5 | Sonnet | done (merged; client tour in T1) |
 | A10 | Distraction-free extras (in P1) | P1 | Sonnet | done (P1) |
 | A11 | Unified config + plugin manager (in F2) | F2 | Opus | done |
-| A12 | Reload performance (Q3) | - | Opus | in progress (Q3) |
+| A12 | Reload performance (Q3) | - | Opus | done (Q3) |
 | B2 | `world` module: biome pages (climate, tags, spawns, ores) + structure pages (server sync) | P5, A7 | Sonnet long | done (merged; 34 structures/64 biomes in dev; real multiplayer untested; jump icon slot 12 pending) |
 | B3 | Tag browser screen (all tags, search, members) | F2 | Sonnet | done (merged; client tour pending after Q1b) |
 | B4 | Copy recipe as text/JSON bind | F2 | Sonnet short | done (with B3) |
@@ -59,8 +59,8 @@ Status: open / in progress / in review / done. `||` = can run in parallel.
 | FX2 | KB5, KB6, KB8, KB9, KB10, KB11 + hasFocusedTextField (EMI core, small) | Sonnet long | done (merged 714005d; manual: regex tag search #/pickax/ showed empty in tour, I with anvil field focused) |
 | FX3 | KB17, KB18, KB22, KB23, KB28, KB29 (loot, ores, enchanting) | Sonnet | done (merged; limits: R/U on books only up to listed level (max+5, <=10), Grinding tab before Enchantments on U) |
 | P8 | Info providers: villager trades (professions), effects | Sonnet long | done (merged; coveredCategories(stack) API; item-info toggle not client-checked) |
-| KBdoc | Update docs/KNOWN_BUGS.md rows from FX1-FX3/Q3 reports (agents do not edit it, avoids conflicts) | Sonnet short | open (after FX1-FX3, Q3) |
-| DOC1 | DEVTOUR.md: list new tours (world, fx2, fx3, p8) + WorldTour helper; world jump icon slot 12 (after T1) | Sonnet short | open |
+| DOC1 | KNOWN_BUGS.md rows from FX1-FX3/Q3 + DEVTOUR.md tour list (world, fx2, fx3, p8, WorldTour) | Sonnet short | in progress |
+| ICON12 | world jump icon slot 12 (after T1) | Sonnet short | open |
 | -- | Later: KB7, KB13; README/CREDITS | - | open |
 
 ## Phase 4 Acceptance

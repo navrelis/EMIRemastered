@@ -67,3 +67,6 @@
 2026-10-19 | P8 review (lead) | providers emiprofessions:trades + emiffect:effects accepted (lazy index per reload, food effects left to stats); follow-up sent: ItemInfoProvider.coveredCategories so recipes provider drops duplicate rows, module-off check, docs rows
 2026-10-19 | P8 follow-up review (lead) | accepted: coveredCategories(EmiStack) (stack-aware so lectern keeps its row), recipes provider filters once per page, module gates, docs rows; merged, build green
 2026-10-19 | B2 review (lead) | accepted: world module (pos 12), server data on SERVER_STARTED + per reloadable-registries cache, loot lookup on daemon with 25 s deadline, batched payload canSend-guarded, reuses BiomeEmiStack, StructureEmiStack; merged, build green
+2026-10-19 | Q3 bench review (lead) | accepted: pack bench warm total 5761->2445 ms (pooled -40%), emi plugin -49..66%, join -21%, heap -60 MB (KB12), alloc/reload -37%; stable dump sections identical stock/after/stock-control; KB2 invalidator first; repair check ok; correction: priority boost opt-in only
+2026-10-19 | Q3 merged (lead) | EmiTagKey conflict resolved by agent (concurrent cache + listVersion, no recursive computeIfAbsent); repair check after FX2: 0 remainder errors; merged, build green (301 tests)
+2026-10-19 | DOC1 delegated (Sonnet short): KNOWN_BUGS rows + DEVTOUR tour list
