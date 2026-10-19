@@ -32,14 +32,22 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "dev.emi.emi.platform.fabric.EmiMainFabric"
+      "dev.emi.emi.platform.fabric.EmiMainFabric",
+      "dev.emi.remastered.EmiRemasteredMain"
     ],
     "client": [
-      "dev.emi.emi.platform.fabric.EmiClientFabric"
+      "dev.emi.emi.platform.fabric.EmiClientFabric",
+      "dev.emi.remastered.EmiRemasteredClient"
     ],
     "server": [],
     "emi": [
-      "dev.emi.emi.VanillaPlugin"
+      "dev.emi.emi.VanillaPlugin",
+      "dev.emi.remastered.loot.LootEmiPlugin",
+      "dev.emi.remastered.ores.OresEmiPlugin",
+      "dev.emi.remastered.effects.EffectsEmiPlugin",
+      "dev.emi.remastered.enchanting.EnchantingEmiPlugin",
+      "dev.emi.remastered.professions.ProfessionsEmiPlugin",
+      "dev.emi.remastered.letsdo.LetsDoEmiPlugin"
     ],
     "modmenu": [
       "dev.emi.emi.compat.EmiModMenu"
@@ -55,7 +63,14 @@
   },
   "mixins": [
     "emi.mixins.json",
-    "emi-fabric.mixins.json"
+    "emi-fabric.mixins.json",
+    "emi_remastered_loot.mixins.json",
+    "emi_remastered_ores.mixins.json",
+    "emi_remastered_effects.mixins.json",
+    "emi_remastered_enchanting.mixins.json",
+    "emi_remastered_professions.mixins.json",
+    "emi_remastered_letsdo.mixins.json",
+    "emi_remastered_distraction_free.mixins.json"
   ],
   "accessWidener": "emi.accesswidener",
   "provides": [

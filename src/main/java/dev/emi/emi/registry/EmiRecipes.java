@@ -128,6 +128,11 @@ public class EmiRecipes {
 		recipes.add(recipe);
 	}
 
+	// EMI Remastered: recipes registered so far in this reload (plugin manager statistics)
+	public static int getRecipeCount() {
+		return recipes.size();
+	}
+
 	private static synchronized void setWorker(Worker worker) {
 		activeWorker = worker;
 		if (worker != null) {

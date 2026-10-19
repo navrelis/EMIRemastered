@@ -792,5 +792,20 @@
   "tag.item.fabric.shovels": "Shovels",
   "tag.item.fabric.hoes": "Hoes",
   "tag.item.fabric.swords": "Swords",
-  "tag.item.fabric.shears": "Shears"
+  "tag.item.fabric.shears": "Shears",
+  "config.emi.group.modules": "Modules",
+  "config.emi.modules.loot": "Loot (EMI Loot)",
+  "config.emi.tooltip.modules.loot": "Shows chest, block, mob, gameplay and archaeology loot.",
+  "config.emi.modules.ores": "Ores (EMI Ores)",
+  "config.emi.tooltip.modules.ores": "Shows in which biomes and at which heights ores and geodes generate.",
+  "config.emi.modules.effects": "Effects (EMIffect)",
+  "config.emi.tooltip.modules.effects": "Shows status effects with their description and sources.",
+  "config.emi.modules.enchanting": "Enchanting (EMI Enchanting)",
+  "config.emi.tooltip.modules.enchanting": "Shows enchantments with their maximum level, incompatibilities and the items they apply to.",
+  "config.emi.modules.professions": "Professions (EMI Professions)",
+  "config.emi.tooltip.modules.professions": "Shows villager professions with their workstations and trades.",
+  "config.emi.modules.letsdo": "Let's Do (Let's Do EMI Compat)",
+  "config.emi.tooltip.modules.letsdo": "Shows recipes of the Let's Do mods (Vinery, Meadow, Bakery, ...).",
+  "config.emi.modules.distraction_free": "Distraction-Free Recipes",
+  "config.emi.tooltip.modules.distraction_free": "Hides EMI's index until you search for something."
 }

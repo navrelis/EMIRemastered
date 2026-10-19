@@ -3,6 +3,7 @@ package dev.emi.emi.screen;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -48,6 +49,8 @@ import dev.emi.emi.screen.widget.config.SidebarPagesWidget;
 import dev.emi.emi.screen.widget.config.SidebarSubpanelsWidget;
 import dev.emi.emi.screen.widget.config.SubGroupNameWidget;
 import dev.emi.emi.search.EmiSearch;
+import dev.emi.remastered.config.ModuleConfigs;
+import dev.emi.remastered.config.screen.RemasteredConfigScreens;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -71,11 +74,14 @@ public class ConfigScreen extends Screen {
 	public int lastModifier;
 	public String originalConfig;
 	public ButtonWidget resetButton;
+	// EMI Remastered: module switches when the screen opened (reload on close if one changed)
+	private final Map<String, Boolean> moduleSwitches;
 
 	public ConfigScreen(Screen last) {
 		super(EmiPort.translatable("screen.emi.config"));
 		this.last = last;
 		originalConfig = EmiConfig.getSavedConfig();
+		moduleSwitches = ModuleConfigs.snapshotSwitches();
 	}
 
 	public void setActiveBind(EmiBind bind, int offset) {
@@ -89,6 +95,7 @@ public class ConfigScreen extends Screen {
 	public void close() {
 		EmiConfig.writeConfig();
 		EmiSearch.update();
+		RemasteredConfigScreens.onConfigClosed(moduleSwitches); // EMI Remastered
 		MinecraftClient.getInstance().setScreen(last);
 	}
 
@@ -108,9 +115,9 @@ public class ConfigScreen extends Screen {
 			text = null;
 		}
 		if (text == null) {
-			return List.of();
+			text = List.of();
 		}
-		return text;
+		return RemasteredConfigScreens.decorateTooltip(field, text); // EMI Remastered: module switch notes
 	}
 
 	@Override
@@ -148,10 +155,14 @@ public class ConfigScreen extends Screen {
 		this.addDrawableChild(EmiPort.newButton(x + w / 2 + 2, height - 30, w / 2 - 2, 20, EmiPort.translatable("gui.done"), button -> {
 			this.close();
 		}));
-		this.addDrawableChild(EmiPort.newButton(x + w / 2 + 2, height - 52, w / 2 - 24, 20, EmiPort.translatable("screen.emi.presets"), button -> {
+		// EMI Remastered: presets and plugin manager share the place of the presets button
+		int presetsWidth = (w / 2 - 26) / 2;
+		this.addDrawableChild(EmiPort.newButton(x + w / 2 + 2, height - 52, presetsWidth, 20, EmiPort.translatable("screen.emi.presets"), button -> {
 			MinecraftClient client = MinecraftClient.getInstance();
 			client.setScreen(new ConfigPresetScreen(this));
 		}));
+		this.addDrawableChild(RemasteredConfigScreens.createPluginsButton(x + w / 2 + 4 + presetsWidth, height - 52,
+			w / 2 - 26 - presetsWidth, this));
 		this.addDrawableChild(new SizedButtonWidget(x + w - 20, height - 52, 20, 20, 164, 0, () -> true, widget -> {
 			EmiConfig.setGlobalState(!EmiConfig.useGlobalConfig);
 			ConfigScreen.this.resize(client, width, height);
@@ -169,7 +180,7 @@ public class ConfigScreen extends Screen {
 			ConfigGroup currentGroup = null;
 			SubGroupNameWidget currentSubGroupWidget = null;
 			Supplier<String> searchSupplier = () -> search.getSearch();
-			for (Field field : EmiConfig.class.getFields()) {
+			for (Field field : RemasteredConfigScreens.getScreenFields()) { // EMI Remastered: + module config classes
 				ConfigValue annot = field.getAnnotation(ConfigValue.class);
 				if (annot != null) {
 					String group = annot.value().split("\\.")[0];
@@ -243,6 +254,9 @@ public class ConfigScreen extends Screen {
 						entry = new IntGroupWidget(translation, getFieldTooltip(field), searchSupplier, objectMutator(field));
 					} else if (ConfigEnum.class.isAssignableFrom(field.getType())) {
 						entry = new EnumWidget(translation, getFieldTooltip(field), searchSupplier, objectMutator(field), (Predicate<ConfigEnum>) predicate);
+					} else {
+						// EMI Remastered: double and String settings
+						entry = RemasteredConfigScreens.createExtraWidget(this, field, translation, getFieldTooltip(field), searchSupplier);
 					}
 					boolean endGroup = field.getAnnotation(ConfigGroupEnd.class) != null;
 					if (entry != null) {
@@ -282,6 +296,8 @@ public class ConfigScreen extends Screen {
 			"binds", "binds.crafts", "binds.cheats",
 			"dev"
 		);
+		// EMI Remastered: module groups below EMI's own ("modules", then one indented jump per module group)
+		List<String> moduleJumps = RemasteredConfigScreens.getJumpTargets(list);
 		List<List<String>> removes = List.of(
 			List.of("binds.cheats"),
 			List.of("general.search"),
@@ -290,12 +306,15 @@ public class ConfigScreen extends Screen {
 			List.of("ui.left-sidebar", "ui.right-sidebar")
 		);
 		int space = list.getLogicalHeight() - 10;
+		if ((jumps.size() + moduleJumps.size()) * 16 > space) {
+			RemasteredConfigScreens.trimJumpTargets(moduleJumps); // EMI Remastered
+		}
 		for (List<String> r : removes) {
-			if (jumps.size() * 16 > space) {
+			if ((jumps.size() + moduleJumps.size()) * 16 > space) {
 				jumps.removeAll(r);
 			}
 		}
-		int y = 40 + (list.getLogicalHeight() - jumps.size() * 16) / 2;
+		int y = 40 + (list.getLogicalHeight() - (jumps.size() + moduleJumps.size()) * 16) / 2;
 		int u = 0, v = -16;
 		for (String s : jumps) {
 			boolean newGroup = !s.contains(".");
@@ -310,6 +329,7 @@ public class ConfigScreen extends Screen {
 				List.of(EmiPort.translatable("config.emi.group." + s.replace('-', '_')))));
 			y += 16;
 		}
+		RemasteredConfigScreens.addJumpButtons(moduleJumps, y, this::jump, b -> this.addDrawableChild(b)); // EMI Remastered
 	}
 
 	public void jump(String jump) {
