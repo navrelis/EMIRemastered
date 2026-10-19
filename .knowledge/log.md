@@ -93,3 +93,5 @@
 2026-10-19 | KB7 review (lead) | accepted: invs apart from remainders, usedRemainder per node (accumulated over tag stacks), countRecipes adds it; activator rail before 2/2 after 3/3; merged, build green; credit aMelonRind/emi (MIT) in DOC3
 2026-10-19 | DOC3 delegated (Sonnet short): TOUR_REPORT/KNOWN_BUGS statuses, CREDITS (aMelonRind), CHANGELOG session 5, DEVTOUR kb7
 2026-10-19 | DOC3 review (lead) | accepted: Status column in TOUR_REPORT, KB7/KB43 fixed, KB44 closed not reproducible, counts recomputed, CREDITS + CHANGELOG; merged
+2026-10-19 | owner decision Phase 4: swap after owner closes the game, owner launches, lead checks the log
+2026-10-19 | auto-handoff: T2 stopped after its tour runs (report not written); see F:\Coding\EMI_Remastered\handoff-2026-10-19-2db405d6.md
