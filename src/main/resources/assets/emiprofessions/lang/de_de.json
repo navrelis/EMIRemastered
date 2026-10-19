@@ -18,5 +18,14 @@
   "config.emi.professions.show_trades": "Dorfbewohner-Handel anzeigen",
   "config.emi.tooltip.professions.show_trades": "Zeigt die Angebote jedes Dorfbewohner-Berufs und des Fahrenden Händlers als Rezepte.\nBenötigt ein EMI-Neuladen.",
   "config.emi.professions.trade_rolls": "Würfe pro Handelsfabrik",
-  "config.emi.tooltip.professions.trade_rolls": "Wie oft jede Handelsfabrik gewürfelt wird, um die Varianten zufälliger Angebote wie verzauberter Bücher zu finden (1 bis 64).\nBenötigt ein EMI-Neuladen."
+  "config.emi.tooltip.professions.trade_rolls": "Wie oft jede Handelsfabrik gewürfelt wird, um die Varianten zufälliger Angebote wie verzauberter Bücher zu finden (1 bis 64).\nBenötigt ein EMI-Neuladen.",
+  "emiprofessions.info.sold": "Von Dorfbewohnern verkauft (%s)",
+  "emiprofessions.info.bought": "Von Dorfbewohnern gekauft (%s)",
+  "emiprofessions.info.levels": "Stufen: %s",
+  "emiprofessions.info.together": "Zusammen mit: %1$s x %2$s",
+  "emiprofessions.info.all": "Alle %s Angebote anzeigen",
+  "config.emi.professions.item_info": "Handel in der Gegenstandsinfo",
+  "config.emi.tooltip.professions.item_info": "Fügt der Gegenstandsinfo eines Gegenstands die Angebote von Dorfbewohnern und Fahrendem Händler hinzu, die ihn verkaufen oder kaufen (Beruf, Stufe und Preis).\nBenötigt den Dorfbewohner-Handel von oben. Bereits geöffnete Seiten werden nach einem EMI-Neuladen aktualisiert.",
+  "emiprofessions.info.earned": "Von Dorfbewohnern erhalten (%s)",
+  "emiprofessions.info.spent": "Bei Dorfbewohnern ausgegeben (%s)"
 }

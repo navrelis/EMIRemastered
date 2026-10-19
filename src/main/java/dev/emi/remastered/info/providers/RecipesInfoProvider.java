@@ -21,8 +21,11 @@ import dev.emi.remastered.info.api.InfoCollector;
 import dev.emi.remastered.info.api.InfoLink;
 import dev.emi.remastered.info.api.InfoSection;
 import dev.emi.remastered.info.api.ItemInfoProvider;
+import dev.emi.remastered.info.api.ItemInfoRegistry;
+import dev.emi.remastered.info.client.InfoService;
 import dev.emi.remastered.info.core.CategoryGrouping;
 import dev.emi.remastered.info.core.CategoryGrouping.Group;
+import dev.emi.remastered.info.core.CoveredCategories;
 import net.minecraft.item.Items;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -69,13 +72,14 @@ public final class RecipesInfoProvider implements ItemInfoProvider {
 	@Override
 	public void collect(EmiStack stack, InfoCollector collector) {
 		EmiRecipeManager manager = EmiApi.getRecipeManager();
+		Set<Identifier> covered = coveredByOthers(stack);
 		List<EmiRecipe> infoPages = new ArrayList<>();
 
 		List<EmiRecipe> produced = new ArrayList<>();
 		for (EmiRecipe recipe : manager.getRecipesByOutput(stack)) {
 			if (recipe.getCategory() == VanillaEmiRecipeCategories.INFO) {
 				infoPages.add(recipe);
-			} else if (produces(recipe, stack)) {
+			} else if (produces(recipe, stack) && !covered.contains(recipe.getCategory().getId())) {
 				produced.add(recipe);
 			}
 		}
@@ -108,7 +112,7 @@ public final class RecipesInfoProvider implements ItemInfoProvider {
 				if (!infoPages.contains(recipe)) {
 					infoPages.add(recipe);
 				}
-			} else if (uses(recipe, stack)) {
+			} else if (uses(recipe, stack) && !covered.contains(recipe.getCategory().getId())) {
 				used.add(recipe);
 			}
 		}
@@ -160,6 +164,15 @@ public final class RecipesInfoProvider implements ItemInfoProvider {
 				: EmiPort.translatable("emi_info.tags.open");
 			section.link(more, InfoLink.usesOf(stack, VanillaPlugin.TAG));
 		}
+	}
+
+	/**
+	 * Categories that other active providers list themselves for this stack (computed once per page build): their
+	 * rows are left out here so the page does not show the same recipes twice.
+	 */
+	private Set<Identifier> coveredByOthers(EmiStack stack) {
+		return CoveredCategories.compute(ItemInfoRegistry.getProviders(),
+			p -> p != this && InfoService.isModuleOn(p) && p.appliesTo(stack), p -> p.coveredCategories(stack));
 	}
 
 	private static boolean produces(EmiRecipe recipe, EmiStack stack) {

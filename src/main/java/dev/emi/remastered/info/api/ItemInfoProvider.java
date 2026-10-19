@@ -1,5 +1,7 @@
 package dev.emi.remastered.info.api;
 
+import java.util.Set;
+
 import org.jetbrains.annotations.Nullable;
 
 import dev.emi.emi.api.stack.EmiStack;
@@ -46,6 +48,17 @@ public interface ItemInfoProvider {
 	/** Cheap pre-check without recipe lookups; {@link #collect} is only called when this returns true. */
 	default boolean appliesTo(EmiStack stack) {
 		return true;
+	}
+
+	/**
+	 * Ids of EMI recipe categories whose recipes this provider already lists for {@code stack}, so the built-in recipe
+	 * provider leaves their rows ("Produced by", "Used in") out and the page does not show the same recipes twice.
+	 * Only declare a category while this provider really shows that data for the stack: return an empty set when its
+	 * setting is off or it has nothing for the stack, so the built-in row stays. The set is asked once per page build
+	 * and only of providers that are active (module on, {@link #appliesTo} true); keep it cheap.
+	 */
+	default Set<Identifier> coveredCategories(EmiStack stack) {
+		return Set.of();
 	}
 
 	/**
