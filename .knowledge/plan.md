@@ -1,6 +1,6 @@
 # Plan
 
-Usage tally (work units: short = 1, long = 2): Opus 12 (F1, F2, Q3 x2, A1 x2) / Sonnet 37 -> Opus 24 %
+Usage tally (work units: short = 1, long = 2): Opus 12 (F1, F2, Q3 x2, A1 x2) / Sonnet 40 -> Opus 23 %
 
 Status: open / in progress / in review / done. `||` = can run in parallel.
 
@@ -18,7 +18,7 @@ Status: open / in progress / in review / done. `||` = can run in parallel.
 | P2 | EMIffect -> `effects` | Sonnet short | in progress (wave 1, continued in its worktree) |
 | P3 | EMI Professions -> `professions` | Sonnet short | done |
 | P4 | EMI Enchanting -> `enchanting` | Sonnet short | in progress (wave 1, continued in its worktree) |
-| P5 | EMI Ores -> `ores` (LGPL headers kept) | Sonnet long | in progress (wave 1, continued in its worktree) |
+| P5 | EMI Ores -> `ores` (LGPL headers kept) | Sonnet long | done |
 | P6 | Let's Do compat -> `letsdo` (Vinery/Meadow fixes, no Architectury, dedupe native) | Sonnet long | in progress (wave 1, wip/p6-letsdo) |
 | P7 | EMI Loot -> `loot` (fzzy_config -> EMI config, Fabric networking, AW merge) | Sonnet long | in progress (wave 1, continued in its worktree) |
 
@@ -44,8 +44,8 @@ Status: open / in progress / in review / done. `||` = can run in parallel.
 | A11 | Unified config + plugin manager (in F2) | F2 | Opus | done |
 | A12 | Reload performance (Q3) | - | Opus | in progress (Q3) |
 | B2 | `world` module: biome pages (climate, tags, spawns, ores) + structure pages (server sync) | P5, A7 | Sonnet long | open |
-| B3 | Tag browser screen (all tags, search, members) | F2 | Sonnet | open |
-| B4 | Copy recipe as text/JSON bind | F2 | Sonnet short | open |
+| B3 | Tag browser screen (all tags, search, members) | F2 | Sonnet | in progress (module `tools`, wip/b-tools) |
+| B4 | Copy recipe as text/JSON bind | F2 | Sonnet short | in progress (with B3) |
 | B5 | Advancement links in item info (icon/display) | A1 | Sonnet short | open |
 | X1 | Pack-dev export command `/emi export` (recipes, loot, sources to JSON/CSV) | A1 | Sonnet | open |
 | X2 | Let's Do port fixes + dedupe (P6) | Y0 | Sonnet long | open |
