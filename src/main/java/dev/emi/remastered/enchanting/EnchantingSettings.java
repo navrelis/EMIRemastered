@@ -20,7 +20,7 @@ public final class EnchantingSettings {
 	public static boolean showForItems = true;
 
 	@Comment("The most enchanted book levels listed per enchantment. Enchantments with a higher maximum level "
-		+ "list levels up to this number and the maximum level. Books of any other level still open the info page.")
+		+ "list levels up to this number and the maximum level.")
 	@ConfigValue("enchanting.book-level-limit")
 	public static int bookLevelLimit = 10;
 

@@ -3,13 +3,10 @@
   "minVersion": "0.8",
   "package": "dev.emi.remastered.enchanting.mixin",
   "compatibilityLevel": "JAVA_21",
+  "mixins": [],
+  "client": [],
+  "server": [],
   "injectors": {
     "defaultRequire": 1
-  },
-  "mixins": [],
-  "client": [
-    "EnchantmentThrowMixin",
-    "EmiApiMixin"
-  ],
-  "server": []
+  }
 }

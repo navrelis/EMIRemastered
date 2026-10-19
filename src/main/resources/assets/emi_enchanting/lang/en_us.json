@@ -23,5 +23,5 @@
   "config.emi.enchanting.show_for_items": "Show for Items",
   "config.emi.tooltip.enchanting.show_for_items": "Whether looking up the uses of an item that can be enchanted lists the info pages of its enchantments.",
   "config.emi.enchanting.book_level_limit": "Book Level Limit",
-  "config.emi.tooltip.enchanting.book_level_limit": "The most enchanted book levels listed per enchantment. Enchantments with a higher maximum level list levels up to this number and the maximum level. Books of any other level still open the info page."
+  "config.emi.tooltip.enchanting.book_level_limit": "The most enchanted book levels listed per enchantment. Enchantments with a higher maximum level list levels up to this number and the maximum level."
 }
