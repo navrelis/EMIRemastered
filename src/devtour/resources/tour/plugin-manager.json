@@ -1,0 +1,61 @@
+{
+  "description": "Plugin Manager (EMI config screen -> Plugins): list, tooltips, toggles, reload on close, Enable All; always restores the enabled state.",
+  "warmupTicks": 60,
+  "settleTicks": 10,
+  "steps": [
+    { "type": "resize", "w": 1280, "h": 720 },
+    { "type": "set_gui_scale", "n": 2 },
+    { "type": "open_emi_config" },
+    { "type": "screenshot", "name": "config-with-plugins-button" },
+    { "type": "click", "key": "screen.emi_remastered.plugins.button" },
+    { "type": "hover", "x": 630, "y": 5 },
+    { "type": "screenshot", "name": "plugin-manager" },
+    { "type": "screen_info" },
+
+    { "type": "hover", "x": 300, "y": 54 },
+    { "type": "screenshot", "name": "tooltip-emi-core" },
+    { "type": "hover", "x": 300, "y": 78 },
+    { "type": "screenshot", "name": "tooltip-emi-loot" },
+    { "type": "hover", "x": 280, "y": 174 },
+    { "type": "screenshot", "name": "tooltip-last-plugin" },
+    { "type": "hover", "x": 630, "y": 5 },
+
+    { "type": "plugin_toggle", "id": "emi_ores", "state": "off" },
+    { "type": "plugin_toggle", "id": "emiffect", "state": "off" },
+    { "type": "screenshot", "name": "two-switched-off" },
+    { "type": "hover", "x": 300, "y": 102 },
+    { "type": "screenshot", "name": "tooltip-pending" },
+    { "type": "hover", "x": 630, "y": 5 },
+
+    { "type": "scroll", "amount": -3 },
+    { "type": "screenshot", "name": "scrolled" },
+    { "type": "scroll", "amount": 3 },
+
+    { "type": "screen_close" },
+    { "type": "emi_wait_loaded" },
+    { "type": "screenshot", "name": "back-in-config-after-reload" },
+    { "type": "click", "key": "screen.emi_remastered.plugins.button" },
+    { "type": "screenshot", "name": "plugin-manager-after-reload" },
+    { "type": "hover", "x": 300, "y": 102 },
+    { "type": "screenshot", "name": "tooltip-disabled" },
+    { "type": "hover", "x": 630, "y": 5 },
+
+    { "type": "click", "text": "Enable All" },
+    { "type": "screenshot", "name": "enable-all" },
+    { "type": "screen_close" },
+    { "type": "emi_wait_loaded" },
+    { "type": "click", "key": "screen.emi_remastered.plugins.button" },
+    { "type": "screenshot", "name": "plugin-manager-restored" },
+
+    { "type": "resize", "w": 854, "h": 480 },
+    { "type": "wait", "ticks": 10 },
+    { "type": "screenshot", "name": "small-window" },
+    { "type": "resize", "w": 1280, "h": 720 },
+    { "type": "set_gui_scale", "n": 3 },
+    { "type": "wait", "ticks": 10 },
+    { "type": "screenshot", "name": "scale-3" },
+    { "type": "set_gui_scale", "n": 2 },
+    { "type": "screen_close" },
+    { "type": "screen_close" }
+  ]
+}

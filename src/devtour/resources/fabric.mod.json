@@ -3,12 +3,15 @@
   "id": "emi_devtour",
   "version": "${version}",
   "name": "EMI Dev Tour",
-  "description": "Dev-only automated screenshot tour for EMI Remastered. Only on the classpath of the clientTour run config, never shipped.",
+  "description": "Dev-only helpers for EMI Remastered dev clients (no cursor capture, no focus steal, optional screenshot tour). Only on the classpath of the dev client run configs, never shipped.",
   "authors": [
     "navrelis"
   ],
   "license": "MIT",
   "environment": "client",
+  "mixins": [
+    "emi_devtour.mixins.json"
+  ],
   "entrypoints": {
     "client": [
       "dev.emi.remastered.devtour.TourMod"
