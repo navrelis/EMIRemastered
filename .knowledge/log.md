@@ -32,3 +32,7 @@
 2026-10-19 | A8 loot extras (Sonnet), A9 ores extras + sync marker (Sonnet), A7 mobs module (Sonnet, long) | delegated, own worktrees from c7cf633
 2026-10-19 | P1+A10 review (lead) | accepted: upstream behaviour, no mixins, marked edits in EmiScreenManager (isVisible delegates to new isBaseVisible + DF hiding, same as upstream mixin; no signature changes) and EmiSearchWidget; module off = stock; merged, build+tests green. Manual: real clicks on Show/Hide buttons, crafting-table scope
 2026-10-19 | owner: dev clients grab his mouse -> all agents told: no OS input, no client launches until no-grab fix lands (Q1b, urgent)
+2026-10-19 | P4 review (lead) | accepted: dynamic-registry enchantments, porter's EmiApi mixin dropped (no mixins into EMI); merged, build green. Lost extra: show-recipes on multi-enchant books (needs EMI hook, optional)
+2026-10-19 | A4 review (lead) | accepted: 485 villager + 70 wanderer trades, per-factory try/catch, SellMap accessor placeholder, Villager API reflection isolated (untested live); also fixed P3 recipe ids (26 EMI errors gone); merged
+2026-10-19 | P6 review (lead) | accepted: sub-modules loaded by name after isModLoaded, LinkageError caught per sub-module, dedupe vs native vinery/bakery/farm_and_charm plugins, tested with real pack jars in run/mods; merged, build+tests green
+2026-10-19 | B3+B4 (Sonnet) | code done, build green; client checks pending (no-client rule); default binds T / Ctrl+C to be checked against text fields
