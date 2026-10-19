@@ -64,7 +64,7 @@ public class EmiStackList {
 		keyIndices.clear();
 	}
 
-	public static void reload() {
+	public static void reload() { long perfT0 = System.nanoTime(); try { perf$reload(); } finally { dev.emi.emi.runtime.EmiLog.info("PERF EmiStackList.reload " + (System.nanoTime() - perfT0) / 1000000 + "ms"); } } private static void perf$reload() { // PERF-TMP-WRAP public static void reload() {
 		MinecraftClient client = MinecraftClient.getInstance();
 		ItemGroup.DisplayContext context = new ItemGroup.DisplayContext(client.player.networkHandler.getEnabledFeatures(), false, client.world.getRegistryManager());
 		List<IndexGroup> groups = Lists.newArrayList();
@@ -184,7 +184,7 @@ public class EmiStackList {
 		return false;
 	}
 
-	public static void bake() {
+	public static void bake() { long perfT0 = System.nanoTime(); try { perf$bake(); } finally { dev.emi.emi.runtime.EmiLog.info("PERF EmiStackList.bake " + (System.nanoTime() - perfT0) / 1000000 + "ms"); } } private static void perf$bake() { // PERF-TMP-WRAP public static void bake() {
 		stacks.removeIf(s -> {
 			try {
 				if (s.isEmpty()) {

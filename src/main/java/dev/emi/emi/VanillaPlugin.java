@@ -340,6 +340,7 @@ public class VanillaPlugin implements EmiPlugin {
 
 		List<Item> dyeableItems = EmiTagKey.of(ItemTags.DYEABLE).getList();
 
+		long perfT = System.nanoTime(); // PERF-TMP
 		for (CraftingRecipe recipe : getRecipes(registry, RecipeType.CRAFTING)) {
 			Identifier id = EmiPort.getId(recipe);
 			if (recipe instanceof MapExtendingRecipe map) {
@@ -435,6 +436,7 @@ public class VanillaPlugin implements EmiPlugin {
 			}
 		}
 
+		EmiLog.info("PERF vanilla.crafting " + (System.nanoTime() - perfT) / 1000000 + "ms"); perfT = System.nanoTime(); // PERF-TMP
 		for (SmeltingRecipe recipe : getRecipes(registry, RecipeType.SMELTING)) {
 			addRecipeSafe(registry, () -> new EmiCookingRecipe(recipe, SMELTING, 1, false), recipe);
 		}
@@ -462,17 +464,21 @@ public class VanillaPlugin implements EmiPlugin {
 			addRecipeSafe(registry, () -> new EmiStonecuttingRecipe(recipe), recipe);
 		}
 
+		EmiLog.info("PERF vanilla.cooking+smithing+stonecutting " + (System.nanoTime() - perfT) / 1000000 + "ms"); perfT = System.nanoTime(); // PERF-TMP
 		safely("repair", () -> addRepair(registry, hiddenItems));
+		EmiLog.info("PERF vanilla.repair " + (System.nanoTime() - perfT) / 1000000 + "ms"); perfT = System.nanoTime(); // PERF-TMP
 		safely("brewing", () -> EmiAgnos.addBrewingRecipes(registry));
 		safely("world interaction", () -> addWorldInteraction(registry, hiddenItems, dyeableItems));
 		safely("fuel", () -> addFuel(registry, hiddenItems));
 		safely("composting", () -> addComposting(registry, hiddenItems));
 
+		EmiLog.info("PERF vanilla.brewing+world+fuel+compost " + (System.nanoTime() - perfT) / 1000000 + "ms"); perfT = System.nanoTime(); // PERF-TMP
 		for (EmiTagKey<?> key : EmiTags.TAGS) {
 			if (new TagEmiIngredient(key.raw(), 1).getEmiStacks().size() > 1) {
 				addRecipeSafe(registry, () -> new EmiTagRecipe(key.raw()));
 			}
 		}
+		EmiLog.info("PERF vanilla.tagrecipes " + (System.nanoTime() - perfT) / 1000000 + "ms"); // PERF-TMP
 	}
 
 	private static void addRepair(EmiRegistry registry, Set<Item> hiddenItems) {
