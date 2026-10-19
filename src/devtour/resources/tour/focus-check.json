@@ -1,5 +1,5 @@
 {
-  "description": "Checks that the dev client neither takes the OS focus nor locks the cursor, and that screenshots render unfocused.",
+  "description": "Checks that the dev client window is hidden (default) or at least unfocused (-PdevtourVisible=true), the cursor is never locked, and that screenshots render with the hidden window, also after resizes.",
   "warmupTicks": 40,
   "steps": [
     { "type": "window_info" },
@@ -9,6 +9,16 @@
     { "type": "close_screen" },
     { "type": "wait", "ticks": 20 },
     { "type": "window_info" },
-    { "type": "screenshot", "name": "world-unfocused" }
+    { "type": "screenshot", "name": "world-unfocused" },
+    { "type": "resize", "w": 1280, "h": 720 },
+    { "type": "window_info" },
+    { "type": "open_inventory" },
+    { "type": "screenshot", "name": "inventory-1280x720" },
+    { "type": "resize", "w": 1920, "h": 1080 },
+    { "type": "window_info" },
+    { "type": "screenshot", "name": "inventory-1920x1080" },
+    { "type": "close_screen" },
+    { "type": "wait", "ticks": 10 },
+    { "type": "window_info" }
   ]
 }
