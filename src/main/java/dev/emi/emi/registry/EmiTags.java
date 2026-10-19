@@ -1,6 +1,8 @@
 package dev.emi.emi.registry;
 
+import java.util.BitSet;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -39,6 +41,8 @@ public class EmiTags {
 	private static final Map<EmiTagKey<?>, List<?>> TAG_VALUES = Maps.newHashMap();
 	private static final Map<Identifier, List<EmiTagKey<?>>> SORTED_TAGS = Maps.newHashMap();
 	public static final List<EmiTagKey<?>> TAGS = Lists.newArrayList();
+	// EMI Remastered: per registry, for every value the positions (in getTags order) of the tags containing it
+	private static final Map<Identifier, EmiTagIndex> TAG_INDEX = Maps.newHashMap();
 	public static TagExclusions exclusions = new TagExclusions();
 
 	@SuppressWarnings({"unchecked", "rawtypes"})
@@ -97,17 +101,36 @@ public class EmiTags {
 		} else {
 			keys = Lists.newArrayList();
 			Set<T> original = new HashSet<>(map.keySet());
-			for (EmiTagKey<T> key : getTags(registry)) {
-				List<T> values = key.getList();
-				if (values.size() < 2) {
-					continue;
+			List<EmiTagKey<T>> tags = getTags(registry);
+			// EMI Remastered: only a tag sharing a value with the stacks can pass containsAll, so test just those (in
+			// the same order) instead of every tag of the registry; falls back to the full scan if the index is stale
+			EmiTagIndex index = TAG_INDEX.get(registry.getKey().getValue());
+			if (index != null && index.isFor(tags, EmiTagKey.getListVersion())) {
+				BitSet candidates = index.candidates(original);
+				for (int i = candidates.nextSetBit(0); i >= 0; i = candidates.nextSetBit(i + 1)) {
+					EmiTagKey<T> key = tags.get(i);
+					List<T> values = key.getList();
+					if (map.keySet().containsAll(values)) {
+						values.forEach(map::remove);
+						keys.add(key);
+					}
+					if (map.isEmpty()) {
+						break;
+					}
 				}
-				if (map.keySet().containsAll(values)) {
-					values.forEach(map::remove);
-					keys.add(key);
-				}
-				if (map.isEmpty()) {
-					break;
+			} else {
+				for (EmiTagKey<T> key : tags) {
+					List<T> values = key.getList();
+					if (values.size() < 2) {
+						continue;
+					}
+					if (map.keySet().containsAll(values)) {
+						values.forEach(map::remove);
+						keys.add(key);
+					}
+					if (map.isEmpty()) {
+						break;
+					}
 				}
 			}
 			CACHED_TAGS.put((Set) original, (List) keys);
@@ -172,12 +195,13 @@ public class EmiTags {
 		*/
 	}
 	
-	public static void reload() { long perfT0 = System.nanoTime(); try { perf$reload(); } finally { dev.emi.emi.runtime.EmiLog.info("PERF EmiTags.reload " + (System.nanoTime() - perfT0) / 1000000 + "ms"); } } private static void perf$reload() { // PERF-TMP-WRAP public static void reload() {
+	public static void reload() {
 		EmiTagKey.reload();
 		TAGS.clear();
 		SORTED_TAGS.clear();
 		TAG_VALUES.clear();
 		CACHED_TAGS.clear();
+		TAG_INDEX.clear(); // EMI Remastered
 		for (Registry<?> registry : ADAPTERS_BY_REGISTRY.keySet()) {
 			reloadTags(registry);
 		}
@@ -200,11 +224,21 @@ public class EmiTags {
 				TAG_VALUES.put(key, values);
 			}
 		}
-		EmiTags.TAGS.addAll(tags.stream().sorted((a, b) -> a.id().toString().compareTo(b.id().toString())).toList());
+		// EMI Remastered: sort keys computed once per tag instead of in every comparison (same comparisons, same
+		// stable sort, so the same order); stream().count() resolved the registry entry list twice per comparison
+		Map<EmiTagKey<T>, String> names = new IdentityHashMap<>();
+		Map<EmiTagKey<T>, Long> counts = new IdentityHashMap<>();
+		for (EmiTagKey<T> key : tags) {
+			names.put(key, key.id().toString());
+			counts.put(key, key.stream().count());
+		}
+		EmiTags.TAGS.addAll(tags.stream().sorted((a, b) -> names.get(a).compareTo(names.get(b))).toList());
 		tags = tags.stream()
-			.sorted((a, b) -> Long.compare(b.stream().count(), a.stream().count()))
+			.sorted((a, b) -> Long.compare(counts.get(b), counts.get(a)))
 			.toList();
 		EmiTags.SORTED_TAGS.put(registry.getKey().getValue(), (List) tags);
+		TAG_INDEX.put(registry.getKey().getValue(), EmiTagIndex.build(tags.stream().map(EmiTagKey::getList).toList(),
+			tags, EmiTagKey.getListVersion())); // EMI Remastered
 	}
 
 	@SuppressWarnings("unchecked")

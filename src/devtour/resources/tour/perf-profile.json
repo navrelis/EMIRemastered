@@ -1,0 +1,18 @@
+{
+  "description": "EMI reload profiling (scripts/perf/run_bench.py --profile): two warm-up reloads, then 3 reloads recorded with JFR (profile settings) into reload.jfr.",
+  "warmupTicks": 100,
+  "settleTicks": 10,
+  "stepTimeoutSeconds": 900,
+  "worldJoinTimeoutSeconds": 900,
+  "timeoutSeconds": 3600,
+  "steps": [
+    { "type": "bench_record", "label": "join" },
+    { "type": "emi_reload", "label": "warmup-1" },
+    { "type": "emi_reload", "label": "warmup-2" },
+    { "type": "jfr_start" },
+    { "type": "emi_reload", "label": "profiled-1" },
+    { "type": "emi_reload", "label": "profiled-2" },
+    { "type": "emi_reload", "label": "profiled-3" },
+    { "type": "jfr_stop", "name": "reload" }
+  ]
+}

@@ -1,16 +1,17 @@
 """Generate a load-test datapack for EMI reload measurements (dev only, never shipped).
 
 The datapack adds many crafting/cooking/stonecutting/smithing recipes, many item tags
-and data-driven enchantments (which multiply EMI's anvil/grindstone recipes), plus an
-optional reload loop (a load function that runs /reload every N ticks, K times), so the
-dev client logs K+1 "Reloaded EMI in Xms" lines without any input.
+and data-driven enchantments (which multiply EMI's anvil/grindstone recipes). Datapacks
+cannot add items; the extra items come from the dev-only BenchItems initializer in
+src/devtour (config/emi_bench.properties, written by run_bench.py). Pass the same counts
+with --bench-items/--bench-tools/--bench-armor so recipes and tags use those items and the
+bench tools/armor join the vanilla enchantable tags (like modded tools do).
 
-Only vanilla item ids are used; they are read from the Minecraft jar in the Loom cache
+Vanilla item ids are read from the Minecraft jar in the Loom cache
 (data/minecraft/recipe + data/minecraft/tags/item), so every generated recipe parses.
 
 Usage (from the project root):
   py -3 scripts/perf/gen_datapack.py --out run/saves/devworld/datapacks/emi_perf.zip
-  py -3 scripts/perf/gen_datapack.py --out ... --recipes 0 --tags 0 --enchantments 0   # vanilla + loop only
 Options: see --help. Output is deterministic for a given --seed.
 """
 import argparse
@@ -106,9 +107,9 @@ def main():
     ap.add_argument("--recipes", type=int, default=50000)
     ap.add_argument("--tags", type=int, default=3000, help="number of generated item tags")
     ap.add_argument("--enchantments", type=int, default=40)
-    ap.add_argument("--reloads", type=int, default=5, help="number of automatic /reload runs after joining (0 = no loop)")
-    ap.add_argument("--interval", type=int, default=600, help="ticks between automatic reloads (600 = 30 s)")
-    ap.add_argument("--first-delay", type=int, default=600, help="ticks before the first automatic reload")
+    ap.add_argument("--bench-items", type=int, default=0, help="plain emi_bench:item_NNNNN items registered by BenchItems")
+    ap.add_argument("--bench-tools", type=int, default=0, help="emi_bench:sword_/pickaxe_NNNNN tools registered by BenchItems")
+    ap.add_argument("--bench-armor", type=int, default=0, help="emi_bench:armor_NNNNN pieces registered by BenchItems")
     ap.add_argument("--empty-stone-tool-materials", action="store_true",
                     help="also make #minecraft:stone_tool_materials empty (reproduces the repair AIOOBE in VanillaPlugin.addRepair)")
     ap.add_argument("--seed", type=int, default=1234)
@@ -119,6 +120,10 @@ def main():
     if not jar:
         sys.exit("Minecraft 1.21.1 jar not found; pass --mc-jar")
     items = collect_items(jar)
+    swords = [f"emi_bench:sword_{i:05d}" for i in range(0, a.bench_tools, 2)]
+    pickaxes = [f"emi_bench:pickaxe_{i:05d}" for i in range(1, a.bench_tools, 2)]
+    armor = [f"emi_bench:armor_{i:05d}" for i in range(a.bench_armor)]
+    items = items + [f"emi_bench:item_{i:05d}" for i in range(a.bench_items)] + swords + pickaxes + armor
     rnd = random.Random(a.seed)
 
     out = a.out
@@ -211,20 +216,28 @@ def main():
             "slots": ["any"],
         })
 
-    if a.reloads > 0:
-        fdir = os.path.join(data, NS, "function")
-        # #runs counts loads (server start + every reload); stored in the world's scoreboard,
-        # so the loop restarts only with a fresh world copy.
-        write_text(os.path.join(fdir, "load.mcfunction"),
-                   "scoreboard objectives add emi_perf dummy\n"
-                   "scoreboard players add #runs emi_perf 1\n"
-                   f"execute if score #runs emi_perf matches 1 run schedule function {NS}:reload {a.first_delay}t replace\n"
-                   f"execute if score #runs emi_perf matches 2..{a.reloads} run schedule function {NS}:reload {a.interval}t replace\n")
-        write_text(os.path.join(fdir, "reload.mcfunction"), "reload\n")
-        write_json(os.path.join(data, "minecraft", "tags", "function", "load.json"), {"values": [f"{NS}:load"]})
+    # bench tools and armor join the vanilla enchantable tags (replace: false), like modded tools do
+    def extend(tag, values):
+        if values:
+            write_json(os.path.join(data, "minecraft", "tags", "item", *tag.split("/")) + ".json", {"replace": False, "values": values})
+    slots = {"head_armor": armor[0::4], "chest_armor": armor[1::4], "leg_armor": armor[2::4], "foot_armor": armor[3::4]}
+    extend("swords", swords)
+    extend("pickaxes", pickaxes)
+    for tag, values in slots.items():
+        extend("enchantable/" + tag, values)
+    extend("enchantable/armor", armor)
+    extend("enchantable/equippable", armor)
+    extend("enchantable/sword", swords)
+    extend("enchantable/sharp_weapon", swords)
+    extend("enchantable/fire_aspect", swords)
+    extend("enchantable/weapon", swords)
+    extend("enchantable/mining", pickaxes)
+    extend("enchantable/mining_loot", pickaxes)
+    extend("enchantable/durability", swords + pickaxes + armor)
+    extend("enchantable/vanishing", swords + pickaxes + armor)
 
     flush(out)
-    print(f"items={len(items)} tags={a.tags} recipes={a.recipes} enchantments={a.enchantments} reloads={a.reloads} -> {out}")
+    print(f"items={len(items)} tags={a.tags} recipes={a.recipes} enchantments={a.enchantments} -> {out}")
 
 
 if __name__ == "__main__":

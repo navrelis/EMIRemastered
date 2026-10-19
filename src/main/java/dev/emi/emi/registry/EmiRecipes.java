@@ -1,6 +1,7 @@
 package dev.emi.emi.registry;
 
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -81,7 +82,7 @@ public class EmiRecipes {
 		}
 	}
 
-	public static void bake() { long perfT0 = System.nanoTime(); try { perf$bake(); } finally { dev.emi.emi.runtime.EmiLog.info("PERF EmiRecipes.bake " + (System.nanoTime() - perfT0) / 1000000 + "ms"); } } private static void perf$bake() { // PERF-TMP-WRAP public static void bake() {
+	public static void bake() {
 		long start = System.currentTimeMillis();
 		recipes.addAll(EmiData.recipes.stream().map(r -> r.get()).toList());
 		categories.sort((a, b) -> EmiRecipeCategoryProperties.getOrder(a) - EmiRecipeCategoryProperties.getOrder(b));
@@ -96,7 +97,6 @@ public class EmiRecipes {
 			return false;
 		});
 
-		long perfT = System.nanoTime(); // PERF-TMP
 		List<EmiRecipe> filtered = recipes.stream().filter(r -> {
 			for (Predicate<EmiRecipe> predicate : invalidators) {
 				if (predicate.test(r)) {
@@ -105,7 +105,6 @@ public class EmiRecipes {
 			}
 			return true;
 		}).toList();
-		EmiLog.info("PERF recipes.filter " + (System.nanoTime() - perfT) / 1000000 + "ms"); // PERF-TMP
 		Map<EmiRecipeCategory, List<EmiIngredient>> filteredWorkstations = Maps.newHashMap();
 		for (Map.Entry<EmiRecipeCategory, List<EmiIngredient>> entry : workstations.entrySet()) {
 			List<EmiIngredient> w = entry.getValue().stream().filter(s -> !EmiHidden.isDisabled(s)).toList();
@@ -113,9 +112,7 @@ public class EmiRecipes {
 				filteredWorkstations.put(entry.getKey(), w);
 			}
 		}
-		perfT = System.nanoTime(); // PERF-TMP
 		manager = new Manager(categories, filteredWorkstations, filtered, false);
-		EmiLog.info("PERF recipes.manager1 " + (System.nanoTime() - perfT) / 1000000 + "ms"); // PERF-TMP
 		setWorker(new Worker(categories, filteredWorkstations, filtered));
 		EmiLog.info("Baked " + recipes.size() + " recipes in " + (System.currentTimeMillis() - start) + "ms");
 	}
@@ -165,9 +162,10 @@ public class EmiRecipes {
 			this.workstations = workstations;
 			this.recipes = List.copyOf(recipes);
 	
-			long perfT = System.nanoTime(); // PERF-TMP
 			Object2IntMap<Identifier> duplicateIds = new Object2IntOpenHashMap<>();
 			Set<Identifier> incorrectIds = new ObjectArraySet<>();
+			// EMI Remastered: dev mode checked recipeIds.containsValue (a linear scan) for every recipe
+			Set<Identifier> knownIds = EmiConfig.devMode ? new HashSet<>(recipeIds.values()) : Set.of();
 			for (EmiRecipe recipe : recipes) {
 				Identifier id = recipe.getId();
 				EmiRecipeCategory category = recipe.getCategory();
@@ -191,7 +189,7 @@ public class EmiRecipes {
 						byId.put(id, recipe);
 					}
 
-					if (EmiConfig.devMode && !id.getPath().startsWith("/") && !recipeIds.containsValue(id)) {
+					if (EmiConfig.devMode && !id.getPath().startsWith("/") && !knownIds.contains(id)) {
 						incorrectIds.add(id);
 					}
 				}
@@ -206,7 +204,6 @@ public class EmiRecipes {
 				}
 			}
 	
-			EmiLog.info("PERF manager(" + doSort + ").categories+ids " + (System.nanoTime() - perfT) / 1000000 + "ms"); perfT = System.nanoTime(); // PERF-TMP
 			Map<EmiStack, Set<EmiRecipe>> byInput = new Object2ObjectOpenCustomHashMap<>(new EmiStackList.ComparisonHashStrategy());
 			Map<EmiStack, Set<EmiRecipe>> byOutput = new Object2ObjectOpenCustomHashMap<>(new EmiStackList.ComparisonHashStrategy());
 
@@ -222,19 +219,23 @@ public class EmiRecipes {
 					EmiRecipeSorter.clear();
 				}
 				byCategory.put(category, cRecipes);
+				// EMI Remastered: plain loops instead of a stream pipeline per recipe (same calls, same order)
 				for (EmiRecipe recipe : cRecipes) {
-					recipe.getInputs().stream().flatMap(i -> i.getEmiStacks().stream()).forEach(i -> {
-						byInput.computeIfAbsent(i.copy(), b -> Sets.newLinkedHashSet()).add(recipe);
-					});
-					recipe.getCatalysts().stream().flatMap(i -> i.getEmiStacks().stream()).forEach(i -> {
-						byInput.computeIfAbsent(i.copy(), b -> Sets.newLinkedHashSet()).add(recipe);
-					});
-					recipe.getOutputs().stream().forEach(i -> {
+					for (EmiIngredient ingredient : recipe.getInputs()) {
+						for (EmiStack i : ingredient.getEmiStacks()) {
+							byInput.computeIfAbsent(i.copy(), b -> Sets.newLinkedHashSet()).add(recipe);
+						}
+					}
+					for (EmiIngredient ingredient : recipe.getCatalysts()) {
+						for (EmiStack i : ingredient.getEmiStacks()) {
+							byInput.computeIfAbsent(i.copy(), b -> Sets.newLinkedHashSet()).add(recipe);
+						}
+					}
+					for (EmiStack i : recipe.getOutputs()) {
 						byOutput.computeIfAbsent(i.copy(), b -> Sets.newLinkedHashSet()).add(recipe);
-					});
+					}
 				}
 			}
-			EmiLog.info("PERF manager(" + doSort + ").sort+index " + (System.nanoTime() - perfT) / 1000000 + "ms"); perfT = System.nanoTime(); // PERF-TMP
 			for (EmiStack key : byInput.keySet()) {
 				Set<EmiRecipe> r = byInput.getOrDefault(key, null);
 				if (r != null) {
@@ -267,7 +268,6 @@ public class EmiRecipes {
 				}
 			}
 
-			EmiLog.info("PERF manager(" + doSort + ").finalize+workstations " + (System.nanoTime() - perfT) / 1000000 + "ms"); // PERF-TMP
 			if (EmiConfig.devMode) {
 				EmiDev.duplicateRecipeIds = duplicateIds.keySet();
 				EmiDev.incorrectRecipeIds = incorrectIds;

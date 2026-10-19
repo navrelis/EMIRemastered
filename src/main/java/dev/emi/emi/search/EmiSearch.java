@@ -55,7 +55,7 @@ public class EmiSearch {
 	public static SuffixArray<SearchStack> names, tooltips, mods;
 	public static SuffixArray<EmiStack> aliases;
 
-	public static void bake() { long perfT0 = System.nanoTime(); try { perf$bake(); } finally { dev.emi.emi.runtime.EmiLog.info("PERF EmiSearch.bake " + (System.nanoTime() - perfT0) / 1000000 + "ms"); } } private static void perf$bake() { // PERF-TMP-WRAP public static void bake() {
+	public static void bake() {
 		SuffixArray<SearchStack> names = new SuffixArray<>();
 		SuffixArray<SearchStack> tooltips = new SuffixArray<>();
 		SuffixArray<SearchStack> mods = new SuffixArray<>();

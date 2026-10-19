@@ -130,7 +130,7 @@ public class BoM {
 		}
 	}
 
-	public static void reload() { long perfT0 = System.nanoTime(); try { perf$reload(); } finally { dev.emi.emi.runtime.EmiLog.info("PERF BoM.reload " + (System.nanoTime() - perfT0) / 1000000 + "ms"); } } private static void perf$reload() { // PERF-TMP-WRAP public static void reload() {
+	public static void reload() {
 		defaultRecipes = defaults.bake();
 	}
 

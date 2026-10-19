@@ -1,19 +1,25 @@
-"""Run one EMI reload benchmark session in the dev client and summarise the timings.
+"""Run one EMI reload benchmark session in the (muted) dev client and store the results.
 
 What it does (project root = the folder containing gradlew):
- 1. Makes a pristine copy of the dev world once (run/saves/emi_perf_template, from run/saves/devworld
-    or run/world), moves the current run/saves/devworld aside and replaces it with a fresh copy
-    (the reload loop counter lives in the world's scoreboard). The original devworld is restored at the end.
- 2. Generates the load-test datapack (gen_datapack.py) into that world, or only the reload loop with --vanilla.
- 3. Starts `gradlew runClientWorld` (quick-plays run/saves/devworld), waits until the log shows
-    1 + --reloads "Reloaded EMI in" lines, then stops ONLY the game JVM it started
-    (matched by this project's Loom launch.cfg path on the command line).
- 4. Copies run/logs/latest.log to build/emi_perf/<label>.log and prints / stores (<label>.json) the timings.
+ 1. Keeps a pristine copy of the dev world (run/saves/emi_perf_template, made once from run/saves/devworld),
+    moves run/saves/devworld aside and replaces it with a fresh copy of the template. The original devworld
+    is restored at the end, whatever happens.
+ 2. Pack mode (default): generates the load-test datapack (gen_datapack.py) into that world and writes
+    run/config/emi_bench.properties, which makes the dev-only BenchItems initializer (src/devtour) register
+    the extra items. --vanilla: no datapack, no extra items.
+ 3. Sets EMI's dev-mode and log-untranslated-tags to false like the pack (run/config/emi.css is restored after)
+    and forces soundCategory_master:0.0 in run/options.txt (the dev client must never play sound).
+ 4. Runs `gradlew runClientTour -Ptour=perf-bench` (or perf-profile with --profile). The tour records the join
+    reload, a warm-up reload and 5 warm reloads (EmiReloadManager.reload(), the reload F3+T triggers), dumps
+    EMI's baked state and quits the game by itself.
+ 5. Copies run/tour-out/<tour>/ (bench.jsonl, dump-final/, reload.jfr) and run/logs/latest.log to
+    build/emi_perf/<label>/ and prints the summary (summarize.py).
 
 Usage:
-  py -3 scripts/perf/run_bench.py --label before            # generated datapack (50k recipes, 3k tags, 40 enchantments)
+  py -3 scripts/perf/run_bench.py --label before-pack
   py -3 scripts/perf/run_bench.py --label before-vanilla --vanilla
-  py -3 scripts/perf/summarize.py build/emi_perf/before.log  # re-parse a saved log
+  py -3 scripts/perf/run_bench.py --label prof --profile
+  py -3 scripts/perf/summarize.py build/emi_perf/before-pack build/emi_perf/after-pack
 """
 import argparse
 import os
@@ -27,12 +33,18 @@ sys.path.insert(0, HERE)
 import summarize  # noqa: E402
 
 ROOT = os.path.abspath(os.path.join(HERE, "..", ".."))
-SAVES = os.path.join(ROOT, "run", "saves")
+RUN = os.path.join(ROOT, "run")
+SAVES = os.path.join(RUN, "saves")
 WORLD = os.path.join(SAVES, "devworld")
 TEMPLATE = os.path.join(SAVES, "emi_perf_template")
 BACKUP = os.path.join(SAVES, "devworld.emiperf-backup")
-LOG = os.path.join(ROOT, "run", "logs", "latest.log")
 OUT = os.path.join(ROOT, "build", "emi_perf")
+EMI_CSS = os.path.join(RUN, "config", "emi.css")
+EMI_CSS_BACKUP = EMI_CSS + ".emiperf-backup"
+BENCH_PROPS = os.path.join(RUN, "config", "emi_bench.properties")
+
+# Pack-like load: ~100k recipes in EMI (pack: 112,836), ~12k items, 4k extra tags
+PACK = {"items": 9000, "tools": 800, "armor": 800, "recipes": 60000, "tags": 4000, "enchantments": 0}
 
 
 def ps(cmd):
@@ -40,68 +52,66 @@ def ps(cmd):
 
 
 def game_pids():
-    # Loom passes -Dfabric.dli.config=<project>/.gradle/loom-cache/launch.cfg to the game JVM
-    marker = os.path.join(ROOT, ".gradle", "loom-cache", "launch.cfg").replace("\\", "\\\\")
+    """PIDs of dev game JVMs of THIS project (Loom passes the project's launch.cfg path on the command line)."""
+    marker = os.path.join(ROOT, ".gradle", "loom-cache", "launch.cfg")
     out = ps("Get-CimInstance Win32_Process -Filter \"Name='java.exe' OR Name='javaw.exe'\" | "
-             "Where-Object { $_.CommandLine -like '*devlaunchinjector*' -and $_.CommandLine -like '*" + marker.replace("\\\\", "\\") + "*' } | "
+             "Where-Object { $_.CommandLine -like '*devlaunchinjector*' -and $_.CommandLine -like '*" + marker + "*' } | "
              "ForEach-Object { $_.ProcessId }")
     return [int(x) for x in out.split() if x.strip().isdigit()]
 
 
 def prepare_world(vanilla, gen_args):
     if not os.path.isdir(TEMPLATE):
-        src = WORLD if os.path.isfile(os.path.join(WORLD, "level.dat")) else os.path.join(ROOT, "run", "world")
-        if not os.path.isfile(os.path.join(src, "level.dat")):
-            sys.exit("No dev world found (run/saves/devworld or run/world)")
-        shutil.copytree(src, TEMPLATE, ignore=shutil.ignore_patterns("session.lock", "emi_perf*"))
+        if not os.path.isfile(os.path.join(WORLD, "level.dat")):
+            sys.exit("No dev world: run `gradlew runServer` once (see docs/DEVTOUR.md)")
+        shutil.copytree(WORLD, TEMPLATE, ignore=shutil.ignore_patterns("session.lock", "emi_perf*"))
     if os.path.isdir(WORLD) and not os.path.isdir(BACKUP):
         os.rename(WORLD, BACKUP)
     elif os.path.isdir(WORLD):
         shutil.rmtree(WORLD)
     shutil.copytree(TEMPLATE, WORLD)
-    os.makedirs(os.path.join(WORLD, "datapacks"), exist_ok=True)
-    args = [sys.executable, os.path.join(HERE, "gen_datapack.py"), "--out", os.path.join(WORLD, "datapacks", "emi_perf.zip")]
-    if vanilla:
-        args += ["--recipes", "0", "--tags", "0", "--enchantments", "0"]
-    subprocess.run(args + gen_args, check=True)
+    if not vanilla:
+        os.makedirs(os.path.join(WORLD, "datapacks"), exist_ok=True)
+        subprocess.run([sys.executable, os.path.join(HERE, "gen_datapack.py"),
+                        "--out", os.path.join(WORLD, "datapacks", "emi_perf.zip"),
+                        "--recipes", str(PACK["recipes"]), "--tags", str(PACK["tags"]),
+                        "--enchantments", str(PACK["enchantments"]), "--bench-items", str(PACK["items"]),
+                        "--bench-tools", str(PACK["tools"]), "--bench-armor", str(PACK["armor"])] + gen_args, check=True)
+        with open(BENCH_PROPS, "w", encoding="utf-8", newline="\n") as f:
+            f.write(f"items={PACK['items']}\ntools={PACK['tools']}\narmor={PACK['armor']}\n")
 
 
-def restore_world():
+def restore():
     if os.path.isdir(BACKUP):
         if os.path.isdir(WORLD):
             shutil.rmtree(WORLD)
         os.rename(BACKUP, WORLD)
+    if os.path.isfile(EMI_CSS_BACKUP):
+        shutil.copyfile(EMI_CSS_BACKUP, EMI_CSS)
+        os.remove(EMI_CSS_BACKUP)
+    if os.path.isfile(BENCH_PROPS):
+        os.remove(BENCH_PROPS)
 
 
 def ensure_muted():
     """The dev client must never play sound: force soundCategory_master:0.0 in run/options.txt before every launch."""
-    path = os.path.join(ROOT, "run", "options.txt")
+    path = os.path.join(RUN, "options.txt")
     lines = []
     if os.path.isfile(path):
         with open(path, encoding="utf-8") as f:
-            lines = [l.rstrip("
-") for l in f if not l.startswith("soundCategory_master:")]
+            lines = [l.rstrip("\n") for l in f if not l.startswith("soundCategory_master:")]
     if not any(l.startswith("onboardAccessibility:") for l in lines):
         lines.append("onboardAccessibility:false")
     if not any(l.startswith("pauseOnLostFocus:") for l in lines):
-        lines.append("pauseOnLostFocus:false")  # a paused integrated server would stop the reload loop
+        lines.append("pauseOnLostFocus:false")
     lines.append("soundCategory_master:0.0")
     os.makedirs(os.path.dirname(path), exist_ok=True)
-    with open(path, "w", encoding="utf-8", newline="
-") as f:
-        f.write("
-".join(lines) + "
-")
-
-
-EMI_CSS = os.path.join(ROOT, "run", "config", "emi.css")
-EMI_CSS_BACKUP = EMI_CSS + ".emiperf-backup"
+    with open(path, "w", encoding="utf-8", newline="\n") as f:
+        f.write("\n".join(lines) + "\n")
 
 
 def pack_like_config():
-    """Match the modpack's EMI settings that matter for timing: dev-mode false (dev mode adds an
-    O(recipes^2) id check) and log-untranslated-tags false (thousands of log lines for generated tags).
-    The original emi.css is restored after the run."""
+    """Like the pack: dev-mode false (dev mode adds an O(recipes^2) id check) and log-untranslated-tags false."""
     if not os.path.isfile(EMI_CSS):
         return
     shutil.copyfile(EMI_CSS, EMI_CSS_BACKUP)
@@ -112,70 +122,52 @@ def pack_like_config():
         f.write(text)
 
 
-def restore_config():
-    if os.path.isfile(EMI_CSS_BACKUP):
-        shutil.copyfile(EMI_CSS_BACKUP, EMI_CSS)
-        os.remove(EMI_CSS_BACKUP)
-
-
-def count(path, needle):
-    try:
-        with open(path, encoding="utf-8", errors="replace") as f:
-            return f.read().count(needle)
-    except OSError:
-        return 0
-
-
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--label", required=True)
-    ap.add_argument("--vanilla", action="store_true", help="no generated content, only the reload loop")
-    ap.add_argument("--reloads", type=int, default=5)
-    ap.add_argument("--dev-config", action="store_true", help="keep run/config/emi.css as is (default: dev-mode and tag logging off, like the pack)")
-    ap.add_argument("--timeout", type=int, default=1500, help="seconds")
-    ap.add_argument("gen_args", nargs="*", help="extra args for gen_datapack.py (after --)")
+    ap.add_argument("--vanilla", action="store_true", help="no generated datapack and no extra items")
+    ap.add_argument("--profile", action="store_true", help="run the perf-profile tour (JFR of 3 warm reloads)")
+    ap.add_argument("--timeout", type=int, default=3600, help="seconds")
+    ap.add_argument("gen_args", nargs="*", help="extra args for gen_datapack.py (after --), e.g. --empty-stone-tool-materials")
     a = ap.parse_args()
-    os.makedirs(OUT, exist_ok=True)
+    tour = "perf-profile" if a.profile else "perf-bench"
+    dest = os.path.join(OUT, a.label)
+    if os.path.isdir(dest):
+        sys.exit(dest + " exists")
     if game_pids():
         sys.exit("A dev client of this project is already running")
-    prepare_world(a.vanilla, ["--reloads", str(a.reloads)] + a.gen_args)
-    ensure_muted()
-    if not a.dev_config:
-        pack_like_config()
-    start = time.time()
-    gradle_log = open(os.path.join(OUT, a.label + ".gradle.txt"), "w")
-    proc = subprocess.Popen([os.path.join(ROOT, "gradlew.bat"), "runClientWorld", "--console=plain"], cwd=ROOT,
-                            stdout=gradle_log, stderr=subprocess.STDOUT)
-    want = a.reloads + 1
+    os.makedirs(OUT, exist_ok=True)
+    gradle_log_path = os.path.join(OUT, a.label + ".gradle.txt")
     ok = False
     try:
-        while time.time() - start < a.timeout:
-            time.sleep(5)
-            if proc.poll() is not None:
-                print("gradle exited early, see", gradle_log.name)
-                break
-            if os.path.exists(LOG) and os.path.getmtime(LOG) > start:
-                n = count(LOG, "Reloaded EMI in")
-                if n >= want:
-                    time.sleep(15)  # let the async "Baked recipes after reload" line arrive
-                    ok = True
-                    break
+        prepare_world(a.vanilla, a.gen_args)
+        pack_like_config()
+        ensure_muted()
+        start = time.time()
+        with open(gradle_log_path, "w") as gradle_log:
+            proc = subprocess.Popen([os.path.join(ROOT, "gradlew.bat"), "runClientTour", "-Ptour=" + tour, "--console=plain"],
+                                    cwd=ROOT, stdout=gradle_log, stderr=subprocess.STDOUT)
+            try:
+                proc.wait(timeout=a.timeout)
+                ok = proc.returncode == 0
+            except subprocess.TimeoutExpired:
+                print("timeout, stopping the game")
+                for pid in game_pids():
+                    subprocess.run(["taskkill", "/PID", str(pid), "/F"], capture_output=True)
+                proc.wait(timeout=120)
+        print(f"game run took {time.time() - start:.0f}s, gradle exit {proc.returncode}")
     finally:
-        for pid in game_pids():
-            subprocess.run(["taskkill", "/PID", str(pid), "/F"], capture_output=True)
-        try:
-            proc.wait(timeout=120)
-        except subprocess.TimeoutExpired:
-            pass
-        gradle_log.close()
-        restore_world()
-        restore_config()
-    if os.path.exists(LOG) and os.path.getmtime(LOG) > start:
-        dst = os.path.join(OUT, a.label + ".log")
-        shutil.copyfile(LOG, dst)
-        summarize.main([dst])
+        restore()
+    tour_out = os.path.join(RUN, "tour-out", tour)
+    if os.path.isdir(tour_out):
+        shutil.copytree(tour_out, dest)
+    os.makedirs(dest, exist_ok=True)
+    log = os.path.join(RUN, "logs", "latest.log")
+    if os.path.isfile(log):
+        shutil.copyfile(log, os.path.join(dest, "latest.log"))
+    summarize.main([dest])
     if not ok:
-        sys.exit("benchmark did not complete")
+        sys.exit("benchmark run failed, see " + gradle_log_path)
 
 
 if __name__ == "__main__":

@@ -29,7 +29,7 @@ public class EmiPersistentData {
 		}
 	}
 
-	public static void load() { long perfT0 = System.nanoTime(); try { perf$load(); } finally { dev.emi.emi.runtime.EmiLog.info("PERF EmiPersistentData.load " + (System.nanoTime() - perfT0) / 1000000 + "ms"); } } private static void perf$load() { // PERF-TMP-WRAP public static void load() {
+	public static void load() {
 		if (!FILE.exists()) {
 			return;
 		}

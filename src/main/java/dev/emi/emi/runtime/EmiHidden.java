@@ -40,7 +40,7 @@ public class EmiHidden {
 		pluginDisabledFilters.clear();
 	}
 
-	public static void reload() { long perfT0 = System.nanoTime(); try { perf$reload(); } finally { dev.emi.emi.runtime.EmiLog.info("PERF EmiHidden.reload " + (System.nanoTime() - perfT0) / 1000000 + "ms"); } } private static void perf$reload() { // PERF-TMP-WRAP public static void reload() {
+	public static void reload() {
 		List<IndexStackData> isds = EmiData.stackData.stream().map(i -> i.get()).filter(i -> i.disable() && (!i.filters().isEmpty() || !i.removed().isEmpty())).toList();
 		for (IndexStackData data : isds) {
 			for (EmiIngredient stack : data.removed()) {
