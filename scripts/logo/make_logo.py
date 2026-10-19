@@ -160,7 +160,8 @@ def magnifier(cv, cx, cy):
 def icon():
 	cv = Canvas(32, 32)
 	slot(cv, 1, 1, 25, 25)
-	cv.stamp(GEM, 5, 6)
+	# centre the gem in the slot's dark inner area (x/y 5..21, 17 px; the gem is 15x13, so margins are 1 and 2)
+	cv.stamp(GEM, 5 + (17 - len(GEM[0])) // 2, 5 + (17 - len(GEM)) // 2)
 	magnifier(cv, 22.5, 22.5)
 	cv.stamp(SPARK, 26, 1)
 	cv.outline()
