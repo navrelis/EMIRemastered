@@ -118,7 +118,7 @@ All settings are optional (defaults shown). `settleTicks` is how many ticks a sc
 | `open_plugin_manager` | | opens EMI's config screen (unless open) and presses its "Plugins" button; fails if the Plugin Manager did not open |
 | `plugin_toggle` | `id` (plugin id, e.g. `emi_ores`), optional `state` (`on`/`off`) | in the Plugin Manager: scrolls the plugin's row into view and presses its On/Off button; with `state` it only clicks if the plugin is not in that state; fails for locked plugins (`emi`) and unknown ids |
 | `screen_close` | | `Screen.close()` of the current screen, like its Done button or Escape, so close hooks run (config saved; Plugin Manager saves and starts an EMI reload after a change; module switches with apply mode "reload" reload EMI). Follow with `emi_wait_loaded` when a reload is expected. `close_screen` just drops all screens without hooks |
-| `window_info` | | notes `focused` (OS focus of the game window), `visible`, `cursorLocked` and the GLFW cursor mode; dev clients must show `focused=false cursorLocked=false` |
+| `window_info` | | notes `mode` (hidden/visible), `visible` (GLFW_VISIBLE), `pos`, `size`, `framebuffer`, `focused` (GLFW_FOCUSED, OS focus), `cursorLocked` and the GLFW cursor mode; fails unless `focused=false cursorLocked=false`, in the default hidden mode also unless `visible=false` |
 | `call` | `class`, `method` | calls a public static no-arg method (escape hatch) |
 
 The default window is 854x480; the default tour starts with `resize 1280x720` and `set_gui_scale 2`.
@@ -162,25 +162,84 @@ above. No other file needs a change; the new type can then be used in any tour j
 Several dev clients (and the developer's own work) share one PC, so a dev client must never capture the mouse or take
 the keyboard focus. The `emi_devtour` mod (`src/devtour`, never shipped) carries the protection. It is on the classpath
 of **every** client run config: `runClient`, `runClientWorld`, `runClientTour` (and Loom's `runClientRenderDoc`), but
-not of `runServer`. Plain `runClient` / `runClientWorld` therefore behave like normal clients minus the grab; the
+not of `runServer`. Plain `runClient` / `runClientWorld` therefore behave like normal clients minus the grab, with a
+hidden window unless `-PdevtourVisible=true` (below); the
 screenshot tour itself only runs when `-Demi.tour` is set (only `runClientTour` sets it). Everything is dev-only: the
 mixins are not in the release jar. The mixin config uses `defaultRequire: 1`, so a Minecraft change that removes a
 target crashes the start-up instead of silently grabbing the cursor again.
 
-Neutralised vanilla calls (Yarn 1.21.1+build.3), `src/devtour/java/dev/emi/remastered/devtour/mixin`:
+### Hidden window (default)
+
+The dev client window is **hidden** by default (`GLFW_VISIBLE=false` before `glfwCreateWindow`): it never appears on
+the screen, has no taskbar button and can never become the foreground window, so it cannot take the keyboard focus
+even on Windows (the `GLFW_FOCUSED`/`GLFW_FOCUS_ON_SHOW` hints alone were not enough, `focus-check` reported
+`focused=true`, TOUR_REPORT T1-1). Minecraft renders into its own main framebuffer, so the game runs normally and
+screenshots are correct while hidden, also after `resize` (checked up to 2560x1440: the window size and the framebuffer
+follow `glfwSetWindowSize`). No off-screen fallback is needed; a hidden window is never shown by
+`glfwSetWindowSize`/`glfwSetWindowMonitor` (windowed)/`glfwSetWindowTitle`/`glfwSetWindowIcon` (GLFW 3.4 of LWJGL
+3.3.3 shows a window only in `glfwShowWindow`, in `glfwCreateWindow` with `GLFW_VISIBLE` or when a window is put on a
+monitor for fullscreen, which is blocked). The start-up log says which mode is active:
+
+```
+(EmiDevTour) dev client window hidden (visible=false pos=853,480 size=854x480 framebuffer=854x480), focused=false (set -PdevtourVisible=true to show it)
+```
+
+To see or play the dev client, pass `-PdevtourVisible=true` (sets `-Demi.devtour.visible=true` on `runClient`,
+`runClientWorld` and `runClientTour`):
+
+```
+gradlew runClientWorld -PdevtourVisible=true
+```
+
+The window is then visible but created unfocused and shown without activation (it comes up behind the active
+window; click it to play). Without the property (IDE run configs generated before, `runClientRenderDoc`) the window is
+hidden. `DevWindow.tick` is a safety net: if anything shows a hidden dev window, it is hidden again on the next
+client tick and a WARN `dev client window was shown by someone, hidden again` is logged once.
+
+`MinecraftClient#isWindowFocused` stays at its initial `true` (no focus event ever arrives), so vanilla behaviour that
+depends on it is unchanged.
+
+### Foreground check (independent, read-only)
+
+`scripts/foreground-check.ps1` proves from outside the game that a dev client never owns the foreground window. It
+polls `GetForegroundWindow` / `GetWindowThreadProcessId` / `GetWindowText` and enumerates the visible top-level windows
+of the game JVM (java processes whose command line contains the worktree path and `devlaunchinjector`, or `-GamePid`).
+It only reads (no input, no focus or window change) and prints window titles only for game windows (or with
+`-ShowTitles`). Start it right before the launch, it stops when the game has exited:
+
+```
+powershell -File scripts\foreground-check.ps1 -Seconds 400 -StopWhenGameExits -ExpectHidden   # terminal 1
+gradlew runClientTour -Ptour=focus-check                                                    # terminal 2
+```
+
+One line per poll (`fg pid=... (process) game=<pids> visibleGameWindows=<n>`, `GAME-FOREGROUND` when the game owned
+the foreground), then `foreground-check result: polls=.. gamePidsSeen=.. gameForeground=0 pollsWithVisibleGameWindow=0`.
+Exit code 0 = never foreground (and, with `-ExpectHidden`, never a visible game window), 1 = violated, 2 = no game
+process seen. Options: `-Worktree <path>` (default: current directory), `-IntervalMs` (2000), `-Seconds` (120).
+
+### Neutralised vanilla calls
+
+(Yarn 1.21.1+build.3), `src/devtour/java/dev/emi/remastered/devtour/mixin`:
 
 | Mixin | Target | Effect |
 |---|---|---|
 | `MouseMixin` | `Mouse#lockCursor`, `Mouse#unlockCursor` | cancelled: the cursor is never captured or released |
 | `InputUtilMixin` | `InputUtil#setCursorParameters` | cancelled: the only caller of `glfwSetCursorPos` and `glfwSetInputMode(GLFW_CURSOR)` |
 | `InputUtilMixin` | `InputUtil#setRawMouseMotionMode` | cancelled: no `glfwSetInputMode(GLFW_RAW_MOUSE_MOTION)` |
-| `WindowMixin` | `Window.<init>` before `glfwCreateWindow` | `GLFW_FOCUS_ON_SHOW=false`, `GLFW_FOCUSED=false`: shown without activating |
+| `WindowMixin` | `Window.<init>` before `glfwCreateWindow` | `GLFW_VISIBLE=false` (true with `-Demi.devtour.visible=true`), `GLFW_FOCUS_ON_SHOW=false`, `GLFW_FOCUSED=false`, `fullscreen=false` |
+| `WindowMixin` | `Window.<init>` `glfwCreateWindow` monitor argument | always 0: never created as a fullscreen window (GLFW shows and focuses those) |
+| `WindowMixin` | `Window.<init>` tail | logs the window mode, visibility, position, sizes and focus (`DevWindow.created`) |
 | `WindowMixin` | `Window#toggleFullscreen` | cancelled (F11, the fullscreen option, the start-up toggle) |
 | `WindowMixin` | `Window#updateWindowRegion` | `fullscreen`/`currentFullscreen` forced to false: the only `glfwSetWindowMonitor` caller never enters fullscreen |
 | `GameRendererMixin` | `GameRenderer#render` read of `GameOptions#pauseOnLostFocus` | always false: an unfocused client does not open the game menu |
 
-Other GLFW calls of Minecraft only read state or register callbacks (title, icon, vsync, size limits, monitors,
-clipboard, key/mouse callbacks); vanilla never calls `glfwFocusWindow` or `glfwRequestWindowAttention`. With the cursor
+Other GLFW calls of Minecraft only read state, register callbacks or change hidden-safe properties (title, icon,
+vsync, size limits, monitors, clipboard, key/mouse callbacks). Checked in the bytecode of the 1.21.1 client (Yarn
+build.3): `net.minecraft.client.util.Window` is the only class with window calls (`glfwDefaultWindowHints`,
+`glfwWindowHint`, `glfwCreateWindow`, `glfwSetWindowSizeLimits`, `glfwSetWindowIcon`, `glfwSetWindowMonitor` in
+`updateWindowRegion`, `glfwSetWindowTitle`); no Minecraft class calls `glfwShowWindow`, `glfwFocusWindow`,
+`glfwRequestWindowAttention`, `glfwRestoreWindow`, `glfwMaximizeWindow`, `glfwIconifyWindow`, `glfwSetWindowPos`,
+`glfwSetWindowSize` or `glfwSetWindowAttrib`. With the cursor
 never locked, Minecraft's other cursor-lock code paths (`MinecraftClient#setScreen`, `Mouse#onMouseButton`) just do
 nothing; screens open and the world renders as usual.
 
@@ -195,9 +254,12 @@ other line):
 Tour steps inject input in-process only: `Screen.mouseClicked/mouseReleased/mouseScrolled/mouseMoved`, the game's
 `Keyboard.onKey` handler and the virtual mouse position of `Mouse` (`click`, `scroll`, `hover`, `key`, ...). Nothing
 uses GLFW input, `java.awt.Robot` or any OS input. The only window call is `resize` (`glfwSetWindowSize`, no
-activation). Check the protection with `gradlew runClientTour -Ptour=focus-check` (step `window_info`): it must report
-`focused=false cursorLocked=false cursorMode=212993` (GLFW_CURSOR_NORMAL).
-Limitation: a real mouse that moves over the game window still moves the in-game cursor.
+activation, a hidden window stays hidden). Check the protection with `gradlew runClientTour -Ptour=focus-check`
+(together with `scripts/foreground-check.ps1`): every `window_info` step must report
+`mode=hidden visible=false ... focused=false cursorLocked=false cursorMode=212993` (GLFW_CURSOR_NORMAL); the step
+fails otherwise. The tour also resizes to 1280x720 and 1920x1080 and takes screenshots there.
+Limitation (visible mode only): a real mouse that moves over the game window still moves the in-game cursor, and
+clicking the window focuses it (then `window_info` fails, as it should).
 
 ## EMI reload benchmark (perf tours)
 
