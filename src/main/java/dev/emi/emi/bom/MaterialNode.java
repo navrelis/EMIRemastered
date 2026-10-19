@@ -23,7 +23,8 @@ public class MaterialNode {
 	// Should these be decoupled from material nodes?
 	public FoldState state = FoldState.EXPANDED;
 	public ProgressState progress = ProgressState.UNSTARTED;
-	public long neededBatches = 0, totalNeeded = 0;
+	// EMI Remastered: KB7 (port of aMelonRind/emi 2508321): amount of this node served by recipe remainders in the last progress calculation
+	public long neededBatches = 0, totalNeeded = 0, usedRemainder = 0;
 
 	public MaterialNode(EmiIngredient ingredient) {
 		this.amount = ingredient.getAmount();

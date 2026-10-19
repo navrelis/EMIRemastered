@@ -297,7 +297,8 @@ public class EmiFavorites {
 				batches.removeLong(node.recipe);
 			}
 			batches.put(node.recipe, amount);
-			amount = node.totalNeeded;
+			// EMI Remastered: KB7 (port of aMelonRind/emi 2508321)
+			amount = node.totalNeeded + node.usedRemainder;
 			if (amounts.containsKey(node.recipe)) {
 				// Remove?
 				amount += amounts.getLong(node.recipe);
