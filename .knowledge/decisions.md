@@ -16,3 +16,4 @@
 - D15 Until FOCUS1 is merged no agent except the FOCUS1 agent starts a dev client (T1-1: window still takes OS focus on Windows); gated agents finish code/build/server first and get a go message after the merge (owner focus rule).
 - D16 Pack check without the owner: the lead does not launch the real pack instance (owner decision + agent rule); compatibility is shown by a pack-mirror dev client (copied mods, hidden, muted) and a production dedicated server with copied mods. The owner's own launch stays the final check.
 - D17 Precision override: PACK-CLI and LOGO go to Opus (telling dev-remapping artefacts from real mixin incompatibilities; visual design quality the owner sees first). Budget stays ~20 % Opus.
+- D18 Structure lookup results are delivered asynchronously (sent when ready) instead of the server thread waiting up to 30 s; found in the real pack (join blocked ~24 s). Opus (concurrency on the network path).

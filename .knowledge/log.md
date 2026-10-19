@@ -108,3 +108,4 @@
 2026-10-19 | PACK-SRV review (lead) | accepted: release jar on production Knot server with copied pack (560 mods) clean; Initialized 12 modules; no dev.emi lines in 283 WARN/6 ERROR; removed for server only: certain_questing_additions (InvalidInjection into FTB Quests client method), miningspeedtooltips (client API in main entrypoint) - pack issues, not ours
 2026-10-19 | LOGO correction (lead) | owner: gem not centred -> gem centred in inner area (margins 1/1, 2/2 on 32 grid), lead viewed render; merged, build green
 2026-10-19 | owner: 'no you do all' -> PACK-REAL delegated (Opus long, precision: owner's real instance); newest jar installed in pack first
+2026-10-19 | PACK-REAL review (lead) | accepted: real pack ok (see plan); instance traces of the test identity restored by lead via instance git (last_world.fmdata, usercache.json, jade usernamecache, crash_assistant username.info, fabricDefaultResourcePacks.dat); F1/F2 -> LOOT-ASYNC (Opus long, concurrency)
