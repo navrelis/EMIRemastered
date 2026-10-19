@@ -55,3 +55,4 @@ Owner statement (2026-10-19): he asked the authors for permission to use and cha
 - No new runtime libraries. JUnit 5 for tests only.
 - Subagents implement; lead writes only `.knowledge/`, runs builds/tests/git. Subagents never commit.
 - Never force-push; no secrets.
+- Owner (2026-10-19): never start Minecraft with sound.
