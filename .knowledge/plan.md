@@ -15,7 +15,7 @@ Status: open / in progress / in review / done. `||` = can run in parallel.
 | ID | Task | Model | Status |
 |---|---|---|---|
 | P1 | Distraction Free Recipes into EMI core | Sonnet short | done (incl. A10) |
-| P2 | EMIffect -> `effects` | Sonnet short | in progress (wave 1, continued in its worktree) |
+| P2 | EMIffect -> `effects` | Sonnet short | done (incl. A3) |
 | P3 | EMI Professions -> `professions` | Sonnet short | done |
 | P4 | EMI Enchanting -> `enchanting` | Sonnet short | done |
 | P5 | EMI Ores -> `ores` (LGPL headers kept) | Sonnet long | done |
@@ -34,7 +34,7 @@ Status: open / in progress / in review / done. `||` = can run in parallel.
 |---|---|---|---|---|
 | A1 | Item Info screen + provider API ("How to get": recipes by output grouped, loot, mob drops, ores, trades, brewing; "no known source" marker); key bind on hovered stack | F2 | Opus long | in progress (wave 1, continued in its worktree) |
 | A2 | Enchanting: real max level (cap mods), incompatibilities via canBeCombined, sources (table/loot/librarian), info provider | P4, A1 | Sonnet | open |
-| A3 | Effects sources (in P2) | P2 | Sonnet | in P2 |
+| A3 | Effects sources (in P2) | P2 | Sonnet | done (P2) |
 | A4 | Villager trades per profession/level (client dummy villager, wandering trader, Fabric TradeOfferHelper trades; Villager-API plans if reachable) | P3 | Sonnet long | done |
 | A5+B1 | `stats` module: food page, tool/weapon/armour stats pages, fuel/compost in info screen (A6) | F2, A1 | Sonnet long | open |
 | A7 | `mobs` module: mob pages (health, armour, attack, speed, spawn biomes via server sync, drops link) | P7 | Sonnet long | in progress (wip/a7-mobs) |

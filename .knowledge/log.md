@@ -36,3 +36,4 @@
 2026-10-19 | A4 review (lead) | accepted: 485 villager + 70 wanderer trades, per-factory try/catch, SellMap accessor placeholder, Villager API reflection isolated (untested live); also fixed P3 recipe ids (26 EMI errors gone); merged
 2026-10-19 | P6 review (lead) | accepted: sub-modules loaded by name after isModLoaded, LinkageError caught per sub-module, dedupe vs native vinery/bakery/farm_and_charm plugins, tested with real pack jars in run/mods; merged, build+tests green
 2026-10-19 | B3+B4 (Sonnet) | code done, build green; client checks pending (no-client rule); default binds T / Ctrl+C to be checked against text fields
+2026-10-19 | P2+A3 review (lead) | accepted: one-pass index (63-93 ms vs ~1.1 s upstream cold), emiffect:effect id kept + favourites string bug fixed, sources table, EffectsEmiPlugin initialize forwarding; merged, build green. Steps.java click step will clash with Q1b (resolve at merge). Manual: module-off client check
