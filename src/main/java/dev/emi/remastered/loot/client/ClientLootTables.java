@@ -1,11 +1,13 @@
 package dev.emi.remastered.loot.client;
 
 import dev.emi.remastered.loot.EMILoot;
+import dev.emi.remastered.loot.structure.StructureRef;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.util.Identifier;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 public class ClientLootTables {
@@ -33,6 +35,38 @@ public class ClientLootTables {
         } catch (Throwable e) {
             EMILoot.LOGGER.error("Critical error encountered while receiving Chest Loot Packet");
             EMILoot.LOGGER.error("Thrown Error: ", e);
+        }
+    }
+
+    /**
+     * Structures of chest tables received before the server's structure lookup was done: updates the tables in place,
+     * which are the same objects EMI's chest recipes hold. Returns how many tables changed.
+     */
+    int receiveChestStructures(PacketByteBuf buf) {
+        try {
+            int count = buf.readVarInt();
+            Map<Identifier, List<StructureRef>> structures = new HashMap<>();
+            for (int i = 0; i < count; i++) {
+                Identifier id = AbstractTextKeyParsingClientLootTable.getIdFromBuf(buf);
+                structures.put(id, StructureRef.read(buf));
+            }
+            int changed = 0;
+            synchronized (chestLoots) {
+                for (LootReceiver receiver : chestLoots) {
+                    if (receiver instanceof ClientChestLootTable chest) {
+                        List<StructureRef> refs = structures.get(chest.getId());
+                        if (refs != null && !refs.equals(chest.getStructures())) {
+                            chest.setStructures(refs);
+                            changed++;
+                        }
+                    }
+                }
+            }
+            EMILoot.LOGGER.info("Received the structures of {} chest loot tables, {} pages updated", structures.size(), changed);
+            return changed;
+        } catch (Throwable e) {
+            EMILoot.LOGGER.error("Could not read the structures of chest loot tables", e);
+            return 0;
         }
     }
 

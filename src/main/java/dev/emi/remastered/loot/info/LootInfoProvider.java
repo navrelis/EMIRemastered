@@ -6,6 +6,7 @@ import dev.emi.remastered.info.api.InfoCollector;
 import dev.emi.remastered.info.api.InfoLink;
 import dev.emi.remastered.info.api.InfoSection;
 import dev.emi.remastered.info.api.ItemInfoProvider;
+import dev.emi.remastered.info.api.ItemInfoRegistry;
 import dev.emi.remastered.loot.EMILoot;
 import dev.emi.remastered.loot.LootSettings;
 import dev.emi.remastered.loot.emi.ChestLootRecipe;
@@ -39,7 +40,20 @@ public final class LootInfoProvider implements ItemInfoProvider {
 	public static final Identifier CONDITIONS = EMILoot.identity("conditions");
 	private static final int MAX_STRUCTURES = 24;
 	private static final int MAX_CHESTS_IN_TOOLTIP = 8;
+	public static final LootInfoProvider INSTANCE = new LootInfoProvider();
 	private LootInfoIndex index;
+
+	private LootInfoProvider() {
+	}
+
+	/**
+	 * The structures of chest tables arrived after EMI built its pages: rebuild the index and drop the cached Item Info
+	 * pages (registering the same provider again changes the registry version the page cache depends on). Client thread.
+	 */
+	public static void refresh() {
+		INSTANCE.index = null;
+		ItemInfoRegistry.register(INSTANCE);
+	}
 
 	@Override
 	public Identifier getId() {

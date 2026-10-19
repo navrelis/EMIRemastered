@@ -61,10 +61,10 @@ public class ChestLootRecipe implements EmiRecipe {
         }
         this.outputs = list;
         inputStack = new ChestLootEmiStack(loot.id);
-        this.info = Suppliers.memoize(this::buildInfo);
     }
 
-    private final Supplier<Info> info;
+    /** Built from the structures it names; rebuilt when the server sends them later. */
+    private volatile Info info;
 
     private final ClientChestLootTable loot;
     private final Supplier<ArrayListMultimap<Float, EmiStack>> lootStacksSorted;
@@ -77,7 +77,7 @@ public class ChestLootRecipe implements EmiRecipe {
 
 
     public List<StructureRef> getStructures() {
-        return loot.structures;
+        return loot.getStructures();
     }
 
     public Text getTitle() {
@@ -115,7 +115,7 @@ public class ChestLootRecipe implements EmiRecipe {
     }
 
     /** The extra lines below the title: where the chest is found, and the Lootr note. */
-    private record Info(ClientText.Wrapped structure, Text structureText, ClientText.Wrapped lootr) {
+    private record Info(List<StructureRef> source, ClientText.Wrapped structure, Text structureText, ClientText.Wrapped lootr) {
         int lineCount() {
             return structure.lines().size() + lootr.lines().size();
         }
@@ -125,17 +125,27 @@ public class ChestLootRecipe implements EmiRecipe {
     private static final int INFO_LINE_HEIGHT = 9;
     private static final int INFO_COLOR = 0x555555;
 
-    private Info buildInfo() {
+    private Info info() {
+        List<StructureRef> structures = loot.getStructures();
+        Info current = info;
+        if (current == null || current.source() != structures) {
+            current = buildInfo(structures);
+            info = current;
+        }
+        return current;
+    }
+
+    private Info buildInfo(List<StructureRef> structures) {
         ClientText.Wrapped none = new ClientText.Wrapped(List.of(), false);
-        Text found = LootSettings.showStructures ? StructureText.foundIn(loot.structures) : null;
+        Text found = LootSettings.showStructures ? StructureText.foundIn(structures) : null;
         ClientText.Wrapped structure = found == null ? none : ClientText.wrap(found, INFO_WIDTH, 2);
         ClientText.Wrapped lootr = LootSettings.lootrNote && EMILoot.isModLoaded("lootr") ? ClientText.wrap(LText.translatable("emi_loot.lootr_note"), INFO_WIDTH, 2) : none;
-        return new Info(structure, found, lootr);
+        return new Info(structures, structure, found, lootr);
     }
 
     @Override
     public int getDisplayHeight() {
-        int titleHeight = 11 + info.get().lineCount() * INFO_LINE_HEIGHT;
+        int titleHeight = 11 + info().lineCount() * INFO_LINE_HEIGHT;
         int boxesHeight = ((int) Math.ceil(lootStacksSortedSize/ columns) * (EMILoot.Type.CHEST.isCompact() ? 18 : 19)) - 1;
         return titleHeight + boxesHeight;
     }
@@ -144,7 +154,7 @@ public class ChestLootRecipe implements EmiRecipe {
     public void addWidgets(WidgetHolder widgets) {
         final int titleSpace;
         final int finalRowHeight;
-        Info extra = info.get();
+        Info extra = info();
         int infoHeight = extra.lineCount() * INFO_LINE_HEIGHT;
         if (widgets.getHeight() < getDisplayHeight()) {
             titleSpace = 9 + infoHeight;

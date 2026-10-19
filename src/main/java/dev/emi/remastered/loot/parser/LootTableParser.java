@@ -24,6 +24,8 @@ import dev.emi.remastered.loot.server.ComplexLootPoolBuilder;
 import dev.emi.remastered.loot.server.NestedLootTableResults;
 import dev.emi.remastered.loot.server.SimpleLootPoolBuilder;
 import dev.emi.remastered.loot.server.ChestLootTableSender;
+import dev.emi.remastered.loot.server.ChestStructureSync;
+import dev.emi.remastered.loot.structure.StructureLookup;
 import dev.emi.remastered.loot.server.GameplayLootTableSender;
 import dev.emi.remastered.loot.server.LootBuilder;
 import dev.emi.remastered.loot.server.LootSender;
@@ -110,6 +112,11 @@ public class LootTableParser {
         return true;
     }
 
+    /** The chest loot tables of the current data. Server thread. */
+    public static Collection<ChestLootTableSender> chestSenders() {
+        return Collections.unmodifiableCollection(chestSenders.values());
+    }
+
     public void registerServer(ServerPlayerEntity player) {
         if (!hasPostProcessed()) {
             EMILoot.LOGGER.warn("Post-processing not completed for some reason, completing now...");
@@ -120,8 +127,11 @@ public class LootTableParser {
         }
         if (!LootNetworking.canSend(player, ClearPayload.TYPE)) return;
         ServerPlayNetworking.send(player, ClearPayload.INSTANCE);
-        if (LootSettings.parseChestLoot)
-            chestSenders.forEach((id, chestSender) -> chestSender.send(player));
+        if (LootSettings.parseChestLoot) {
+            // never waits for the structure lookup: without it the structures follow once it is done
+            StructureLookup structures = ChestStructureSync.begin(player, chestSenders.values());
+            chestSenders.forEach((id, chestSender) -> chestSender.send(player, structures));
+        }
         if (LootSettings.parseBlockLoot)
             blockSenders.forEach((id, blockSender) -> blockSender.send(player));
         if (LootSettings.parseMobLoot)

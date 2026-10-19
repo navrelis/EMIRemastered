@@ -8,7 +8,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -29,6 +31,8 @@ public final class TourPlan {
 	/** Global timeout for the whole tour, measured from game start. */
 	public final int timeoutSeconds;
 	public final List<JsonObject> steps;
+	/** System properties to set as soon as the tour is loaded (before the integrated server starts), e.g. dev-only delays. */
+	public final Map<String, String> systemProperties;
 
 	private TourPlan(String name, String source, JsonObject root) {
 		this.name = name;
@@ -45,6 +49,11 @@ public final class TourPlan {
 			list.add(e.getAsJsonObject());
 		}
 		this.steps = list;
+		Map<String, String> properties = new LinkedHashMap<>();
+		if (root.has("systemProperties")) {
+			root.getAsJsonObject("systemProperties").entrySet().forEach(e -> properties.put(e.getKey(), e.getValue().getAsString()));
+		}
+		this.systemProperties = properties;
 	}
 
 	private static int getInt(JsonObject o, String key, int fallback) {

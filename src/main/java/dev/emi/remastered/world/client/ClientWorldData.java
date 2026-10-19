@@ -1,7 +1,9 @@
 package dev.emi.remastered.world.client;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import dev.emi.emi.runtime.EmiReloadManager;
 import dev.emi.remastered.world.World;
@@ -27,8 +29,50 @@ public final class ClientWorldData {
 	private static boolean used;
 	private static int usedFingerprint = NOTHING;
 	private static int version;
+	/** Chest loot tables by structure: from the last complete sync, replaced by a later {@link #acceptLoot}. */
+	private static Map<String, List<String>> lootTables = new HashMap<>();
+	private static int lootVersion;
 
 	private ClientWorldData() {
+	}
+
+	/** Changes whenever the chest loot tables of the structures change, for the loot links of the structure pages. */
+	public static int lootVersion() {
+		synchronized (LOCK) {
+			return lootVersion;
+		}
+	}
+
+	/** The chest loot tables of a structure: from the last complete sync, or from the follow-up that came after it. */
+	public static List<String> lootTablesOf(String structure) {
+		synchronized (LOCK) {
+			return lootTables.getOrDefault(structure, List.of());
+		}
+	}
+
+	/**
+	 * The chest loot tables the server looked up after it sent the world data. The structure pages read them when a
+	 * page is built, and the snapshot's fingerprint leaves them out, so they never cause an EMI reload.
+	 */
+	public static void acceptLoot(boolean first, Map<String, List<String>> tables) {
+		synchronized (LOCK) {
+			if (first) {
+				lootTables = new HashMap<>();
+			}
+			lootTables.putAll(tables);
+			lootVersion++;
+		}
+		World.LOGGER.info("Received the chest loot tables of {} structures from the server", tables.size());
+	}
+
+	private static Map<String, List<String>> lootTablesOf(WorldSnapshot snapshot) {
+		Map<String, List<String>> tables = new HashMap<>();
+		for (StructureRow row : snapshot.structures()) {
+			if (!row.lootTables().isEmpty()) {
+				tables.put(row.id(), row.lootTables());
+			}
+		}
+		return tables;
 	}
 
 	/** Changes whenever the data changes or is cleared, for caches that are built from it. */
@@ -58,6 +102,8 @@ public final class ClientWorldData {
 				pendingStructures = new ArrayList<>();
 				assembling = false;
 				version++;
+				lootTables = lootTablesOf(snapshot);
+				lootVersion++;
 				World.LOGGER.info("Received {} structures and {} dimensions from the server", snapshot.structures().size(), snapshot.dimensionCount());
 				reload = used && usedFingerprint != snapshot.fingerprint();
 			}
@@ -75,6 +121,8 @@ public final class ClientWorldData {
 			pendingStructures = new ArrayList<>();
 			assembling = false;
 			version++;
+			lootTables = new HashMap<>();
+			lootVersion++;
 			used = false;
 			usedFingerprint = NOTHING;
 		}

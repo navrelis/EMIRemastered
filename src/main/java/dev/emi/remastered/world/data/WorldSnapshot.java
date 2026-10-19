@@ -81,8 +81,15 @@ public final class WorldSnapshot {
 		return structuresOfBiome.getOrDefault(biome, List.of());
 	}
 
-	/** Identifies the content; EMI reloads when the data changes after it was registered. */
+	/**
+	 * Identifies the content; EMI reloads when the data changes after it was registered. The chest loot tables are not
+	 * part of it: the structure pages read them live (they can arrive after the data, see {@code ClientWorldData}).
+	 */
 	public int fingerprint() {
-		return 31 * structures.hashCode() + biomesOfDimension.hashCode();
+		int hash = 0;
+		for (StructureRow structure : structures) {
+			hash = 31 * hash + structure.withLootTables(List.of()).hashCode();
+		}
+		return 31 * hash + biomesOfDimension.hashCode();
 	}
 }

@@ -51,6 +51,10 @@ public final class WorldTour {
 		return structure("minecraft:village_plains");
 	}
 
+	public static String desertPyramid() {
+		return structure("minecraft:desert_pyramid");
+	}
+
 	public static String stronghold() {
 		return structure("minecraft:stronghold");
 	}
