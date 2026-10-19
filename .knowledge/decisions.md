@@ -13,3 +13,4 @@
 - D12 Game sound always off: every client launch with `soundCategory_master:0.0` (owner request); prepareDevOptions enforces it (Q1b).
 - D13 Dev clients never take the owner's mouse: no computer-use/OS input by agents; dev-only no-grab/no-focus mixin in the devtour mod on every client run config; client checks batched into tour runs (owner request).
 - D14 Enchanted books above the listed range (> max+5 or > 10) do not open the enchantment page: a level-ignoring lookup would need an EMI core comparison change for all enchanted books (side effects); accepted limitation.
+- D15 Until FOCUS1 is merged no agent except the FOCUS1 agent starts a dev client (T1-1: window still takes OS focus on Windows); gated agents finish code/build/server first and get a go message after the merge (owner focus rule).
