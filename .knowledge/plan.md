@@ -32,12 +32,12 @@ Status: open / in progress / in review / done. `||` = can run in parallel.
 ## Phase 3 Features (after the module each builds on is merged)
 | ID | Task | Builds on | Model | Status |
 |---|---|---|---|---|
-| A1 | Item Info screen + provider API ("How to get": recipes by output grouped, loot, mob drops, ores, trades, brewing; "no known source" marker); key bind on hovered stack | F2 | Opus long | in progress (wave 1, continued in its worktree) |
+| A1 | Item Info screen + provider API ("How to get": recipes by output grouped, loot, mob drops, ores, trades, brewing; "no known source" marker); key bind on hovered stack | F2 | Opus long | done (client module-off check pending) |
 | A2 | Enchanting: real max level (cap mods), incompatibilities via canBeCombined, sources (table/loot/librarian), info provider | P4, A1 | Sonnet | open |
 | A3 | Effects sources (in P2) | P2 | Sonnet | done (P2) |
 | A4 | Villager trades per profession/level (client dummy villager, wandering trader, Fabric TradeOfferHelper trades; Villager-API plans if reachable) | P3 | Sonnet long | done |
 | A5+B1 | `stats` module: food page, tool/weapon/armour stats pages, fuel/compost in info screen (A6) | F2, A1 | Sonnet long | open |
-| A7 | `mobs` module: mob pages (health, armour, attack, speed, spawn biomes via server sync, drops link) | P7 | Sonnet long | in progress (wip/a7-mobs) |
+| A7 | `mobs` module: mob pages (health, armour, attack, speed, spawn biomes via server sync, drops link) | P7 | Sonnet long | in review (code done, client checks blocked) |
 | A8 | Loot: structure/dimension filters, condition icons, Lootr per-player note | P7 | Sonnet | in progress (wip/a8-loot-extras) |
 | A9 | Ores: modded dimensions, compact biome list, Y-range highlight | P5 | Sonnet | in progress (wip/a9-ores-extras) |
 | A10 | Distraction-free extras (in P1) | P1 | Sonnet | done (P1) |
