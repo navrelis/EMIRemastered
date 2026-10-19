@@ -28,3 +28,4 @@
 2026-10-19 | wave 1 delegated (continue in worktree, shared rules file): P7 loot, P5 ores, P4 enchanting, P1 DFR+A10, P2 effects+A3, Q1b tour+mute enforcement, A4 trades (Sonnet); P6 letsdo new (Sonnet, long); Q3 perf, A1 info (Opus, long)
 2026-10-19 | B3+B4 new module tools (Sonnet, long) | delegated, wip/b-tools (no jump icon: lead adds later)
 2026-10-19 | P5 review (lead) | accepted: faithful port, LGPL headers, OresEmiPlugin initialize forwarding (needed for biome serializer), canSend guard; merged a123b92, build+tests green. Follow-up for A9: batch-complete marker so a reload mid-sync can't see partial features
+2026-10-19 | P7 review (lead) | accepted: faithful port, 11 AW class lines (no EMI lines removed), 6 S2C payloads canSend-guarded, settings restored to upstream set; merged 5e68fda, build+tests green. Note: lootify condition/function types registered like upstream

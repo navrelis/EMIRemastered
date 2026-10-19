@@ -20,7 +20,7 @@ Status: open / in progress / in review / done. `||` = can run in parallel.
 | P4 | EMI Enchanting -> `enchanting` | Sonnet short | in progress (wave 1, continued in its worktree) |
 | P5 | EMI Ores -> `ores` (LGPL headers kept) | Sonnet long | done |
 | P6 | Let's Do compat -> `letsdo` (Vinery/Meadow fixes, no Architectury, dedupe native) | Sonnet long | in progress (wave 1, wip/p6-letsdo) |
-| P7 | EMI Loot -> `loot` (fzzy_config -> EMI config, Fabric networking, AW merge) | Sonnet long | in progress (wave 1, continued in its worktree) |
+| P7 | EMI Loot -> `loot` (fzzy_config -> EMI config, Fabric networking, AW merge) | Sonnet long | done |
 
 ## Phase 2 Quality
 | ID | Task | Model | Status |
