@@ -1,6 +1,7 @@
 package dev.emi.emi.registry;
 
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -39,6 +40,8 @@ public class EmiTags {
 	private static final Map<EmiTagKey<?>, List<?>> TAG_VALUES = Maps.newHashMap();
 	private static final Map<Identifier, List<EmiTagKey<?>>> SORTED_TAGS = Maps.newHashMap();
 	public static final List<EmiTagKey<?>> TAGS = Lists.newArrayList();
+	// EMI Remastered: per registry, for every value the positions (in getTags order) of the tags containing it
+	private static final Map<Identifier, EmiTagIndex> TAG_INDEX = Maps.newHashMap();
 	public static TagExclusions exclusions = new TagExclusions();
 
 	@SuppressWarnings({"unchecked", "rawtypes"})
@@ -97,18 +100,14 @@ public class EmiTags {
 		} else {
 			keys = Lists.newArrayList();
 			Set<T> original = new HashSet<>(map.keySet());
-			for (EmiTagKey<T> key : getTags(registry)) {
-				List<T> values = key.getList();
-				if (values.size() < 2) {
-					continue;
-				}
-				if (map.keySet().containsAll(values)) {
-					values.forEach(map::remove);
-					keys.add(key);
-				}
-				if (map.isEmpty()) {
-					break;
-				}
+			List<EmiTagKey<T>> tags = getTags(registry);
+			// EMI Remastered: only a tag sharing a value with the stacks can be taken, so test just those (same order,
+			// same tags taken) instead of every tag of the registry; the full scan if the index does not match
+			EmiTagIndex index = TAG_INDEX.get(registry.getKey().getValue());
+			if (index != null && index.isFor(tags, EmiTagKey.getListVersion())) {
+				index.scan(tags, EmiTagKey::getList, map, original, keys);
+			} else {
+				EmiTagIndex.scanAll(tags, EmiTagKey::getList, map, keys);
 			}
 			CACHED_TAGS.put((Set) original, (List) keys);
 		}
@@ -178,6 +177,7 @@ public class EmiTags {
 		SORTED_TAGS.clear();
 		TAG_VALUES.clear();
 		CACHED_TAGS.clear();
+		TAG_INDEX.clear(); // EMI Remastered
 		for (Registry<?> registry : ADAPTERS_BY_REGISTRY.keySet()) {
 			reloadTags(registry);
 		}
@@ -200,11 +200,21 @@ public class EmiTags {
 				TAG_VALUES.put(key, values);
 			}
 		}
-		EmiTags.TAGS.addAll(tags.stream().sorted((a, b) -> a.id().toString().compareTo(b.id().toString())).toList());
+		// EMI Remastered: sort keys computed once per tag instead of in every comparison (same comparisons, same
+		// stable sort, so the same order); stream().count() resolved the registry entry list twice per comparison
+		Map<EmiTagKey<T>, String> names = new IdentityHashMap<>();
+		Map<EmiTagKey<T>, Long> counts = new IdentityHashMap<>();
+		for (EmiTagKey<T> key : tags) {
+			names.put(key, key.id().toString());
+			counts.put(key, key.stream().count());
+		}
+		EmiTags.TAGS.addAll(tags.stream().sorted((a, b) -> names.get(a).compareTo(names.get(b))).toList());
 		tags = tags.stream()
-			.sorted((a, b) -> Long.compare(b.stream().count(), a.stream().count()))
+			.sorted((a, b) -> Long.compare(counts.get(b), counts.get(a)))
 			.toList();
 		EmiTags.SORTED_TAGS.put(registry.getKey().getValue(), (List) tags);
+		TAG_INDEX.put(registry.getKey().getValue(), EmiTagIndex.build(tags.stream().map(EmiTagKey::getList).toList(),
+			tags, EmiTagKey.getListVersion())); // EMI Remastered
 	}
 
 	@SuppressWarnings("unchecked")
