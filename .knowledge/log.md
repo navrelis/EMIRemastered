@@ -116,3 +116,5 @@
 2026-10-19 | auto-handoff: POLISH and PACK-CLI stopped; see F:\Coding\EMI_Remastered\handoff-2026-10-19-cee17f08.md
 2026-10-19 | session 7 start: state checked = handoff; PACK-CLI dropped; jar c2b433ec installed (lock)
 2026-10-19 | POLISH re-delegated (Sonnet long) || PACK-REAL2 (Opus long) || DOC4 (Sonnet short)
+2026-10-19 | DOC4 review (lead) | accepted, committed on wip/doc4; merge after POLISH (mobs speed wording may change)
+2026-10-19 | PACK-REAL2 review (lead) | accepted: LOOT-ASYNC verified in real pack (join 4 s); cleanup verified; cosmetic: summary log counts 433/789 chestTables while 563 tables delivered (report only)

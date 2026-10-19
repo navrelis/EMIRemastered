@@ -80,8 +80,8 @@ Status: open / in progress / in review / done. `||` = can run in parallel.
 | LOOT-ASYNC | Structure lookup never blocks the server thread; late results pushed to players; no 25 s cut of world loot links; honest log lines | Opus long | done (merged; join and lookup decoupled (login->joined same second with 20 s delay), late payloads update chest pages, Item Info and structure pages without EMI reload, 9 new tests; needs re-check in real pack) |
 | TRADE-ROW | Item Info trade rows: viewed-item amount in the title, not the count column next to the other side's stacks | Sonnet short | done (merged; 'Cleric - Master · 22×', stacks show own amounts; trade-row 45/45, p8 132/132) |
 | POLISH | R3 wither skeleton damage (spawn-time base values), R4 bat/ghast speed 30.2, R2 stats right margin, R1 duplicate tag names | Sonnet long | in progress (session 7, worktree polish, port 25676) |
-| PACK-REAL2 | Real pack launch with LOOT-ASYNC build (c2b433ec installed 23:30): join not blocked, late structure delivery logged, same safeguards | Opus long | in progress |
-| DOC4 | CHANGELOG 2.0.0: FX-SER, LOOT-VAN, LOOT-ASYNC, TRADE-ROW, POLISH, icon; DESCRIPTION factual check | Sonnet short | in progress (worktree doc4) |
+| PACK-REAL2 | Real pack launch with LOOT-ASYNC build (c2b433ec installed 23:30): join not blocked, late structure delivery logged, same safeguards | Opus long | done (logged in->joined 4 s (was ~24 s); lookup 45.4 s off-thread, structures sent/received 8 s after reload, 563 pages updated in place, no 2nd reload; 640 mods, 38 plugins 0 errors, reload 22983 ms; no new emi warnings; all safeguards verified by lead: lock gone, test world + xaero removed, options sound restored, instance git traces restored) |
+| DOC4 | CHANGELOG 2.0.0: FX-SER, LOOT-VAN, LOOT-ASYNC, TRADE-ROW, POLISH, icon; DESCRIPTION factual check | Sonnet short | in review (committed d84f5183 on wip/doc4; merge after POLISH, mobs wording) |
 | -- | Later: KB13 (Sodium vertex path, needs pack measurement), T1-29 core string | - | open |
 
 ## Phase 4 Acceptance
