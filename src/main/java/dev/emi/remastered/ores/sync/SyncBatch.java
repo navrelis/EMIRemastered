@@ -9,9 +9,10 @@ import net.minecraft.util.Identifier;
 /**
  * One batch of features of a sync.
  *
- * @param last true for the final batch of the sync: the client may use the data once it has it
+ * @param index position of the batch in its sync, 0 up to {@link SyncHeader#batchCount()} (exclusive); batches may
+ *              arrive in any order and a repeated one is ignored
  */
-public record SyncBatch<F>(int syncId, boolean last, List<Entry<F>> entries) {
+public record SyncBatch<F>(int syncId, int index, List<Entry<F>> entries) {
 
 	/** A feature (null when the client could not decode it) and the indices of its biomes in the header's biome table. */
 	public record Entry<F>(Identifier id, F feature, int[] biomeIndices) {

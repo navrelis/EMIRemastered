@@ -51,6 +51,7 @@ public abstract class AbstractPlacedFeatureEmiRecipe implements EmiRecipe {
 	private static final int BAND_COLUMNS = 8;
 	private static final int LINE_HEIGHT = 11;
 	private static final int SECTION_GAP = 2;
+	private static final int CAPTION_WIDTH = 93;
 	private static final int MAX_TOOLTIP_LINES = 16;
 	private static final int TOOLTIP_WIDTH = 250;
 
@@ -77,11 +78,38 @@ public abstract class AbstractPlacedFeatureEmiRecipe implements EmiRecipe {
 		this.allBiomes = EmiIngredient.of(biomes.stream().map(id -> BiomeEmiStack.of(registry.get(id))).toList());
 
 		int limit = OresSettings.biomeIconLimit();
-		for (BiomeSummary.Section section : BiomeSummary.summarize(biomes, snapshot.dimensionsOf(featureId), limit)) {
-			BiomeSummary.Split split = BiomeSummary.split(section.listed(), limit);
+		boolean compact = OresSettings.compactBiomeList;
+		for (BiomeSummary.Section section : BiomeSummary.summarize(biomes, snapshot.dimensionsOf(featureId), limit, compact)) {
+			BiomeSummary.Split split = BiomeSummary.split(section.listed(), limit, compact);
 			List<EmiStack> shown = split.shown().stream().map(id -> BiomeEmiStack.of(registry.get(id))).toList();
 			bandSections.add(new BandSection(section, shown, split.hidden()));
 		}
+	}
+
+	/** The height provider of the feature's height range modifier, null if it has none. */
+	protected abstract HeightProvider heightProvider();
+
+	// ---- facts for the Item Info page ----
+
+	/** How high the feature generates in a dimension; {@code height} is null when the feature has no supported height range. */
+	public record DimensionHeight(Identifier dimension, Resolved height) {
+	}
+
+	/**
+	 * @param biomeSections the compact biome summary per dimension
+	 * @param biomeCount    number of biomes the feature is in, whatever the dimension
+	 */
+	public record Facts(Identifier featureId, List<DimensionHeight> heights, List<BiomeSummary.Section> biomeSections, int biomeCount) {
+	}
+
+	/** Dimensions, height ranges (peak included) and biome summary of this feature, resolved for each dimension it generates in. */
+	public Facts facts() {
+		Spec spec = heightProvider() == null ? null : toSpec(heightProvider());
+		List<DimensionHeight> heights = new ArrayList<>();
+		for (OresSnapshot.Dimension dimension : snapshot.dimensionsOf(featureId)) {
+			heights.add(new DimensionHeight(dimension.id(), spec == null ? null : HeightModel.resolve(spec, dimension.bottomY(), dimension.topY())));
+		}
+		return new Facts(featureId, heights, bandSections.stream().map(BandSection::data).toList(), snapshot.biomesOf(featureId).size());
 	}
 
 	// ---- biome list ----
@@ -273,6 +301,35 @@ public abstract class AbstractPlacedFeatureEmiRecipe implements EmiRecipe {
 		if (resolved.shape() == Shape.TRIANGULAR) {
 			addAnchorText(widgets, page, peak[0], x + GRAPH_WIDTH / 2, y + 8, TextWidget.Alignment.CENTER, TextWidget.Alignment.CENTER);
 		}
+		addCaption(widgets, x + 3, y + 20, page, resolved);
+	}
+
+	/** The dimension the heights are for and the best height, as text below the graph. */
+	private void addCaption(WidgetHolder widgets, int x, int y, Page page, Resolved resolved) {
+		TextRenderer font = MinecraftClient.getInstance().textRenderer;
+		List<Text> lines = new ArrayList<>();
+		if (page.dimension() != null) {
+			lines.add(OresTexts.dimensionName(page.dimension()));
+		}
+		if (OresSettings.highlightBestHeight) {
+			lines.add(bestHeightText(resolved));
+		}
+		for (int i = 0; i < lines.size(); i++) {
+			Text line = lines.get(i);
+			String shown = font.trimToWidth(line.getString(), CAPTION_WIDTH);
+			widgets.addDrawable(x, y + i * 10, CAPTION_WIDTH, 9, (gui, mouseX, mouseY, delta) -> gui.drawText(font, shown, 0, 0, 0x404040, false))
+				.tooltip((mouseX, mouseY) -> List.of(TooltipComponent.of(line.asOrderedText())));
+		}
+	}
+
+	private static Text bestHeightText(Resolved resolved) {
+		if (resolved.peakLow() == resolved.peakHigh()) {
+			return Text.translatable("emi_ores.distribution.best_line.single", resolved.peakLow());
+		}
+		if (resolved.shape() == Shape.UNIFORM) {
+			return Text.translatable("emi_ores.distribution.best_line.any");
+		}
+		return Text.translatable("emi_ores.distribution.best_line", resolved.peakLow(), resolved.peakHigh());
 	}
 
 	/** The player's block height when the page is for the dimension the player is in, else null. */

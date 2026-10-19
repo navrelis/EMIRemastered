@@ -112,6 +112,11 @@ public class GeodeGenEmiRecipe extends AbstractPlacedFeatureEmiRecipe {
 	}
 
 	@Override
+	protected HeightProvider heightProvider() {
+		return heightProvider;
+	}
+
+	@Override
 	public EmiRecipeCategory getCategory() {
 		return OresRecipeCategories.GEODE;
 	}

@@ -47,6 +47,13 @@ public final class BiomeSummary {
 	 *                  feature is in more biomes of it than fit into the icons
 	 */
 	public static List<Section> summarize(Collection<Identifier> featureBiomes, Collection<OresSnapshot.Dimension> dimensions, int iconLimit) {
+		return summarize(featureBiomes, dimensions, iconLimit, true);
+	}
+
+	/**
+	 * @param compact false lists every biome of every dimension, without "all" or "all except" summaries
+	 */
+	public static List<Section> summarize(Collection<Identifier> featureBiomes, Collection<OresSnapshot.Dimension> dimensions, int iconLimit, boolean compact) {
 		Set<Identifier> feature = new LinkedHashSet<>(featureBiomes);
 		Set<Identifier> placed = new LinkedHashSet<>();
 		List<Section> sections = new ArrayList<>();
@@ -60,7 +67,9 @@ public final class BiomeSummary {
 				continue;
 			}
 			placed.addAll(present);
-			if (missing.isEmpty()) {
+			if (!compact) {
+				sections.add(new Section(dimension.id(), Kind.LIST, present.size(), sorted(present)));
+			} else if (missing.isEmpty()) {
 				sections.add(new Section(dimension.id(), Kind.ALL, present.size(), List.of()));
 			} else if (present.size() > iconLimit && missing.size() < present.size()) {
 				sections.add(new Section(dimension.id(), Kind.ALL_EXCEPT, present.size(), sorted(missing)));
@@ -90,6 +99,10 @@ public final class BiomeSummary {
 	}
 
 	/** Shows the first {@code iconLimit} entries, unless hiding two or fewer would not save any room. */
+	public static Split split(List<Identifier> list, int iconLimit, boolean compact) {
+		return compact ? split(list, iconLimit) : new Split(list, List.of());
+	}
+
 	public static Split split(List<Identifier> list, int iconLimit) {
 		int limit = Math.max(1, iconLimit);
 		if (list.size() <= limit + 2) {

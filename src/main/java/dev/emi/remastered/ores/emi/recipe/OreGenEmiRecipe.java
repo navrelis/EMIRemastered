@@ -123,6 +123,11 @@ public class OreGenEmiRecipe extends AbstractPlacedFeatureEmiRecipe {
 	}
 
 	@Override
+	protected HeightProvider heightProvider() {
+		return heightProvider;
+	}
+
+	@Override
 	public EmiRecipeCategory getCategory() {
 		return OresRecipeCategories.OREGEN;
 	}
@@ -174,7 +179,7 @@ public class OreGenEmiRecipe extends AbstractPlacedFeatureEmiRecipe {
 		addBiomeBand(widgets, bodyHeight());
 
 		if (discardChanceOnAirExposure > 0)
-			widgets.addSlot(EmiStack.of(Items.BARRIER).setChance(discardChanceOnAirExposure), 142, 18)
+			widgets.addSlot(EmiStack.of(Items.BARRIER).setChance(discardChanceOnAirExposure), 142, 0)
 					.appendTooltip(Text.translatable("emi_ores.discard_on_air_chance"));
 
 		Text veinFreq = getVeinFreqComponent(countMin, countMax, rarityChance);

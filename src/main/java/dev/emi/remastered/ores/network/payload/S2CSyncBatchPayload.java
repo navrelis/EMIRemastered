@@ -22,7 +22,7 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * A batch of placed features of a sync, each as an id, a JSON string (the format of the original EMI Ores) and the
- * indices of its biomes in the biome table of the start packet. The batch with the {@code last} flag ends the sync.
+ * indices of its biomes in the biome table of the start packet. The sync is ended by {@link S2CSyncCompletePayload}.
  */
 public record S2CSyncBatchPayload(SyncBatch<PlacedFeature> batch) implements CustomPayload {
 	public static final Id<S2CSyncBatchPayload> TYPE = new Id<>(Ores.id("sync_batch"));
@@ -33,7 +33,7 @@ public record S2CSyncBatchPayload(SyncBatch<PlacedFeature> batch) implements Cus
 
 	public static S2CSyncBatchPayload decode(PacketByteBuf buffer) {
 		int syncId = buffer.readVarInt();
-		boolean last = buffer.readBoolean();
+		int index = buffer.readVarInt();
 		int size = buffer.readVarInt();
 		List<SyncBatch.Entry<PlacedFeature>> entries = new ArrayList<>(size);
 		for (int i = 0; i < size; i++) {
@@ -49,13 +49,13 @@ public record S2CSyncBatchPayload(SyncBatch<PlacedFeature> batch) implements Cus
 			}
 			entries.add(new SyncBatch.Entry<>(id, feature, biomes));
 		}
-		return new S2CSyncBatchPayload(new SyncBatch<>(syncId, last, entries));
+		return new S2CSyncBatchPayload(new SyncBatch<>(syncId, index, entries));
 	}
 
 	public static void encode(PacketByteBuf buffer, S2CSyncBatchPayload packet) {
 		SyncBatch<PlacedFeature> batch = packet.batch;
 		buffer.writeVarInt(batch.syncId());
-		buffer.writeBoolean(batch.last());
+		buffer.writeVarInt(batch.index());
 		buffer.writeVarInt(batch.entries().size());
 		for (SyncBatch.Entry<PlacedFeature> entry : batch.entries()) {
 			buffer.writeIdentifier(entry.id());

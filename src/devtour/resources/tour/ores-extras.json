@@ -1,0 +1,52 @@
+{
+  "description": "Ores extras: height graph with highlighted peak and Y caption, dimension line, compact biome lists (all biomes, +N more), and the World Generation section on the Item Info page of an ore.",
+  "warmupTicks": 120,
+  "settleTicks": 20,
+  "steps": [
+    { "type": "resize", "w": 1280, "h": 720 },
+    { "type": "set_gui_scale", "n": 2 },
+    { "type": "command", "text": "/time set day" },
+    { "type": "wait", "ticks": 40 },
+    { "type": "emi_wait_loaded" },
+    { "type": "note", "text": "ore sync arrives with the join; EMI reloads once more when the sync completes after EMI's first load" },
+
+    { "type": "emi_recipes", "item": "minecraft:diamond_ore" },
+    { "type": "emi_category", "id": "emi_ores:oregen" },
+    { "type": "screenshot", "name": "oregen-diamond-peak-y" },
+    { "type": "close_screen" },
+
+    { "type": "emi_recipes", "item": "minecraft:emerald_ore" },
+    { "type": "emi_category", "id": "emi_ores:oregen" },
+    { "type": "screenshot", "name": "oregen-emerald-long-biome-list" },
+    { "type": "close_screen" },
+
+    { "type": "emi_recipes", "item": "minecraft:coal_ore" },
+    { "type": "emi_category", "id": "emi_ores:oregen" },
+    { "type": "screenshot", "name": "oregen-coal-all-biomes" },
+    { "type": "close_screen" },
+
+    { "type": "emi_recipes", "item": "minecraft:ancient_debris" },
+    { "type": "emi_category", "id": "emi_ores:oregen" },
+    { "type": "screenshot", "name": "oregen-ancient-debris-nether" },
+    { "type": "close_screen" },
+
+    { "type": "emi_recipes", "item": "minecraft:budding_amethyst" },
+    { "type": "emi_category", "id": "emi_ores:geode" },
+    { "type": "screenshot", "name": "geode-amethyst" },
+    { "type": "close_screen" },
+
+    { "type": "open_inventory" },
+    { "type": "emi_stack_key", "item": "minecraft:diamond_ore", "key": "I" },
+    { "type": "screenshot", "name": "info-diamond-ore" },
+    { "type": "close_screen" },
+
+    { "type": "open_inventory" },
+    { "type": "emi_stack_key", "item": "minecraft:emerald_ore", "key": "I" },
+    { "type": "screenshot", "name": "info-emerald-ore" },
+    { "type": "close_screen" },
+
+    { "type": "open_inventory" },
+    { "type": "emi_search", "text": "$overworld" },
+    { "type": "screenshot", "name": "search-biomes-of-overworld" }
+  ]
+}

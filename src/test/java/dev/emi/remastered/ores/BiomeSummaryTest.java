@@ -105,6 +105,19 @@ class BiomeSummaryTest {
 	}
 
 	@Test
+	void notCompactListsEveryBiomeAndHidesNothing() {
+		List<Identifier> overworld = biomes("minecraft", 60);
+		List<Section> sections = BiomeSummary.summarize(overworld, List.of(dimension("overworld", overworld)), 5, false);
+		assertEquals(1, sections.size());
+		assertEquals(Kind.LIST, sections.get(0).kind());
+		assertEquals(60, sections.get(0).listed().size());
+		BiomeSummary.Split split = BiomeSummary.split(sections.get(0).listed(), 5, false);
+		assertEquals(60, split.shown().size());
+		assertTrue(split.hidden().isEmpty());
+		assertEquals(5, BiomeSummary.split(sections.get(0).listed(), 5, true).shown().size());
+	}
+
+	@Test
 	void sortsMinecraftFirst() {
 		List<Identifier> sorted = BiomeSummary.sorted(List.of(Identifier.of("b", "x"), Identifier.of("a", "y"), mc("z"), mc("a")));
 		assertEquals(List.of(mc("a"), mc("z"), Identifier.of("a", "y"), Identifier.of("b", "x")), sorted);

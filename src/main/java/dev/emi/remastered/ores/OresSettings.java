@@ -16,7 +16,11 @@ public class OresSettings {
 	@ConfigValue("ores.show-height-values-for-current-dimension-by-default")
 	public static boolean showHeightValuesForCurrentDimensionByDefault = false;
 
-	@Comment("How many biome icons a biome list shows before it is cut down to a +N more label (1 to 16). Whole dimensions are summed up as All biomes.")
+	@Comment("Cut long biome lists down to a few icons and a +N more label, and sum up whole dimensions as All biomes (applies after an EMI reload).")
+	@ConfigValue("ores.compact-biome-list")
+	public static boolean compactBiomeList = true;
+
+	@Comment("How many biome icons a compact biome list shows before it is cut down to a +N more label (1 to 16).")
 	@ConfigValue("ores.biome-icons")
 	public static int biomeIcons = 5;
 
@@ -24,9 +28,13 @@ public class OresSettings {
 	@ConfigValue("ores.show-player-height")
 	public static boolean showPlayerHeight = true;
 
-	@Comment("Highlight the best height (the peak of the distribution, or the whole band for uniform ones) on the height graph.")
+	@Comment("Highlight the best height (the peak of the distribution, or the whole band for uniform ones) on the height graph and write it below.")
 	@ConfigValue("ores.highlight-best-height")
 	public static boolean highlightBestHeight = true;
+
+	@Comment("Add a World generation section with dimension, best height and biomes to the Item Info page of ores (applies after an EMI reload).")
+	@ConfigValue("ores.show-info-section")
+	public static boolean showInfoSection = true;
 
 	/** The icon limit, kept in a sensible range. */
 	public static int biomeIconLimit() {

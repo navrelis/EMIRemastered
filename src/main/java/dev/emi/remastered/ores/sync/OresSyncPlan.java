@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Set;
 import net.minecraft.util.Identifier;
 
-/** What the server sends for one sync: the header and the feature batches, the last batch flagged. */
+/** What the server sends for one sync: the start header, the numbered feature batches and the complete marker. */
 public record OresSyncPlan<F>(SyncHeader header, List<SyncBatch<F>> batches) {
 	/** Features per batch. */
 	public static final int MAX_FEATURES_PER_BATCH = 100;
@@ -25,6 +25,11 @@ public record OresSyncPlan<F>(SyncHeader header, List<SyncBatch<F>> batches) {
 	}
 
 	public record DimensionSource(Identifier id, int bottomY, int topY, Collection<Identifier> biomes) {
+	}
+
+	/** The marker that ends the sync, sent after the last batch. */
+	public SyncComplete complete() {
+		return new SyncComplete(header.syncId(), batches.size());
 	}
 
 	public static <F> OresSyncPlan<F> build(int syncId, Map<Identifier, Feature<F>> features, List<DimensionSource> dimensions) {
@@ -45,17 +50,18 @@ public record OresSyncPlan<F>(SyncHeader header, List<SyncBatch<F>> batches) {
 		for (Map.Entry<Identifier, Feature<F>> entry : features.entrySet()) {
 			Feature<F> feature = entry.getValue();
 			if (!current.isEmpty() && (current.size() >= maxFeatures || currentSize + feature.size() > maxSize)) {
-				batches.add(new SyncBatch<>(syncId, false, current));
+				batches.add(new SyncBatch<>(syncId, batches.size(), current));
 				current = new ArrayList<>();
 				currentSize = 0;
 			}
 			current.add(new SyncBatch.Entry<>(entry.getKey(), feature.feature(), indices(table, feature.biomes())));
 			currentSize += feature.size();
 		}
-		// the final batch always exists, it carries the end-of-sync flag even when there are no features
-		batches.add(new SyncBatch<>(syncId, true, current));
+		if (!current.isEmpty()) {
+			batches.add(new SyncBatch<>(syncId, batches.size(), current));
+		}
 
-		SyncHeader header = new SyncHeader(syncId, features.size(), new ArrayList<>(table.keySet()), headerDimensions);
+		SyncHeader header = new SyncHeader(syncId, batches.size(), features.size(), new ArrayList<>(table.keySet()), headerDimensions);
 		return new OresSyncPlan<>(header, batches);
 	}
 
