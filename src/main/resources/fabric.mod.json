@@ -3,7 +3,7 @@
   "id": "emi",
   "version": "${version}",
   "name": "EMI Remastered",
-  "description": "A featureful and accessible item and recipe viewer. EMI Remastered is EMI with these add-ons built in: EMI Loot, EMI Ores, EMIffect, EMI Enchanting, EMI Professions, Let's Do EMI Compat and Distraction Free Recipes.",
+  "description": "EMI 1.1.24 and seven EMI add-ons (Loot, Ores, Effects, Enchanting, Professions, Let's Do, Distraction Free) merged into one Fabric 1.21.1 mod, plus pages that show where things come from.",
   "authors": [
     "Emi",
     "navrelis"
