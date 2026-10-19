@@ -100,3 +100,6 @@
 2026-10-19 | delegated: FX-SER (Sonnet short), LOOT-VAN (Sonnet short), T2-SHOTS screenshot review (Sonnet short, read-only)
 2026-10-19 | FX-SER review (lead) | accepted: null serializer -> EMPTY + one WARN per type per session, typeless object -> EMPTY + one-line WARN, real serializer errors still ERROR; callers keep raw entries (agent checked each); merged, build green
 2026-10-19 | LOOT-VAN review (lead) | accepted: CodePlacedLoot by StructureType from 1.21.1 generator sources, only tables present in the loot registry, before propagation; merged, build green. Lead noticed in shot: trade row 'Bought by Villagers' shows emerald icon with x22 (amount of viewed item) -> fix batch
+2026-10-19 | owner request: check with Nytheria pack; description, summary, pixel-art logo. Owner then went offline: 'no questions asked anymore'
+2026-10-19 | Phase 4 jar swap (lead) | pack client closed, game lock taken, 8 jars -> mods_backup/, EMIRemastered-1.21.1-2.0.0-Fabric.jar (build of 5a075026) -> mods/, lock removed; owner launch pending (owner decision: owner launches)
+2026-10-19 | delegated: PACK-CLI (Opus long, precision: real vs dev-artefact mixin failures), PACK-SRV (Sonnet long), BRAND (Sonnet short), LOGO (Opus long, visual quality)
