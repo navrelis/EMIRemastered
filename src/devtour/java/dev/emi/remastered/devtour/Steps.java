@@ -14,14 +14,18 @@ import com.google.gson.JsonElement;
 import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.stack.EmiStack;
+import dev.emi.emi.api.stack.EmiStackInteraction;
 import dev.emi.emi.runtime.EmiReloadManager;
 import dev.emi.emi.screen.ConfigScreen;
+import dev.emi.emi.screen.EmiScreenManager;
 import dev.emi.emi.screen.RecipeScreen;
 import dev.emi.emi.screen.RecipeTab;
+import dev.emi.remastered.effects.EffectEmiStack;
 import dev.emi.emi.search.EmiSearch;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
+import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.server.integrated.IntegratedServer;
@@ -200,11 +204,23 @@ public final class Steps {
 		});
 
 		// {"type":"emi_recipes","item":"minecraft:iron_pickaxe"}  (EmiApi.displayRecipes)
+		// {"type":"emi_recipes","effect":"minecraft:speed"}  page of a status effect (effects module)
 		register("emi_recipes", (args, ctx) -> {
 			requireWorld(ctx);
-			String id = args.str("item");
 			Screen before = ctx.client.currentScreen;
-			EmiApi.displayRecipes(EmiStack.of(resolveItem(id)));
+			String id;
+			if (args.has("effect")) {
+				id = args.str("effect");
+				Identifier ident = Identifier.tryParse(id);
+				StatusEffect effect = ident == null ? null : Registries.STATUS_EFFECT.get(ident);
+				if (effect == null) {
+					throw new IllegalArgumentException("unknown effect '" + id + "'");
+				}
+				EmiApi.displayRecipes(new EffectEmiStack(effect));
+			} else {
+				id = args.str("item");
+				EmiApi.displayRecipes(EmiStack.of(resolveItem(id)));
+			}
 			return afterRecipeScreen(ctx, before, "recipes", id);
 		});
 
@@ -215,6 +231,18 @@ public final class Steps {
 			Screen before = ctx.client.currentScreen;
 			EmiApi.displayUses(EmiStack.of(resolveItem(id)));
 			return afterRecipeScreen(ctx, before, "uses", id);
+		});
+
+		// {"type":"click","x":383,"y":270}  left click (optional "button") at GUI-scaled coordinates in the open screen
+		register("click", (args, ctx) -> {
+			Screen screen = ctx.client.currentScreen;
+			if (screen == null) {
+				throw new IllegalStateException("no screen is open");
+			}
+			int button = args.intVal("button", 0);
+			screen.mouseClicked(args.intVal("x"), args.intVal("y"), button);
+			screen.mouseReleased(args.intVal("x"), args.intVal("y"), button);
+			return waitTicks(2);
 		});
 
 		// {"type":"emi_category","id":"emi:fuel"}  switches the open recipe screen to that category's tab
@@ -283,6 +311,29 @@ public final class Steps {
 			};
 		});
 
+		// {"type":"emi_stack_key","item":"minecraft:iron_ingot","key":"I"}  a key press on a hovered stack, through
+		// EMI's stack interaction (what EMI does for the stack under the mouse): view recipes/uses, favourite, item info...
+		register("emi_stack_key", (args, ctx) -> {
+			requireWorld(ctx);
+			String id = args.str("item");
+			int key = resolveKey(args.str("key"));
+			int scancode = GLFW.glfwGetKeyScancode(key);
+			Screen before = ctx.client.currentScreen;
+			boolean handled = EmiScreenManager.stackInteraction(new EmiStackInteraction(EmiStack.of(resolveItem(id))),
+				bind -> bind.matchesKey(key, scancode));
+			ctx.info("handled=" + handled + " screen " + screenName(before) + " -> " + screenName(ctx.client.currentScreen));
+			return waitTicks(2);
+		});
+
+		// {"type":"screen_scroll","amount":-3}  mouse wheel in the middle of the current screen (negative = down)
+		register("screen_scroll", (args, ctx) -> {
+			Screen screen = ctx.client.currentScreen;
+			if (screen == null) {
+				throw new IllegalStateException("no screen open");
+			}
+			screen.mouseScrolled(screen.width / 2.0, screen.height / 2.0, 0, args.intVal("amount", -3));
+			return waitTicks(2);
+		});
 		// {"type":"command","text":"/time set day"}  runs a command on the integrated server as the server (op 4)
 		register("command", (args, ctx) -> {
 			IntegratedServer server = ctx.client.getServer();

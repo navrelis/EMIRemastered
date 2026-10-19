@@ -1,22 +1,38 @@
+/*
+ * Copyright (c) Abbie, licensed under LGPL-3.0-only; modified for EMI Remastered.
+ */
 package dev.emi.remastered.ores;
 
+import dev.emi.emi.api.EmiInitRegistry;
 import dev.emi.emi.api.EmiRegistry;
+import dev.emi.remastered.ores.client.OresClient;
+import dev.emi.remastered.ores.client.OresEmiRegistration;
+import dev.emi.remastered.ores.network.OresFeaturesSender;
+import dev.emi.remastered.ores.network.payload.S2CSendBiomeInfoPayload;
+import dev.emi.remastered.ores.network.payload.S2CSendFeaturesPayload;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 
-/** PORTER-owned stub (P5); replaced by the ported module code. */
-public final class OresContent {
+public class OresContent {
 
-	private OresContent() {
-	}
-
-	/** Both sides, always: payload types, server listeners. */
+	/** Common init, runs on the client and the dedicated server. */
 	public static void init() {
+		PayloadTypeRegistry.playS2C().register(S2CSendBiomeInfoPayload.TYPE, S2CSendBiomeInfoPayload.CODEC);
+		PayloadTypeRegistry.playS2C().register(S2CSendFeaturesPayload.TYPE, S2CSendFeaturesPayload.CODEC);
+
+		ServerLifecycleEvents.SYNC_DATA_PACK_CONTENTS.register(OresFeaturesSender::onSyncDataPackContents);
 	}
 
-	/** Client, only when the module is enabled at startup. */
+	/** Client-only init, only called when the module is enabled. */
 	public static void initClient() {
+		OresClient.init();
 	}
 
-	/** EMI registration, only while the module is enabled. */
+	public static void initialize(EmiInitRegistry registry) {
+		OresEmiRegistration.initialize(registry);
+	}
+
 	public static void register(EmiRegistry registry) {
+		OresEmiRegistration.register(registry);
 	}
 }

@@ -24,3 +24,20 @@
 2026-10-19 | P3 review (lead) | accepted: 6 classes, no mixins, server-safe; merged (add/add on stubs -> porter versions), build+tests green
 2026-10-19 | A4 villager trades in professions module (Sonnet, long) | delegated, wip/a4-trades
 2026-10-19 | auto-handoff: all agents stopped, partial work uncommitted in worktrees; see F:\Coding\EMI_Remastered\handoff-2026-10-19-5f3846e1.md
+2026-10-19 | session 2: handoff checked against repo (matches; Q3 also touched EmiHidden/EmiPersistentData/EmiSearch); F1-based worktrees P4/P5/P7/Q3 got WIP commits + merge of remastered (stub add/add -> porter versions); all worktrees muted (run/options.txt)
+2026-10-19 | wave 1 delegated (continue in worktree, shared rules file): P7 loot, P5 ores, P4 enchanting, P1 DFR+A10, P2 effects+A3, Q1b tour+mute enforcement, A4 trades (Sonnet); P6 letsdo new (Sonnet, long); Q3 perf, A1 info (Opus, long)
+2026-10-19 | B3+B4 new module tools (Sonnet, long) | delegated, wip/b-tools (no jump icon: lead adds later)
+2026-10-19 | P5 review (lead) | accepted: faithful port, LGPL headers, OresEmiPlugin initialize forwarding (needed for biome serializer), canSend guard; merged a123b92, build+tests green. Follow-up for A9: batch-complete marker so a reload mid-sync can't see partial features
+2026-10-19 | P7 review (lead) | accepted: faithful port, 11 AW class lines (no EMI lines removed), 6 S2C payloads canSend-guarded, settings restored to upstream set; merged 5e68fda, build+tests green. Note: lootify condition/function types registered like upstream
+2026-10-19 | A8 loot extras (Sonnet), A9 ores extras + sync marker (Sonnet), A7 mobs module (Sonnet, long) | delegated, own worktrees from c7cf633
+2026-10-19 | P1+A10 review (lead) | accepted: upstream behaviour, no mixins, marked edits in EmiScreenManager (isVisible delegates to new isBaseVisible + DF hiding, same as upstream mixin; no signature changes) and EmiSearchWidget; module off = stock; merged, build+tests green. Manual: real clicks on Show/Hide buttons, crafting-table scope
+2026-10-19 | owner: dev clients grab his mouse -> all agents told: no OS input, no client launches until no-grab fix lands (Q1b, urgent)
+2026-10-19 | P4 review (lead) | accepted: dynamic-registry enchantments, porter's EmiApi mixin dropped (no mixins into EMI); merged, build green. Lost extra: show-recipes on multi-enchant books (needs EMI hook, optional)
+2026-10-19 | A4 review (lead) | accepted: 485 villager + 70 wanderer trades, per-factory try/catch, SellMap accessor placeholder, Villager API reflection isolated (untested live); also fixed P3 recipe ids (26 EMI errors gone); merged
+2026-10-19 | P6 review (lead) | accepted: sub-modules loaded by name after isModLoaded, LinkageError caught per sub-module, dedupe vs native vinery/bakery/farm_and_charm plugins, tested with real pack jars in run/mods; merged, build+tests green
+2026-10-19 | B3+B4 (Sonnet) | code done, build green; client checks pending (no-client rule); default binds T / Ctrl+C to be checked against text fields
+2026-10-19 | P2+A3 review (lead) | accepted: one-pass index (63-93 ms vs ~1.1 s upstream cold), emiffect:effect id kept + favourites string bug fixed, sources table, EffectsEmiPlugin initialize forwarding; merged, build green. Steps.java click step will clash with Q1b (resolve at merge). Manual: module-off client check
+2026-10-19 | A1 review (lead) | accepted: module info (ns emi_info), API in info.api + docs/INFO_PROVIDERS.md, recipes/no-source/fuel/compost providers, mixins into EmiApi/EmiScreenManager (HEAD, cancellable only when InfoScreen open), icon index 8; merged, build green. Follow-up: exempt dev.emi.remastered mixins from EMI 'tainted' warning
+2026-10-19 | A7 mobs (Sonnet) | code done, build+server green; client checks pending
+2026-10-19 | wave 3 delegated (Sonnet, no client launches until D13 fix): A2 enchanting extras, Q2 bug survey, A5+B1 stats module, B5 advancement provider, X1 /emiexport
+2026-10-19 | auto-handoff: all agents stopped; partial work uncommitted in worktrees; see F:\Coding\EMI_Remastered\handoff-2026-10-19-5b513619.md

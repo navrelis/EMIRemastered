@@ -1,0 +1,19 @@
+package dev.emi.remastered.loot.parser;
+
+import dev.emi.remastered.loot.EMILoot;
+import dev.emi.remastered.loot.util.LText;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.predicate.NbtPredicate;
+import net.minecraft.text.Text;
+
+public class NbtPredicateParser {
+
+    public static Text parseNbtPredicate(NbtPredicate predicate) {
+        NbtCompound nbt = predicate.nbt();
+        if (nbt.isEmpty()) {
+            if (EMILoot.isDebug()) EMILoot.LOGGER.warn("Empty or unparsable nbt predicate in table: "  + LootTableParser.currentTable);
+            return LText.translatable("emi_loot.predicate.invalid");
+        }
+        return LText.translatable("emi_loot.entity_predicate.nbt", nbt.toString());
+    }
+}

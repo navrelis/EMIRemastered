@@ -72,6 +72,7 @@ import dev.emi.emi.screen.widget.SidebarButtonWidget;
 import dev.emi.emi.screen.widget.SizedButtonWidget;
 import dev.emi.emi.search.EmiSearch;
 import dev.emi.emi.search.EmiSearch.CompiledQuery;
+import dev.emi.remastered.distractionfree.DistractionFree;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.ParentElement;
@@ -194,10 +195,11 @@ public class EmiScreenManager {
 				SidebarSettings.RIGHT);
 
 		spaceExclusion = Lists.newArrayList();
-		if (panels.get(0).isVisible()) {
+		// EMI Remastered: the layout ignores distraction-free hiding so that the other panels do not move when the index fades in
+		if (panels.get(0).isBaseVisible()) {
 			spaceExclusion.add(panels.get(0).getBounds());
 		}
-		if (panels.get(1).isVisible()) {
+		if (panels.get(1).isBaseVisible()) {
 			spaceExclusion.add(panels.get(1).getBounds());
 		}
 		spaceExclusion.addAll(exclusion);
@@ -268,7 +270,8 @@ public class EmiScreenManager {
 	}
 
 	private static int getVerticalConstraint(SidebarPanel panel, int cx, int def, int max, boolean top) {
-		if (panel.isVisible()) {
+		// EMI Remastered: isBaseVisible, see recalculate
+		if (panel.isBaseVisible()) {
 			Bounds bounds = panel.getBounds();
 			if (bounds.x() <= cx && bounds.right() >= cx) {
 				return top ? Math.max(def, bounds.top()) : Math.min(def, bounds.bottom());
@@ -604,9 +607,16 @@ public class EmiScreenManager {
 		recalculate();
 		EmiScreenBase base = EmiScreenBase.getCurrent();
 		if (!base.isEmpty()) {
+			DistractionFree.update(); // EMI Remastered
 			EmiProfiler.push("sidebar");
 			for (SidebarPanel panel : panels) {
-				panel.drawBackground(context, mouseX, mouseY, delta);
+				// EMI Remastered: distraction-free slide and fade
+				boolean transformed = DistractionFree.beginTransform(context, panel);
+				try {
+					panel.drawBackground(context, mouseX, mouseY, delta);
+				} finally {
+					DistractionFree.endTransform(context, transformed);
+				}
 			}
 		}
 	}
@@ -620,6 +630,7 @@ public class EmiScreenManager {
 			EmiProfiler.pop();
 			return;
 		}
+		DistractionFree.update(); // EMI Remastered
 		boolean visible = !isDisabled();
 		emi.visible = EmiConfig.emiConfigButtonVisibility.resolve(visible);
 		tree.visible = EmiConfig.recipeTreeButtonVisibility.resolve(visible);
@@ -655,7 +666,13 @@ public class EmiScreenManager {
 		}
 		EmiProfiler.push("sidebars");
 		for (SidebarPanel panel : panels) {
-			panel.render(context, mouseX, mouseY, delta);
+			// EMI Remastered: distraction-free slide and fade
+			boolean transformed = DistractionFree.beginTransform(context, panel);
+			try {
+				panel.render(context, mouseX, mouseY, delta);
+			} finally {
+				DistractionFree.endTransform(context, transformed);
+			}
 		}
 
 		renderLastHoveredCraftable(context, mouseX, mouseY, delta, base);
@@ -1005,6 +1022,10 @@ public class EmiScreenManager {
 			}
 			return false;
 		}
+		// EMI Remastered: distraction-free "Show Recipes" and "Hide Recipes" buttons
+		if (DistractionFree.mouseClicked(mouseX, mouseY, button)) {
+			return true;
+		}
 		recalculate();
 		EmiIngredient ingredient = getHoveredStack((int) mouseX, (int) mouseY, !isClickClicky(button)).getStack();
 		pressedStack = ingredient;
@@ -1165,6 +1186,10 @@ public class EmiScreenManager {
 	public static boolean genericInteraction(Function<EmiBind, Boolean> function) {
 		if (function.apply(EmiConfig.toggleVisibility)) {
 			toggleVisibility(true);
+			return true;
+		}
+		// EMI Remastered: distraction-free pin bind
+		if (DistractionFree.handleBind(function)) {
 			return true;
 		}
 		boolean searchBreak = false;
@@ -1497,7 +1522,17 @@ public class EmiScreenManager {
 						cycleType(1);
 					}
 				}
-				if (isVisible()) {
+				// EMI Remastered: a fading distraction-free panel is drawn although isVisible() is false
+				if (isBaseVisible() && DistractionFree.isDrawn(this)) {
+					boolean fading = !isVisible();
+					if (fading) {
+						pageLeft.visible = header;
+						cycle.visible = header;
+						pageRight.visible = header;
+						// no hover effects while the panel is not interactive
+						mouseX = -10000;
+						mouseY = -10000;
+					}
 					EmiProfiler.swap(side.getName());
 					context.push();
 					context.matrices().translate(0, 0, 100);
@@ -1505,6 +1540,11 @@ public class EmiScreenManager {
 					cycle.render(context.raw(), mouseX, mouseY, delta);
 					pageRight.render(context.raw(), mouseX, mouseY, delta);
 					context.pop();
+					if (fading) {
+						pageLeft.visible = false;
+						cycle.visible = false;
+						pageRight.visible = false;
+					}
 					int totalPages = (space.getStacks().size() - 1) / space.pageSize + 1;
 					wrapPage();
 					drawHeader(context, mouseX, mouseY, delta, page, totalPages);
@@ -1515,6 +1555,9 @@ public class EmiScreenManager {
 							space.render(context, mouseX, mouseY, delta, 0);
 						}
 					}
+					DistractionFree.renderHideButton(context, this, mouseX, mouseY);
+				} else if (isBaseVisible()) {
+					DistractionFree.renderHint(context, this, mouseX, mouseY);
 				}
 			} catch (Exception e) {
 				EmiLog.error("Error rendering sidebar", e);
@@ -1533,9 +1576,10 @@ public class EmiScreenManager {
 						cycleType(1);
 					}
 				}
-				if (isVisible()) {
+				// EMI Remastered: a fading distraction-free panel is drawn although isVisible() is false
+				if (isBaseVisible() && DistractionFree.isDrawn(this)) {
 					context.enableDepthTest();
-					context.resetColor();
+					DistractionFree.applyColor(context, this);
 					int headerOffset = header ? 18 : 0;
 					if (theme == SidebarTheme.VANILLA) {
 						int totalHeight = 18 + headerOffset;
@@ -1634,6 +1678,12 @@ public class EmiScreenManager {
 		}
 
 		public boolean isVisible() {
+			// EMI Remastered: distraction-free mode hides the index panel until you search
+			return isBaseVisible() && !DistractionFree.isHidden(this);
+		}
+
+		// EMI Remastered: EMI's own visibility rules, without distraction-free hiding; used for layout and drawing
+		public boolean isBaseVisible() {
 			if (this.space == null) {
 				return false;
 			}

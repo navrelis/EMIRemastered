@@ -12,6 +12,7 @@ EMI Remastered is EMI (mod id `emi`) plus seven built-in modules. Each former ad
 | `professions` | `dev.emi.remastered.professions` | `Professions` | `emiprofessions` | yes |
 | `letsdo` | `dev.emi.remastered.letsdo` | `LetsDo` | `emi_letsdo_compat` | yes |
 | `distraction_free` | `dev.emi.remastered.distractionfree` | `DistractionFree` | `distraction_free_recipes` | no (EMI core screen code) |
+| `info` | `dev.emi.remastered.info` | `Info` | `emi_info` | no (new module: Item Info screen, provider API in `docs/INFO_PROVIDERS.md`) |
 
 ## Files of a module
 

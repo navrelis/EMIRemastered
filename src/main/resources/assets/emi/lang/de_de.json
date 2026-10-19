@@ -901,5 +901,7 @@
   "config.emi.modules.letsdo": "Let's Do (Let's Do EMI Compat)",
   "config.emi.tooltip.modules.letsdo": "Zeigt Rezepte der Let's-Do-Mods (Vinery, Meadow, Bakery, ...).",
   "config.emi.modules.distraction_free": "Ablenkungsfreie Rezepte",
-  "config.emi.tooltip.modules.distraction_free": "Blendet EMIs Index aus, bis du nach etwas suchst."
+  "config.emi.tooltip.modules.distraction_free": "Blendet EMIs Index aus, bis du nach etwas suchst.",
+  "config.emi.modules.info": "Gegenstandsinfo",
+  "config.emi.tooltip.modules.info": "Eine Taste (Standard I) auf einem Stapel öffnet eine Übersicht: wie man ihn bekommt, wofür er verwendet wird und Details."
 }
