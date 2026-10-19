@@ -93,6 +93,8 @@ All settings are optional (defaults shown). `settleTicks` is how many ticks a sc
 | `emi_bom` | | opens the recipe tree (bill of materials) screen |
 | `open_emi_config` | | opens EMI's config screen |
 | `key` | `key`, optional `modifiers` (`shift`/`ctrl`/`alt`) | press + release of a key through the game's keyboard handler; `key` is a GLFW name without prefix (`E`, `F3`, `LEFT_CONTROL`, `KEY_R`, `GLFW_KEY_R`) or a number. Key bindings and open screens react as to a real key press (modifiers are passed to the event only; held-modifier checks via GLFW state do not see them) |
+| `emi_stack_key` | `item`, `key` | a key press on that stack through EMI's stack interaction (what EMI does for the stack under the mouse: view recipes/uses, favourite, item info, ...); records whether it was handled and the screen change |
+| `screen_scroll` | `amount` (-3) | mouse wheel in the middle of the current screen (negative = down) |
 | `command` | `text` (`/time set day`), optional `waitTicks` | runs a command on the integrated server with op level 4 (works without cheats) |
 | `set_gui_scale` | `n` (0 = auto) | changes the GUI scale option |
 | `resize` | `w`, `h` | resizes the window (windowed mode) |
