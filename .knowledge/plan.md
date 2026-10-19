@@ -44,7 +44,7 @@ Status: open / in progress / in review / done. `||` = can run in parallel.
 | A10 | Distraction-free extras (in P1) | P1 | Sonnet | done (P1) |
 | A11 | Unified config + plugin manager (in F2) | F2 | Opus | done |
 | A12 | Reload performance (Q3) | - | Opus | in progress (Q3) |
-| B2 | `world` module: biome pages (climate, tags, spawns, ores) + structure pages (server sync) | P5, A7 | Sonnet long | in progress (session 4) |
+| B2 | `world` module: biome pages (climate, tags, spawns, ores) + structure pages (server sync) | P5, A7 | Sonnet long | done (merged; 34 structures/64 biomes in dev; real multiplayer untested; jump icon slot 12 pending) |
 | B3 | Tag browser screen (all tags, search, members) | F2 | Sonnet | done (merged; client tour pending after Q1b) |
 | B4 | Copy recipe as text/JSON bind | F2 | Sonnet short | done (with B3) |
 | B5 | Advancement links in item info (icon/display) | A1 | Sonnet short | done (merged; client tour in T1) |
@@ -60,7 +60,8 @@ Status: open / in progress / in review / done. `||` = can run in parallel.
 | FX3 | KB17, KB18, KB22, KB23, KB28, KB29 (loot, ores, enchanting) | Sonnet | done (merged; limits: R/U on books only up to listed level (max+5, <=10), Grinding tab before Enchantments on U) |
 | P8 | Info providers: villager trades (professions), effects | Sonnet long | done (merged; coveredCategories(stack) API; item-info toggle not client-checked) |
 | KBdoc | Update docs/KNOWN_BUGS.md rows from FX1-FX3/Q3 reports (agents do not edit it, avoids conflicts) | Sonnet short | open (after FX1-FX3, Q3) |
-| -- | Later: KB7, KB13; world icon slot 12; README/CREDITS | - | open |
+| DOC1 | DEVTOUR.md: list new tours (world, fx2, fx3, p8) + WorldTour helper; world jump icon slot 12 (after T1) | Sonnet short | open |
+| -- | Later: KB7, KB13; README/CREDITS | - | open |
 
 ## Phase 4 Acceptance
 Pack install under game lock, end-to-end check, report, push.
