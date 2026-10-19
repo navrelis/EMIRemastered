@@ -1,6 +1,7 @@
 package dev.emi.emi.runtime;
 
 import java.util.AbstractList;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -10,7 +11,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.api.recipe.EmiPlayerInventory;
 import dev.emi.emi.api.recipe.EmiRecipe;
@@ -23,6 +23,7 @@ import dev.emi.emi.bom.BoM;
 import dev.emi.emi.bom.ChanceMaterialCost;
 import dev.emi.emi.bom.FlatMaterialCost;
 import dev.emi.emi.bom.MaterialNode;
+import dev.emi.remastered.runtime.PreservedEntries;
 import it.unimi.dsi.fastutil.objects.Object2LongLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
 import net.minecraft.util.Identifier;
@@ -33,6 +34,11 @@ public class EmiFavorites {
 	public static List<EmiFavorite.Synthetic> syntheticFavorites = Lists.newArrayList();
 	public static List<EmiFavorite> favoriteSidebar = new CompoundList<>(favorites, syntheticFavorites);
 
+	// EMI Remastered: favourites that could not be read stay in emi.json (KB3)
+	private static final PreservedEntries unreadFavorites = new PreservedEntries();
+	// EMI Remastered: recipe id of a favourite whose recipe is missing right now, written back unchanged (KB3)
+	private static final Map<EmiFavorite, String> missingRecipes = new IdentityHashMap<>();
+
 	public static JsonArray save() {
 		JsonArray arr = new JsonArray();
 		for (EmiFavorite fav : favorites) {
@@ -42,33 +48,63 @@ public class EmiFavorites {
 				obj.add("stack", stack);
 				if (fav.getRecipe() != null && fav.getRecipe().getId() != null) {
 					obj.addProperty("recipe", fav.getRecipe().getId().toString());
+				} else if (fav.getRecipe() == null && missingRecipes.containsKey(fav)) {
+					obj.addProperty("recipe", missingRecipes.get(fav)); // EMI Remastered
 				}
 				arr.add(obj);
 			}
 		}
-		return arr;
+		return unreadFavorites.mergeInto(arr); // EMI Remastered
 	}
 
 	public static void load(JsonArray arr) {
 		favorites.clear();
+		// EMI Remastered: every entry that does not become a favourite is kept verbatim (KB3)
+		unreadFavorites.clear();
+		missingRecipes.clear();
+		JsonElement previous = null;
+		int index = 0;
 		for (JsonElement el : arr) {
-			if (el.isJsonObject()) {
-				JsonObject json = el.getAsJsonObject();
-				EmiRecipe recipe = null;
-				if (JsonHelper.hasString(json, "recipe")) {
-					recipe = EmiApi.getRecipeManager().getRecipe(EmiPort.id(JsonHelper.getString(json, "recipe")));
-				}
-				if (JsonHelper.hasElement(json, "stack")) {
-					EmiIngredient ingredient = EmiIngredientSerializer.getDeserialized(json.get("stack"));
-					if (ingredient.isEmpty()) {
-						continue;
+			boolean read = false;
+			try {
+				if (el.isJsonObject()) {
+					JsonObject json = el.getAsJsonObject();
+					EmiRecipe recipe = null;
+					String missingRecipe = null;
+					if (JsonHelper.hasString(json, "recipe")) {
+						String recipeId = JsonHelper.getString(json, "recipe");
+						Identifier id = Identifier.tryParse(recipeId);
+						recipe = id == null ? null : EmiApi.getRecipeManager().getRecipe(id);
+						if (recipe == null) {
+							missingRecipe = recipeId;
+						}
 					}
-					if (ingredient instanceof EmiStack es) {
-						ingredient = es.copy();
+					if (JsonHelper.hasElement(json, "stack")) {
+						EmiIngredient ingredient = EmiIngredientSerializer.getDeserialized(json.get("stack").deepCopy());
+						if (!ingredient.isEmpty()) {
+							if (ingredient instanceof EmiStack es) {
+								ingredient = es.copy();
+							}
+							EmiFavorite favorite = new EmiFavorite(ingredient, recipe);
+							favorites.add(favorite);
+							if (missingRecipe != null) {
+								missingRecipes.put(favorite, missingRecipe);
+							}
+							read = true;
+						}
 					}
-					favorites.add(new EmiFavorite(ingredient, recipe));
 				}
+			} catch (Exception e) {
+				EmiLog.error("Failed to read favorite " + el, e);
 			}
+			if (!read) {
+				unreadFavorites.keep(el, previous, index);
+			}
+			previous = el;
+			index++;
+		}
+		if (!unreadFavorites.isEmpty()) {
+			EmiLog.warn("Keeping " + unreadFavorites.size() + " favorites that could not be read (missing mod or invalid data)");
 		}
 	}
 

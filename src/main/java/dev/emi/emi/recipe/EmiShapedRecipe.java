@@ -43,9 +43,18 @@ public class EmiShapedRecipe extends EmiCraftingRecipe {
 					inv.setStack(i, stack.getItemStack().copy());
 					CraftingRecipeInput cri = CraftingRecipeInput.create(inv.getWidth(), inv.getHeight(), inv.getHeldStacks());
 					if (cri.getWidth() <= 3 && cri.getHeight() <= 3) {
-						ItemStack remainder = recipe.getRemainder(cri).get((i / 3 * cri.getWidth()) + (i % 3));
-						if (!remainder.isEmpty()) {
-							stack.setRemainder(EmiStack.of(remainder));
+						// EMI Remastered: index into the cropped input, not the padded grid (KB8)
+						boolean[] occupied = new boolean[inv.size()];
+						for (int s = 0; s < occupied.length; s++) {
+							occupied[s] = !inv.getStack(s).isEmpty();
+						}
+						int idx = remainderIndex(i, inv.getWidth(), occupied);
+						List<ItemStack> remainders = recipe.getRemainder(cri);
+						if (idx >= 0 && idx < remainders.size()) {
+							ItemStack remainder = remainders.get(idx);
+							if (!remainder.isEmpty()) {
+								stack.setRemainder(EmiStack.of(remainder));
+							}
 						}
 					}
 				}
@@ -54,6 +63,25 @@ public class EmiShapedRecipe extends EmiCraftingRecipe {
 		} catch (Exception e) {
 			EmiLog.error("Exception thrown setting remainders for " + EmiPort.getId(recipe), e);
 		}
+	}
+
+	/**
+	 * EMI Remastered: index of a grid slot inside the cropped (bounding box of the occupied slots) crafting input.
+	 * Returns -1 if the slot is out of range or not occupied.
+	 */
+	public static int remainderIndex(int slot, int gridWidth, boolean[] occupied) {
+		if (gridWidth <= 0 || slot < 0 || slot >= occupied.length || !occupied[slot]) {
+			return -1;
+		}
+		int minRow = Integer.MAX_VALUE, minCol = Integer.MAX_VALUE, maxCol = Integer.MIN_VALUE;
+		for (int s = 0; s < occupied.length; s++) {
+			if (occupied[s]) {
+				minRow = Math.min(minRow, s / gridWidth);
+				minCol = Math.min(minCol, s % gridWidth);
+				maxCol = Math.max(maxCol, s % gridWidth);
+			}
+		}
+		return (slot / gridWidth - minRow) * (maxCol - minCol + 1) + (slot % gridWidth - minCol);
 	}
 
 	private static List<EmiIngredient> padIngredients(ShapedRecipe recipe) {

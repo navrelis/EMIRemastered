@@ -26,7 +26,7 @@ import net.minecraft.registry.entry.RegistryEntry;
  */
 final class EffectSourceCollector {
 	/** {@code OminousBottleItem} always gives Bad Omen for 120000 ticks (100 minutes). */
-	private static final int OMINOUS_BOTTLE_DURATION = 120000;
+	static final int OMINOUS_BOTTLE_DURATION = 120000;
 
 	private EffectSourceCollector() {
 	}

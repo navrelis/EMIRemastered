@@ -81,5 +81,11 @@
   "effect.minecraft.water_breathing.description": "Verhindert Ertrinken und erlaubt das Atmen unter Wasser.",
   "effect.minecraft.weakness.description": "Verringert den Nahkampfschaden; höhere Stufen verringern den verursachten Schaden weiter.",
   "effect.minecraft.wither.description": "Verursacht tödlichen Schaden über Zeit; höhere Stufen richten pro Sekunde mehr Schaden an.",
-  "effect.minecraft.bad_omen_legacy.description": "Löst beim Betreten eines Dorfes einen Überfall aus; höhere Stufen erhöhen die Schwierigkeit des Überfalls."
+  "effect.minecraft.bad_omen_legacy.description": "Löst beim Betreten eines Dorfes einen Überfall aus; höhere Stufen erhöhen die Schwierigkeit des Überfalls.",
+  "info.emiffect.item.title": "Effekte",
+  "info.emiffect.item.arrow": "Ein getränkter Pfeil wendet ein Achtel der Wirkungsdauer des Tranks an.",
+  "info.emiffect.item.lingering": "Die Wolke eines Verweiltranks wendet ein Viertel der Wirkungsdauer des Tranks an.",
+  "config.emi.effects.item_info": "Effekte in der Gegenstandsinfo",
+  "config.emi.tooltip.effects.item_info": "Fügt der Gegenstandsinfo die Effekte hinzu, die ein Gegenstand auslöst (Tränke, getränkte Pfeile, verdächtiger Eintopf, ...), mit Stufe und Dauer, sowie Quellen, Heilmittel und Modifikatoren eines Effekts.\nNahrung deckt der Abschnitt „Essen“ des Moduls „Werte“ ab. Bereits geöffnete Seiten werden nach einem EMI-Neuladen aktualisiert.",
+  "info.emiffect.item.open": "Effektseite anzeigen"
 }

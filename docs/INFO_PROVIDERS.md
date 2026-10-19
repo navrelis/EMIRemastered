@@ -18,7 +18,7 @@ effects, enchanting, stats, ...) and EMI plugins of other mods add their own sec
 
 | Type | Purpose |
 |---|---|
-| `ItemInfoProvider` | `getId()`, `getOrder()`, `getModuleId()`, `appliesTo(EmiStack)`, `collect(EmiStack, InfoCollector)`, `onReload()` |
+| `ItemInfoProvider` | `getId()`, `getOrder()`, `getModuleId()`, `appliesTo(EmiStack)`, `coveredCategories(EmiStack)`, `collect(EmiStack, InfoCollector)`, `onReload()` |
 | `ItemInfoRegistry` | `register(provider)` (same id replaces), `unregister(id)`, `getProviders()`, `getVersion()` |
 | `InfoCollector` | `getStack()`, `addSection(id, kind, title)`, `hasSource()` |
 | `InfoSection` | building blocks: `icon`, `source`, `text`, `stacks`, `link`, `bar`, `entry`, `element` (advanced) |
@@ -98,6 +98,12 @@ public void register(EmiRegistry registry) {
 - **Order.** Sections are shown by kind (`OBTAIN`, `USE`, `DETAILS`), then by provider order (`getOrder()`, ascending,
   then id), then in the order they were added. `ORDER_RECIPES` (0) is the built-in recipe provider, `ORDER_DEFAULT`
   (1000) the default, `ORDER_LAST` the "no known source" marker.
+- **Covered categories.** If a provider lists the recipes of an EMI category itself (trades, effect pages, ...), it
+  returns that category's id from `coveredCategories(stack)` and the built-in recipe provider leaves the category's
+  "Produced by" and "Used in" rows out for that stack, so the same recipes are not shown twice. Only declare a category
+  while the provider really shows that data for the stack: return an empty set when its setting is off or it has nothing
+  for the stack, and the built-in row stays. The ids of all active providers (module on, `appliesTo` true) are merged
+  once per page build; a provider that throws covers nothing. Categories are matched by `EmiRecipeCategory.getId()`.
 - **Sources.** An `OBTAIN` section counts as a source unless it calls `source(false)` (use that for sections that
   only describe the stack or turn it into itself). `InfoCollector.hasSource()` tells whether one exists so far.
 - **Rendering.** Providers do not draw; the screen lays out the building blocks (scrolling, every GUI scale, EMI
@@ -120,6 +126,13 @@ public void register(EmiRegistry registry) {
 
 "Produced by" skips EMI's tag, ingredient, resolution and fuel pseudo categories; recipes that need the stack itself as
 an input (repairing, cloning) are listed but do not count as a source. Info pages (`emi:info`) go to Details.
+
+## Providers of other modules
+
+| id | order | sections | covers |
+|---|---|---|---|
+| `emiprofessions:trades` (professions, setting `professions.item-info`) | 1000 | `emiprofessions:sold_by` (OBTAIN, trades that give the stack; "Earned from Villagers" for the emerald), `emiprofessions:bought_by` (USE, trades that take it): profession, level, price, max uses; many trades are grouped per profession | `emiprofessions:villager_trades`, `emiprofessions:wandering_trader` for stacks that have trades |
+| `emiffect:effects` (effects, setting `effects.item-info`) | 1000 | `emiffect:item_effects` (DETAILS: effects of potions, tipped arrows, stew, ominous bottles with level and duration; foods are left to the stats Food section); for effect stacks `emiffect:source/*` (OBTAIN), `emiffect:cures/*`, `emiffect:attributes/*` (DETAILS) | `emiffect:status_effect_info` for items with effects and effects with sources |
 
 ## Opening the screen from code
 

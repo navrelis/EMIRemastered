@@ -16,4 +16,8 @@ public class ProfessionsSettings {
 	@Comment("How often every trade factory is rolled to find the variants of random trades such as enchanted books. Needs an EMI reload.")
 	@ConfigValue("professions.trade-rolls")
 	public static int tradeRolls = 8;
+
+	@Comment("Adds the villager and wandering trader trades (sold by / bought by, profession, level, price) to the Item Info page of an item. Needs the trades above and the info module; open pages update after an EMI reload.")
+	@ConfigValue("professions.item-info")
+	public static boolean itemInfo = true;
 }

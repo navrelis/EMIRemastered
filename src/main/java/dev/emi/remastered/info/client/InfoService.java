@@ -82,7 +82,8 @@ public final class InfoService {
 		return new InfoPage(stack, sections, false, System.nanoTime() - start);
 	}
 
-	private static boolean isModuleOn(ItemInfoProvider provider) {
+	/** Whether the module of the provider is switched on (providers without a module always are). */
+	public static boolean isModuleOn(ItemInfoProvider provider) {
 		String moduleId = provider.getModuleId();
 		return moduleId == null || Modules.byId(moduleId).map(Module::isEnabled).orElse(true);
 	}

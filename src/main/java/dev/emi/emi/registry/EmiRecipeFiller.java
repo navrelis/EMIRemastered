@@ -212,7 +212,8 @@ public class EmiRecipeFiller {
 						maxAmount = Math.min(maxAmount, ui.max);
 					}
 				}
-				maxAmount = Math.min(maxAmount, amount + batchesAlreadyPresent(recipe, handler, screen));
+				// EMI Remastered: amount can be Integer.MAX_VALUE (fill max), sum in long to avoid overflow (KB9, upstream PR #1194)
+				maxAmount = Math.min(maxAmount, (int) Math.min(Integer.MAX_VALUE, (long) amount + batchesAlreadyPresent(recipe, handler, screen)));
 
 				if (maxAmount == 0) {
 					return null;

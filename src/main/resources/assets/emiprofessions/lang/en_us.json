@@ -18,5 +18,14 @@
   "config.emi.professions.show_trades": "Show Villager Trades",
   "config.emi.tooltip.professions.show_trades": "Show the trades of every villager profession and of the wandering trader as recipes.\nNeeds an EMI reload.",
   "config.emi.professions.trade_rolls": "Rolls per Trade Factory",
-  "config.emi.tooltip.professions.trade_rolls": "How often every trade factory is rolled to find the variants of random trades such as enchanted books (1 to 64).\nNeeds an EMI reload."
+  "config.emi.tooltip.professions.trade_rolls": "How often every trade factory is rolled to find the variants of random trades such as enchanted books (1 to 64).\nNeeds an EMI reload.",
+  "emiprofessions.info.sold": "Sold by Villagers (%s)",
+  "emiprofessions.info.bought": "Bought by Villagers (%s)",
+  "emiprofessions.info.levels": "Levels: %s",
+  "emiprofessions.info.together": "Together with: %1$s x %2$s",
+  "emiprofessions.info.all": "Show all %s trades",
+  "config.emi.professions.item_info": "Trades in Item Info",
+  "config.emi.tooltip.professions.item_info": "Adds the villager and wandering trader trades that sell or buy an item (profession, level and price) to its Item Info page.\nNeeds the villager trades above. Pages that are already open update after an EMI reload.",
+  "emiprofessions.info.earned": "Earned from Villagers (%s)",
+  "emiprofessions.info.spent": "Spent at Villagers (%s)"
 }

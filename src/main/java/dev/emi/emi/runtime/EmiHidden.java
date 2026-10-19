@@ -4,6 +4,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
 
 import com.google.common.collect.Lists;
@@ -20,6 +21,8 @@ import dev.emi.emi.api.stack.serializer.EmiIngredientSerializer;
 import dev.emi.emi.data.EmiData;
 import dev.emi.emi.data.IndexStackData;
 import dev.emi.emi.registry.EmiStackList;
+import dev.emi.remastered.runtime.PreservedEntries;
+import net.minecraft.client.MinecraftClient;
 
 public class EmiHidden {
 	// Data loaded
@@ -31,8 +34,13 @@ public class EmiHidden {
 	public static List<Predicate<EmiStack>> pluginDisabledFilters = Lists.newArrayList();
 	// User edited
 	public static Set<EmiIngredient> hiddenStacks = new LinkedHashSet<>();
+	// EMI Remastered: hidden stacks that could not be read stay in emi.json (KB3)
+	private static final PreservedEntries unreadHidden = new PreservedEntries();
+	// EMI Remastered: one filtered index rebuild per client tick, however many stacks changed (KB14)
+	private static final AtomicBoolean bakePending = new AtomicBoolean();
 
 	public static void clear() {
+		bakePending.set(false); // EMI Remastered: a queued rebuild may have been dropped by a disconnect
 		disabledStacks.clear();
 		disabledFilters.clear();
 		disabledFilterLookup.clear();
@@ -59,19 +67,29 @@ public class EmiHidden {
 				arr.add(el);
 			}
 		}
-		return arr;
+		return unreadHidden.mergeInto(arr); // EMI Remastered
 	}
 
 	public static void load(JsonArray arr) {
 		hiddenStacks.clear();
+		unreadHidden.clear(); // EMI Remastered
+		JsonElement previous = null;
+		int index = 0;
 		for (JsonElement el : arr) {
-			EmiIngredient stack = EmiIngredientSerializer.getDeserialized(el).copy();
+			EmiIngredient stack = EmiIngredientSerializer.getDeserialized(el.deepCopy()).copy();
 			if (!stack.isEmpty()) {
 				for (EmiStack es : stack.getEmiStacks()) {
 					es.comparison(c -> EmiPort.compareStrict());
 				}
 				hiddenStacks.add(stack);
+			} else {
+				unreadHidden.keep(el, previous, index); // EMI Remastered (KB3)
 			}
+			previous = el;
+			index++;
+		}
+		if (!unreadHidden.isEmpty()) {
+			EmiLog.warn("Keeping " + unreadHidden.size() + " hidden stacks that could not be read (missing mod or invalid data)");
 		}
 		EmiStackList.bakeFiltered();
 	}
@@ -131,6 +149,19 @@ public class EmiHidden {
 			}
 		}
 		EmiPersistentData.save();
-		EmiStackList.bakeFiltered();
+		requestBakeFiltered(); // EMI Remastered: was EmiStackList.bakeFiltered() right here (KB14)
+	}
+
+	/** EMI Remastered: coalesces filtered index rebuilds of one tick into one (KB14). */
+	private static void requestBakeFiltered() {
+		MinecraftClient client = MinecraftClient.getInstance();
+		if (client == null) {
+			EmiStackList.bakeFiltered();
+		} else if (bakePending.compareAndSet(false, true)) {
+			client.send(() -> {
+				bakePending.set(false);
+				EmiStackList.bakeFiltered();
+			});
+		}
 	}
 }

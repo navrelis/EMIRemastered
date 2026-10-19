@@ -81,5 +81,11 @@
   "effect.minecraft.water_breathing.description": "Prevents drowning and allows to breathe underwater.",
   "effect.minecraft.weakness.description": "Decreases melee damage; higher levels decrease damage dealt further.",
   "effect.minecraft.wither.description": "Inflicts lethal damage over time; higher levels do more damage per second.",
-  "effect.minecraft.bad_omen_legacy.description": "Causes an illager raid to start upon entering a village; higher levels increase the raid difficulty."
+  "effect.minecraft.bad_omen_legacy.description": "Causes an illager raid to start upon entering a village; higher levels increase the raid difficulty.",
+  "info.emiffect.item.title": "Effects",
+  "info.emiffect.item.arrow": "A tipped arrow applies one eighth of the potion's duration.",
+  "info.emiffect.item.lingering": "A lingering cloud applies a quarter of the potion's duration.",
+  "config.emi.effects.item_info": "Effects in Item Info",
+  "config.emi.tooltip.effects.item_info": "Adds the effects an item applies (potions, tipped arrows, suspicious stew, ...) with level and duration, and the sources, cures and modifiers of an effect, to the Item Info page.\nFoods are covered by the Food section of the stats module. Pages that are already open update after an EMI reload.",
+  "info.emiffect.item.open": "Show effect page"
 }
