@@ -1,0 +1,27 @@
+{
+  "emi.category.emi_enchanting.enchantments": "Enchantment Info",
+  "emi_enchanting.yes_good": "§0Yes",
+  "emi_enchanting.no_good": "§4No",
+  "emi_enchanting.yes_bad": "§4Yes",
+  "emi_enchanting.no_bad": "§0No",
+  "emi_enchanting.treasure": "Treasure: %s",
+  "emi_enchanting.curse": "Curse: %s",
+  "emi_enchanting.tradeable": "Villagers Trade: %s",
+  "emi_enchanting.random": "Randomly Selectable: %s",
+  "emi_enchanting.maxLvl": "Max Level: %s",
+  "emi_enchanting.valid_items": "Valid Items",
+  "emi_enchanting.description": "Enchantment Description",
+  "emi_enchanting.exclusions": "Exclusions",
+  "emi_enchanting.page_error": "This page could not be shown.",
+  "enchantment.emi_enchanting.unknown.desc": "Unknown Enchantment",
+
+  "config.emi.group.enchanting": "Enchanting",
+  "config.emi.enchanting.show_exclusions": "Show Exclusions",
+  "config.emi.tooltip.enchanting.show_exclusions": "Whether the info page lists the enchantments that cannot be combined with this one.",
+  "config.emi.enchanting.show_description": "Show Description",
+  "config.emi.tooltip.enchanting.show_description": "Whether the info page shows the enchantment's description, if a resource pack or mod provides one.",
+  "config.emi.enchanting.show_for_items": "Show for Items",
+  "config.emi.tooltip.enchanting.show_for_items": "Whether looking up the uses of an item that can be enchanted lists the info pages of its enchantments.",
+  "config.emi.enchanting.book_level_limit": "Book Level Limit",
+  "config.emi.tooltip.enchanting.book_level_limit": "The most enchanted book levels listed per enchantment. Enchantments with a higher maximum level list levels up to this number and the maximum level. Books of any other level still open the info page."
+}
