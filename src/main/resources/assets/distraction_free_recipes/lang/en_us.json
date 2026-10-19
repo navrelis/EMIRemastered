@@ -1,0 +1,5 @@
+{
+  "config.emi.group.distraction_free": "Distraction-Free",
+  "config.emi.distraction_free.show_help_text": "Show Help Text",
+  "config.emi.tooltip.distraction_free.show_help_text": "Shows a hint that you can search to see recipes."
+}

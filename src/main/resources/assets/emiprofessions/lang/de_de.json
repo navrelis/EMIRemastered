@@ -1,0 +1,6 @@
+{
+  "emi.category.emiprofessions.professions": "Berufe",
+  "config.emi.group.professions": "Berufe",
+  "config.emi.professions.show_villager_model": "Dorfbewohner-Modell anzeigen",
+  "config.emi.tooltip.professions.show_villager_model": "Ob Berufsseiten das Modell des Dorfbewohners neben der Arbeitsstätte darstellen."
+}

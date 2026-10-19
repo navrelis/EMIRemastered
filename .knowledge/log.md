@@ -7,3 +7,20 @@
 2026-10-19 | R2 feature data research -> `.upstream/feature-research.md` (Sonnet, long) | delegated
 2026-10-19 | R2 feature research | done: client lacks spawns/features/structures/loot -> server sync; EMI has fuel+composting already; emiffect O(effects x items); reload hot spots listed
 2026-10-19 | F1 review (lead) | accepted: clean build ok, jar metadata ok, GlobalMixin 404 targets = upstream, only EmiAgnos forName lines removed; runClientWorld 1273 ms reload (vanilla)
+2026-10-19 | F2 module framework + unified config + plugin manager (Opus, long) | delegated, main checkout
+2026-10-19 | Q1 dev-client screenshot tour (Sonnet, long) | delegated, own worktree
+2026-10-19 | Q1 review (lead) | accepted: 19/19 steps, devtour not in release jar; committed d054564 on worktree branch; merge after F2. Note: Agent isolation worktrees start from main, not remastered -> lead creates worktrees for later parallel tasks
+2026-10-19 | owner asked for more speed -> ports start before F2 with a fixed contract (scratchpad port-contract.md; F2 told via message)
+2026-10-19 | P7 EMI Loot port (Sonnet, long) | delegated, worktree wip/p7-loot
+2026-10-19 | P4 EMI Enchanting port (Sonnet, short) | delegated, worktree wip/p4-enchanting
+2026-10-19 | Q3 reload performance + repair AIOOBE (Opus, long) | delegated, worktree wip/q3-perf
+2026-10-19 | P3 EMI Professions port (Sonnet, short) | delegated, worktree wip/p3-professions
+2026-10-19 | P5 EMI Ores port (Sonnet, long) | delegated, worktree wip/p5-ores
+2026-10-19 | F2 review (lead) | accepted: EMI diffs small + marked, build ok, 26 tests green; committed 13f59cf; Q1 merged 7c49e57; tour 19/19 ok, config screen shows Plugins button + module jumps, 0 EMI warnings
+2026-10-19 | P1 DFR into core + A10 (Sonnet, long) | delegated, wip/p1-distraction-free (from F2)
+2026-10-19 | P2 EMIffect port + perf + A3 sources (Sonnet, long) | delegated, wip/p2-effects (from F2)
+2026-10-19 | Q1b tour steps click/scroll/config jump/plugin manager + config visual review (Sonnet, short) | delegated, wip/q1b-tour-steps
+2026-10-19 | A1 Item Info screen + provider API (Opus, long) | delegated, wip/a1-info
+2026-10-19 | P3 review (lead) | accepted: 6 classes, no mixins, server-safe; merged (add/add on stubs -> porter versions), build+tests green
+2026-10-19 | A4 villager trades in professions module (Sonnet, long) | delegated, wip/a4-trades
+2026-10-19 | auto-handoff: all agents stopped, partial work uncommitted in worktrees; see F:\Coding\EMI_Remastered\handoff-2026-10-19-5f3846e1.md

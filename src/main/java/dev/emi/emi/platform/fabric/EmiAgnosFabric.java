@@ -128,7 +128,10 @@ public class EmiAgnosFabric extends EmiAgnos {
 		List<EmiPluginContainer> list = Lists.newArrayList();
 		for (EntrypointContainer<EmiPlugin> container : FabricLoader.getInstance().getEntrypointContainers("emi", EmiPlugin.class)) {
 			try {
-				list.add(new EmiPluginContainer(container.getEntrypoint(), container.getProvider().getMetadata().getId()));
+				// EMI Remastered: built-in modules report their own plugin id (the old add-on id), see IdentifiedEmiPlugin
+				EmiPlugin plugin = container.getEntrypoint();
+				String modId = container.getProvider().getMetadata().getId();
+				list.add(new EmiPluginContainer(plugin, dev.emi.remastered.plugin.PluginIds.resolve(plugin, modId)));
 			} catch (Throwable t) {
 				EmiLog.error("Critical exception thrown when constructing EMI Plugin from mod " + container.getProvider().getMetadata().getId(), t);
 			}

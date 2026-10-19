@@ -29,6 +29,7 @@ import dev.emi.emi.registry.EmiTags;
 import dev.emi.emi.screen.EmiScreenBase;
 import dev.emi.emi.screen.EmiScreenManager;
 import dev.emi.emi.search.EmiSearch;
+import dev.emi.remastered.plugin.PluginManager;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.Text;
 
@@ -160,6 +161,8 @@ public class EmiReloadManager {
 					if (EmiAgnos.isModLoaded("jei")) {
 						plugins.add(new EmiPluginContainer(new JemiPlugin(), "jemi"));
 					}
+					// EMI Remastered: plugin manager - remember every plugin found, drop the disabled ones
+					PluginManager.beginReload(plugins);
 					EmiInitRegistry initRegistry = new EmiInitRegistryImpl();
 					for (EmiPluginContainer container : plugins) {
 						step(EmiPort.literal("Initializing plugin from " + container.id()), 5_000);
@@ -167,12 +170,14 @@ public class EmiReloadManager {
 						try {
 							container.plugin().initialize(initRegistry);
 						} catch (Throwable e) {
+							PluginManager.recordError(container.id(), PluginManager.Phase.INITIALIZE, e); // EMI Remastered
 							EmiReloadLog.warn("Exception initializing plugin provided by " + container.id(), e);
 							if (restart) {
 								continue outer;
 							}
 							continue;
 						}
+						PluginManager.recordInit(container.id(), System.currentTimeMillis() - start); // EMI Remastered
 						EmiLog.info("Initialized plugin from " + container.id() + " in " + (System.currentTimeMillis() - start) + "ms");
 					}
 					EmiHidden.reload();
@@ -191,15 +196,20 @@ public class EmiReloadManager {
 					for (EmiPluginContainer container : plugins) {
 						step(EmiPort.literal("Loading plugin from " + container.id()), 10_000);
 						long start = System.currentTimeMillis();
+						PluginManager.beforeRegister(); // EMI Remastered
 						try {
 							container.plugin().register(registry);
 						} catch (Throwable e) {
+							// EMI Remastered: plugin manager statistics
+							PluginManager.afterRegister(container.id(), System.currentTimeMillis() - start);
+							PluginManager.recordError(container.id(), PluginManager.Phase.REGISTER, e);
 							EmiReloadLog.warn("Exception loading plugin provided by " + container.id(), e);
 							if (restart) {
 								continue outer;
 							}
 							continue;
 						}
+						PluginManager.afterRegister(container.id(), System.currentTimeMillis() - start); // EMI Remastered
 						EmiLog.info("Reloaded plugin from " + container.id() + " in " + (System.currentTimeMillis() - start) + "ms");
 						if (restart) {
 							continue outer;
@@ -212,15 +222,20 @@ public class EmiReloadManager {
 					EmiStackList.bake();
 					step(EmiPort.literal("Registering late recipes"), 10_000);
 					Consumer<EmiRecipe> registerLateRecipe = registry::addRecipe;
+					int lateIndex = 0; // EMI Remastered: attribute deferred recipes to the plugin that added them
 					for (Consumer<Consumer<EmiRecipe>> consumer : EmiRecipes.lateRecipes) {
+						PluginManager.beforeLate(); // EMI Remastered
 						try {
 							consumer.accept(registerLateRecipe);
+							PluginManager.afterLate(lateIndex, null); // EMI Remastered
 						} catch (Exception e) {
+							PluginManager.afterLate(lateIndex, e); // EMI Remastered
 							EmiReloadLog.warn("Exception loading late recipes for plugins:", e);
 							if (restart) {
 								continue outer;
 							}
 						}
+						lateIndex++; // EMI Remastered
 					}
 					step(EmiPort.literal("Baking recipes"), 15_000);
 					EmiRecipes.bake();
@@ -232,6 +247,7 @@ public class EmiReloadManager {
 					EmiScreenManager.search.update();
 					EmiScreenManager.forceRecalculate();
 					EmiReloadLog.bake();
+					PluginManager.endReload(System.currentTimeMillis() - reloadStart); // EMI Remastered
 					EmiLog.info("Reloaded EMI in " + (System.currentTimeMillis() - reloadStart) + "ms");
 					status = 2;
 				} catch (Throwable e) {
