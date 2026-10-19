@@ -112,3 +112,4 @@
 2026-10-19 | LOOT-ASYNC review (lead) | accepted: Build/whenReady with generation + stopped-server guard, LateDelivery per generation, ChestStructuresPayload + StructureLootPayload canSend-guarded, client in-place update (volatile structures, Info rebuilt by source identity, provider re-register by id), fingerprint ignores loot tables; merged, build green
 2026-10-19 | TRADE-ROW delegated (Sonnet short)
 2026-10-19 | TRADE-ROW review (lead) | accepted; merged, build green
+2026-10-19 | T2-SHOTS review (lead) | partial coverage accepted (agent image reads failed); findings R1-R4 -> POLISH (Sonnet long); lead viewed world village page, tag browser, p8 potion info: fine
