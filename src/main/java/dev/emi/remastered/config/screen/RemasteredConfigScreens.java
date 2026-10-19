@@ -19,6 +19,7 @@ import dev.emi.emi.screen.ConfigScreen;
 import dev.emi.emi.screen.widget.config.ConfigEntryWidget;
 import dev.emi.emi.screen.widget.config.GroupNameWidget;
 import dev.emi.emi.screen.widget.config.ListWidget;
+import dev.emi.remastered.config.JumpFit;
 import dev.emi.remastered.config.ModuleConfigs;
 import dev.emi.remastered.module.Module;
 import dev.emi.remastered.module.Modules;
@@ -31,6 +32,9 @@ import net.minecraft.util.Formatting;
 
 /** Client-side hooks of EMI's {@code ConfigScreen} for the module config groups and the plugin manager. */
 public final class RemasteredConfigScreens {
+
+	/** Number of jump entries EMI's own {@code ConfigScreen} starts with. */
+	private static final int EMI_JUMPS = 11;
 
 	private RemasteredConfigScreens() {
 	}
@@ -113,9 +117,34 @@ public final class RemasteredConfigScreens {
 		return jumps;
 	}
 
-	/** Drops the per-module jumps when space is short, keeping {@code modules}. */
+	/**
+	 * Called by EMI's {@code ConfigScreen} when the jump buttons do not all fit: keeps as many module jumps as fit
+	 * (same space calculation as EMI: logical list height minus 10, 16 pixels per entry, EMI's own 11 jumps).
+	 */
 	public static void trimJumpTargets(List<String> jumps) {
-		jumps.removeIf(s -> !s.equals(ModuleConfigs.MODULES_GROUP));
+		if (MinecraftClient.getInstance().currentScreen instanceof ConfigScreen screen && screen.list != null) {
+			trimJumpTargets(jumps, EMI_JUMPS, screen.list.getLogicalHeight() - 10);
+		} else {
+			trimJumpTargets(jumps, EMI_JUMPS, 0);
+		}
+	}
+
+	/**
+	 * Shortens the module jumps to what fits next to EMI's own {@code emiJumps} entries within {@code space} pixels:
+	 * the first module groups in registry order, followed by {@code modules} as the last entry when not all fit.
+	 */
+	static void trimJumpTargets(List<String> jumps, int emiJumps, int space) {
+		int keep = JumpFit.fittingModuleJumps(space, emiJumps, jumps.size(), JumpFit.ICON_SIZE);
+		if (keep >= jumps.size()) {
+			return;
+		}
+		boolean modules = jumps.remove(ModuleConfigs.MODULES_GROUP);
+		while (jumps.size() > Math.max(0, keep - 1)) {
+			jumps.remove(jumps.size() - 1);
+		}
+		if (modules || keep > 0) {
+			jumps.add(ModuleConfigs.MODULES_GROUP);
+		}
 	}
 
 	/**

@@ -1,5 +1,5 @@
 {
-  "description": "EMI config screen with the module groups: module switches (toggled and restored), module setting groups, jump buttons and icons, Plugins button, small window, GUI scale 3, GUI scale 1 (all module jump icons).",
+  "description": "EMI config screen with the module groups: module switches (toggled and restored), module setting groups, jump buttons and icons (partial module jumps plus Modules at 1280x720 scale 2 and 3, all 12 icons at 1080p scale 2 incl. the world icon), Plugins button, small window, GUI scale 1, and the Item Info page of a diamond sword with its tags section.",
   "warmupTicks": 60,
   "settleTicks": 10,
   "steps": [
@@ -10,8 +10,10 @@
     { "type": "screenshot", "name": "config-top" },
     { "type": "screen_info" },
 
-    { "type": "hover", "x": 10, "y": 250 },
-    { "type": "screenshot", "name": "jump-hover-modules" },
+    { "type": "note", "text": "1280x720 scale 2: only some module jumps fit, 'Modules' is the last jump button" },
+    { "type": "screenshot", "name": "scale-2-720p-partial-jumps" },
+    { "type": "click", "text": "Modules" },
+    { "type": "screenshot", "name": "scale-2-720p-partial-jumps-modules-click" },
     { "type": "hover", "x": 630, "y": 5 },
 
     { "type": "emi_config_jump", "group": "modules" },
@@ -46,6 +48,10 @@
     { "type": "screenshot", "name": "group-tools" },
     { "type": "emi_config_jump", "group": "stats" },
     { "type": "screenshot", "name": "group-stats" },
+    { "type": "emi_config_jump", "group": "world" },
+    { "type": "screenshot", "name": "group-world" },
+    { "type": "emi_config_jump", "group": "general" },
+    { "type": "screenshot", "name": "scale-2-1080p-all-12-icons" },
     { "type": "resize", "w": 1280, "h": 720 },
     { "type": "wait", "ticks": 10 },
 
@@ -88,6 +94,9 @@
     { "type": "set_gui_scale", "n": 3 },
     { "type": "wait", "ticks": 10 },
     { "type": "screenshot", "name": "scale-3" },
+    { "type": "screen_info" },
+    { "type": "click", "text": "Modules" },
+    { "type": "screenshot", "name": "scale-3-720p-modules-click" },
     { "type": "resize", "w": 2560, "h": 1440 },
     { "type": "wait", "ticks": 10 },
     { "type": "emi_config_jump", "group": "general" },
@@ -104,6 +113,17 @@
     { "type": "screenshot", "name": "scale-1-jump-effects" },
 
     { "type": "set_gui_scale", "n": 2 },
-    { "type": "screen_close" }
+    { "type": "screen_close" },
+
+    { "type": "note", "text": "T1-25: Item Info of a diamond sword, tags section: friendly tag names, raw #id in the tooltip, one 'Show all N tags' link" },
+    { "type": "open_inventory" },
+    { "type": "emi_stack_key", "item": "minecraft:diamond_sword", "key": "I" },
+    { "type": "screenshot", "name": "sword-info-top" },
+    { "type": "screen_scroll", "amount": -10 },
+    { "type": "screenshot", "name": "sword-info-tags-collapsed" },
+    { "type": "screen_info" },
+    { "type": "click", "text": "Show all", "optional": true },
+    { "type": "screenshot", "name": "sword-info-tags-show-all" },
+    { "type": "close_screen" }
   ]
 }

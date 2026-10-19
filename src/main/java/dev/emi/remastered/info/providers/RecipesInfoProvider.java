@@ -17,6 +17,7 @@ import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.recipe.EmiTagRecipe;
 import dev.emi.emi.registry.EmiRecipes;
+import dev.emi.emi.runtime.EmiTagKey;
 import dev.emi.remastered.info.api.InfoCollector;
 import dev.emi.remastered.info.api.InfoLink;
 import dev.emi.remastered.info.api.InfoSection;
@@ -26,7 +27,9 @@ import dev.emi.remastered.info.client.InfoService;
 import dev.emi.remastered.info.core.CategoryGrouping;
 import dev.emi.remastered.info.core.CategoryGrouping.Group;
 import dev.emi.remastered.info.core.CoveredCategories;
+import dev.emi.remastered.info.core.TagNames;
 import net.minecraft.item.Items;
+import net.minecraft.registry.tag.TagKey;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
@@ -157,13 +160,16 @@ public final class RecipesInfoProvider implements ItemInfoProvider {
 				EmiPort.translatable("emi_info.section.tags", tags.size()))
 				.icon(VanillaPlugin.TAG);
 			for (int i = 0; i < tags.size() && i < MAX_TAG_LINES; i++) {
-				section.text(EmiPort.literal("#" + tags.get(i).key.id()));
+				section.text(tagName(tags.get(i).key), List.of(EmiPort.literal("#" + tags.get(i).key.id(), Formatting.GRAY)));
 			}
-			Text more = tags.size() > MAX_TAG_LINES
-				? EmiPort.translatable("emi_info.tags.more", tags.size() - MAX_TAG_LINES)
-				: EmiPort.translatable("emi_info.tags.open");
-			section.link(more, InfoLink.usesOf(stack, VanillaPlugin.TAG));
+			section.link(EmiPort.translatable("emi_info.tags.open", tags.size()), InfoLink.usesOf(stack, VanillaPlugin.TAG));
 		}
+	}
+
+	/** The translated tag name if there is one, else a readable name made from the tag path. */
+	private static Text tagName(TagKey<?> key) {
+		EmiTagKey<?> tag = EmiTagKey.of(key);
+		return tag.hasTranslation() ? tag.getTagName() : EmiPort.literal(TagNames.readable(key.id().getPath()));
 	}
 
 	/**
