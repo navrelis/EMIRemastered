@@ -113,3 +113,6 @@
 2026-10-19 | TRADE-ROW delegated (Sonnet short)
 2026-10-19 | TRADE-ROW review (lead) | accepted; merged, build green
 2026-10-19 | T2-SHOTS review (lead) | partial coverage accepted (agent image reads failed); findings R1-R4 -> POLISH (Sonnet long); lead viewed world village page, tag browser, p8 potion info: fine
+2026-10-19 | auto-handoff: POLISH and PACK-CLI stopped; see F:\Coding\EMI_Remastered\handoff-2026-10-19-cee17f08.md
+2026-10-19 | session 7 start: state checked = handoff; PACK-CLI dropped; jar c2b433ec installed (lock)
+2026-10-19 | POLISH re-delegated (Sonnet long) || PACK-REAL2 (Opus long) || DOC4 (Sonnet short)

@@ -17,3 +17,4 @@
 - D16 Pack check without the owner: the lead does not launch the real pack instance (owner decision + agent rule); compatibility is shown by a pack-mirror dev client (copied mods, hidden, muted) and a production dedicated server with copied mods. The owner's own launch stays the final check.
 - D17 Precision override: PACK-CLI and LOGO go to Opus (telling dev-remapping artefacts from real mixin incompatibilities; visual design quality the owner sees first). Budget stays ~20 % Opus.
 - D18 Structure lookup results are delivered asynchronously (sent when ready) instead of the server thread waiting up to 30 s; found in the real pack (join blocked ~24 s). Opus (concurrency on the network path).
+- D19 PACK-REAL2 runs in parallel with POLISH on the current build (POLISH only changes client display; LOOT-ASYNC is what needs the real pack); the final jar is copied in afterwards without a third launch. Opus as precision override (owner's real instance and data).

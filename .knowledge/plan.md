@@ -1,6 +1,6 @@
 # Plan
 
-Usage tally (work units: short = 1, long = 2): Opus 33 (LOOT-ASYNC x2, PACK-REAL x2, F1, F2, Q3 x6, A1 x2, FX1 x4, FOCUS1 x4 = two delegations, PACK-CLI x2, LOGO x2) / Sonnet 118 -> Opus 22 % (sessions 4+5 re-delegations counted again)
+Usage tally (work units: short = 1, long = 2): Opus 35 (LOOT-ASYNC x2, PACK-REAL x2, PACK-REAL2 x2, F1, F2, Q3 x6, A1 x2, FX1 x4, FOCUS1 x4 = two delegations, PACK-CLI x2, LOGO x2) / Sonnet 121 (session 7: POLISH x2, DOC4 x1) -> Opus 22 % (sessions 4+5 re-delegations counted again)
 
 Status: open / in progress / in review / done. `||` = can run in parallel.
 
@@ -72,16 +72,19 @@ Status: open / in progress / in review / done. `||` = can run in parallel.
 | FX-SER | Unknown stack type (disabled plugin/removed mod) logs 1 WARN per type instead of ERROR+NPE per entry (EmiIngredientSerializers) | Sonnet short | done (merged; plugin-manager tour: 1 WARN per unknown type, 0 ERROR, emi.json entries kept byte-identical; 3 tests) |
 | LOOT-VAN | Code-placed vanilla chest tables mapped by structure type (desert pyramid, fortress, stronghold, ...) in StructureLookup | Sonnet short | done (merged; 53 of 56 chest tables now have a structure, loot-van tour 22/22, lead viewed nether wart Item Info) |
 | DOC3 | KNOWN_BUGS (KB7, KB43, KB44) + TOUR_REPORT statuses after wave 6, CREDITS for KB7 port | Sonnet short | done (merged; T2 findings may need a follow-up) |
-| PACK-CLI | Pack-mirror dev client (pack mods copied into run/mods, hidden, muted): mixins of other mods into EMI, EMI plugins, reload times, modded Item Info | Opus long | in progress (worktree pack-cli, port 25672) |
+| PACK-CLI | Pack-mirror dev client (pack mods copied into run/mods, hidden, muted): mixins of other mods into EMI, EMI plugins, reload times, modded Item Info | Opus long | dropped (superseded by PACK-REAL; never merged; worktree removal blocked by permission, left unmerged) |
 | PACK-SRV | Production dedicated server (release jar + copied pack mods, local files only): loading, provides, server-side modules | Sonnet long | done (production server, loader 0.19.5, 560 mods: started 21 s world/99 s total, clean stop, 0 emi warnings/errors, no provides conflicts; 993 structures, 433 of 789 chest tables with a structure, lookup 10.6 s off-thread; 2 other client-only pack mods crash any dedicated server: certain_questing_additions, miningspeedtooltips) |
 | BRAND | docs/DESCRIPTION.md (summary EN/DE, tagline, CurseForge/Modrinth description), fabric.mod.json description | Sonnet short | done (merged; summary 187 chars, DE 181, tagline 55; one correction: product names untranslated, 'author') |
 | LOGO | Pixel-art logo, banner, mod icon from a deterministic Pillow generator | Opus long | done (merged; slot + gem + magnifier + sparkle, 32 px grid x16, banner 192x48 x8, byte-identical regeneration; lead viewed icon dark/light + banner) |
 | PACK-REAL | Owner-authorised launch of the real pack (copied world, offline, muted, options/emi.json backed up and restored), log check | Opus long | done (640 mods, world reached, clean exit; 5 third-party EMI mixins applied; 38 plugins, 0 errors, Let's Do + repair fixed; join reload 30.0 s cold (emi 3441 ms, emiffect 133 vs 1077 ms); emi.json byte-identical; F1 join blocked ~24 s by chest structure wait, F2 world loot links lost after 25 s -> LOOT-ASYNC) |
 | LOOT-ASYNC | Structure lookup never blocks the server thread; late results pushed to players; no 25 s cut of world loot links; honest log lines | Opus long | done (merged; join and lookup decoupled (login->joined same second with 20 s delay), late payloads update chest pages, Item Info and structure pages without EMI reload, 9 new tests; needs re-check in real pack) |
 | TRADE-ROW | Item Info trade rows: viewed-item amount in the title, not the count column next to the other side's stacks | Sonnet short | done (merged; 'Cleric - Master · 22×', stacks show own amounts; trade-row 45/45, p8 132/132) |
-| POLISH | R3 wither skeleton damage (spawn-time base values), R4 bat/ghast speed 30.2, R2 stats right margin, R1 duplicate tag names | Sonnet long | in progress (worktree polish, port 25676) |
+| POLISH | R3 wither skeleton damage (spawn-time base values), R4 bat/ghast speed 30.2, R2 stats right margin, R1 duplicate tag names | Sonnet long | in progress (session 7, worktree polish, port 25676) |
+| PACK-REAL2 | Real pack launch with LOOT-ASYNC build (c2b433ec installed 23:30): join not blocked, late structure delivery logged, same safeguards | Opus long | in progress |
+| DOC4 | CHANGELOG 2.0.0: FX-SER, LOOT-VAN, LOOT-ASYNC, TRADE-ROW, POLISH, icon; DESCRIPTION factual check | Sonnet short | in progress (worktree doc4) |
 | -- | Later: KB13 (Sodium vertex path, needs pack measurement), T1-29 core string | - | open |
 
 ## Phase 4 Acceptance
 Pack install under game lock, end-to-end check, report, push.
 - Jar swap: done 2026-10-19 21:1x (owner's client closed; 8 jars in mods_backup/, EMIRemastered jar in mods/, lock created and removed). Owner changed the decision (2026-10-19 ~21:30, 'no you do all'): the lead's team launches the real pack (PACK-REAL). Newest jar (33d82605 build) installed before the launch.
+- Session 7 (2026-10-19 23:30): jar of c6861cb4 (LOOT-ASYNC + TRADE-ROW) installed under game lock for PACK-REAL2; after POLISH merge the final jar is copied again (copy only).
