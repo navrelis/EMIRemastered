@@ -7,10 +7,11 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.mojang.serialization.JsonOps;
 import dev.emi.remastered.ores.Ores;
+import dev.emi.remastered.ores.sync.SyncBatch;
 import io.netty.handler.codec.DecoderException;
 import io.netty.handler.codec.EncoderException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.packet.CustomPayload;
@@ -20,38 +21,47 @@ import net.minecraft.world.gen.feature.PlacedFeature;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Placed features by id, each as a JSON string. The wire format is the one of the original
- * EMI Ores. The server may send several of these in a row, the client merges them.
+ * A batch of placed features of a sync, each as an id, a JSON string (the format of the original EMI Ores) and the
+ * indices of its biomes in the biome table of the start packet. The batch with the {@code last} flag ends the sync.
  */
-public record S2CSendFeaturesPayload(Map<Identifier, PlacedFeature> features) implements CustomPayload {
-	public static final Id<S2CSendFeaturesPayload> TYPE = new Id<>(Ores.id("send_features"));
-	public static final PacketCodec<PacketByteBuf, S2CSendFeaturesPayload> CODEC = PacketCodec.ofStatic(S2CSendFeaturesPayload::encode, S2CSendFeaturesPayload::decode);
+public record S2CSyncBatchPayload(SyncBatch<PlacedFeature> batch) implements CustomPayload {
+	public static final Id<S2CSyncBatchPayload> TYPE = new Id<>(Ores.id("sync_batch"));
+	public static final PacketCodec<PacketByteBuf, S2CSyncBatchPayload> CODEC = PacketCodec.ofStatic(S2CSyncBatchPayload::encode, S2CSyncBatchPayload::decode);
 	/** The vanilla string codec would stop at 32767 characters, big modded features can be longer. */
 	public static final int MAX_JSON_LENGTH = 262144;
 	private static final Gson GSON = new Gson();
 
-	public static S2CSendFeaturesPayload decode(PacketByteBuf buffer) {
+	public static S2CSyncBatchPayload decode(PacketByteBuf buffer) {
+		int syncId = buffer.readVarInt();
+		boolean last = buffer.readBoolean();
 		int size = buffer.readVarInt();
-		Map<Identifier, PlacedFeature> features = new HashMap<>();
+		List<SyncBatch.Entry<PlacedFeature>> entries = new ArrayList<>(size);
 		for (int i = 0; i < size; i++) {
 			Identifier id = buffer.readIdentifier();
 			String json = buffer.readString(MAX_JSON_LENGTH);
+			int[] biomes = buffer.readIntArray();
+			PlacedFeature feature = null;
 			try {
-				features.put(id, fromJson(json));
+				feature = fromJson(json);
 			} catch (RuntimeException e) {
 				// one feature that does not decode here must not take the whole connection down
 				Ores.LOG.warn("Skipping placed feature {} that could not be decoded: {}", id, e.getMessage());
 			}
+			entries.add(new SyncBatch.Entry<>(id, feature, biomes));
 		}
-		return new S2CSendFeaturesPayload(features);
+		return new S2CSyncBatchPayload(new SyncBatch<>(syncId, last, entries));
 	}
 
-	public static void encode(PacketByteBuf buffer, S2CSendFeaturesPayload packet) {
-		buffer.writeVarInt(packet.features.size());
-		packet.features.forEach((id, feature) -> {
-			buffer.writeIdentifier(id);
-			buffer.writeString(toJson(feature), MAX_JSON_LENGTH);
-		});
+	public static void encode(PacketByteBuf buffer, S2CSyncBatchPayload packet) {
+		SyncBatch<PlacedFeature> batch = packet.batch;
+		buffer.writeVarInt(batch.syncId());
+		buffer.writeBoolean(batch.last());
+		buffer.writeVarInt(batch.entries().size());
+		for (SyncBatch.Entry<PlacedFeature> entry : batch.entries()) {
+			buffer.writeIdentifier(entry.id());
+			buffer.writeString(toJson(entry.feature()), MAX_JSON_LENGTH);
+			buffer.writeIntArray(entry.biomeIndices());
+		}
 	}
 
 	public static String toJson(PlacedFeature feature) {
@@ -67,7 +77,7 @@ public record S2CSendFeaturesPayload(Map<Identifier, PlacedFeature> features) im
 
 	@NotNull
 	@Override
-	public Id<S2CSendFeaturesPayload> getId() {
+	public Id<S2CSyncBatchPayload> getId() {
 		return TYPE;
 	}
 }

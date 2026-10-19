@@ -3,49 +3,63 @@
  */
 package dev.emi.remastered.ores.client;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.SetMultimap;
-import dev.emi.remastered.ores.network.payload.S2CSendBiomeInfoPayload;
-import dev.emi.remastered.ores.network.payload.S2CSendFeaturesPayload;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.util.Identifier;
-import net.minecraft.world.biome.Biome;
+import dev.emi.emi.runtime.EmiReloadManager;
+import dev.emi.remastered.ores.Ores;
+import dev.emi.remastered.ores.network.payload.S2CSyncBatchPayload;
+import dev.emi.remastered.ores.network.payload.S2CSyncStartPayload;
+import dev.emi.remastered.ores.sync.OresSnapshot;
+import dev.emi.remastered.ores.sync.OresSyncState;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.world.gen.feature.PlacedFeature;
 
 /**
- * Holds the data last sent by the server. EMI's reload thread reads it while the network
- * thread may replace it, so every update swaps in a new immutable snapshot.
+ * Holds the data last sent by the server. A sync is only visible once it is complete (see {@link OresSyncState}),
+ * so an EMI reload that starts while batches are arriving works with the previous complete data. When it did, or
+ * when it ran before any data came, a new reload is started as soon as the sync is complete.
  */
 public class OresFeatures {
-	private static volatile Map<Identifier, PlacedFeature> features = Collections.emptyMap();
-	private static volatile SetMultimap<RegistryKey<PlacedFeature>, RegistryKey<Biome>> biomes = HashMultimap.create();
+	private static final OresSyncState<PlacedFeature> STATE = new OresSyncState<>();
 
-	public static void clearFeatures() {
-		features = Collections.emptyMap();
-		biomes = HashMultimap.create();
+	/** The last complete snapshot, empty before the first sync. */
+	public static OresSnapshot<PlacedFeature> snapshot() {
+		return STATE.snapshot();
 	}
 
-	public static Map<Identifier, PlacedFeature> getFeatures() {
-		return features;
+	/** For EMI's registration: the snapshot to build recipes from. Remembers that EMI used it. */
+	public static OresSnapshot<PlacedFeature> consume() {
+		return STATE.consume();
 	}
 
-	public static SetMultimap<RegistryKey<PlacedFeature>, RegistryKey<Biome>> getBiomes() {
-		return biomes;
+	public static void clear() {
+		STATE.clear();
 	}
 
-	/** The server sends the features in one or more batches, so they are merged. */
-	public static void receive(S2CSendFeaturesPayload payload) {
-		Map<Identifier, PlacedFeature> merged = new HashMap<>(features);
-		merged.putAll(payload.features());
-		features = Collections.unmodifiableMap(merged);
+	/** Always sent first by the server, it starts a new sync. The previous complete data stays until the new one is complete. */
+	public static void receive(S2CSyncStartPayload payload) {
+		STATE.begin(payload.header());
+		Ores.LOG.info("Ore sync {} started: {} features, {} dimensions", payload.header().syncId(),
+			payload.header().featureCount(), payload.header().dimensions().size());
 	}
 
-	/** Always sent first by the server, so it starts a new sync. */
-	public static void receive(S2CSendBiomeInfoPayload payload) {
-		features = Collections.emptyMap();
-		biomes = payload.biomeInfo();
+	public static void receive(S2CSyncBatchPayload payload) {
+		OresSyncState.Status status = STATE.accept(payload.batch());
+		switch (status) {
+			case IGNORED -> Ores.LOG.warn("Ignoring a batch of ore sync {} without a matching start", payload.batch().syncId());
+			case PENDING -> {
+			}
+			case COMPLETE, COMPLETE_RELOAD -> {
+				OresSnapshot<PlacedFeature> snapshot = STATE.snapshot();
+				if (snapshot.features().size() < snapshot.expectedFeatures()) {
+					Ores.LOG.warn("Ore sync {} is missing {} of {} features that could not be decoded", snapshot.syncId(),
+						snapshot.expectedFeatures() - snapshot.features().size(), snapshot.expectedFeatures());
+				}
+				Ores.LOG.info("Ore sync {} complete: {} features, {} dimensions", snapshot.syncId(),
+					snapshot.features().size(), snapshot.dimensions().size());
+				if (status == OresSyncState.Status.COMPLETE_RELOAD) {
+					Ores.LOG.info("EMI loaded older ore data, reloading EMI for ore sync {}", snapshot.syncId());
+					MinecraftClient.getInstance().execute(EmiReloadManager::reload);
+				}
+			}
+		}
 	}
 }
