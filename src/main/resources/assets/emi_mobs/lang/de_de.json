@@ -23,6 +23,8 @@
   "emi_mobs.stat.speed": "Tempo",
   "emi_mobs.stat.speed.tooltip": "Bewegungstempo: %s (etwa %s Blöcke pro Sekunde)",
   "emi_mobs.stat.speed.approx": "Ungefähr: Das echte Tempo hängt davon ab, was der Mob gerade tut.",
+  "emi_mobs.stat.flying_speed": "Fliegen",
+  "emi_mobs.stat.flying_speed.tooltip": "Flugtempo-Attribut: %s (nicht in Blöcken pro Sekunde; das echte Tempo hängt davon ab, was der Mob gerade tut)",
   "emi_mobs.stat.knockback_resistance": "Rückst.res.",
   "emi_mobs.stat.knockback_resistance.tooltip": "Rückstoßresistenz: %s%%",
   "emi_mobs.stat.follow_range": "Reichweite",

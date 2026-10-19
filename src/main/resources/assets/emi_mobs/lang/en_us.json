@@ -23,6 +23,8 @@
   "emi_mobs.stat.speed": "Speed",
   "emi_mobs.stat.speed.tooltip": "Movement speed: %s (about %s blocks per second)",
   "emi_mobs.stat.speed.approx": "Approximate: the real speed depends on what the mob is doing.",
+  "emi_mobs.stat.flying_speed": "Flying",
+  "emi_mobs.stat.flying_speed.tooltip": "Flying speed attribute: %s (not blocks per second; the real speed depends on what the mob is doing)",
   "emi_mobs.stat.knockback_resistance": "Resist.",
   "emi_mobs.stat.knockback_resistance.tooltip": "Knockback resistance: %s%%",
   "emi_mobs.stat.follow_range": "Range",

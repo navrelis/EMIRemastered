@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import dev.emi.remastered.mobs.data.MobFormat;
 import dev.emi.remastered.mobs.data.MobStats;
 import dev.emi.remastered.mobs.data.MobStats.Stat;
+import dev.emi.remastered.mobs.data.SpawnOverrides;
 import dev.emi.remastered.mobs.data.SpawnRow;
 import dev.emi.remastered.mobs.data.SpawnTable;
 import dev.emi.remastered.mobs.data.SpawnWire;
@@ -64,11 +65,11 @@ class MobsLogicTest {
 	}
 
 	private static MobStats zombie() {
-		return new MobStats(20, 2, 0, 3, 0.23, 0, 35, 0.6, 1.95, false, "monster");
+		return new MobStats(20, 2, 0, 3, 0.23, NONE, 0, 35, 0.6, 1.95, false, "monster");
 	}
 
 	private static MobStats cow() {
-		return new MobStats(10, 0, 0, NONE, 0.2, 0, NONE, 0.9, 1.4, false, "creature");
+		return new MobStats(10, 0, 0, NONE, 0.2, NONE, 0, NONE, 0.9, 1.4, false, "creature");
 	}
 
 	@Test
@@ -89,7 +90,7 @@ class MobsLogicTest {
 		assertEquals("9.9", zombie.value(Stat.SPEED));
 		assertEquals("35", zombie.value(Stat.FOLLOW_RANGE));
 		assertEquals("0.6 x 1.95", zombie.sizeText());
-		MobStats golem = new MobStats(100, 0, 0, 15, 0.25, 1, 16, 1.4, 2.7, false, "misc");
+		MobStats golem = new MobStats(100, 0, 0, 15, 0.25, NONE, 1, 16, 1.4, 2.7, false, "misc");
 		assertEquals("100%", golem.value(Stat.KNOCKBACK_RESISTANCE));
 		assertEquals(2, zombie.tooltipArgs(Stat.HEALTH).length);
 		assertEquals(1, zombie.tooltipArgs(Stat.FOLLOW_RANGE).length);
@@ -151,5 +152,42 @@ class MobsLogicTest {
 		assertEquals(4, table.biomeCount());
 		table.clear();
 		assertTrue(table.isEmpty());
+	}
+
+	@Test
+	void spawnOverridesApplyKnownValuesOnly() {
+		assertEquals(4.0, SpawnOverrides.attackDamage("minecraft:wither_skeleton", 2.0));
+		assertEquals(6.0, SpawnOverrides.attackDamage("minecraft:phantom", 2.0));
+		assertEquals(3.0, SpawnOverrides.attackDamage("minecraft:zombie", 3.0));
+		assertEquals(2.0, SpawnOverrides.attackDamage("other:wither_skeleton", 2.0));
+		assertTrue(Double.isNaN(SpawnOverrides.attackDamage("minecraft:wither_skeleton", NONE)));
+		assertTrue(Double.isNaN(SpawnOverrides.attackDamage("minecraft:cow", NONE)));
+	}
+
+	@Test
+	void witherSkeletonShowsDamageFour() {
+		double damage = SpawnOverrides.attackDamage("minecraft:wither_skeleton", 2.0);
+		MobStats skeleton = new MobStats(20, 0, 0, damage, 0.25, NONE, 0, 16, 0.7, 2.4, true, "monster");
+		assertEquals("4", skeleton.value(Stat.ATTACK));
+		assertEquals("2", skeleton.tooltipArgs(Stat.ATTACK)[1]);
+	}
+
+	@Test
+	void speedAtTheAttributeDefaultIsNotShown() {
+		// bat and ghast never set a walking speed, the container holds the attribute default 0.7 (shown as 30.2 once)
+		assertTrue(Double.isNaN(MobStats.walkingSpeed(0.7, 0.7)));
+		assertTrue(Double.isNaN(MobStats.walkingSpeed(NONE, 0.7)));
+		assertEquals(0.23, MobStats.walkingSpeed(0.23, 0.7));
+		MobStats bat = new MobStats(6, 0, 0, NONE, MobStats.walkingSpeed(0.7, 0.7), NONE, 0, 16, 0.5, 0.9, false, "ambient");
+		assertEquals(List.of(Stat.HEALTH, Stat.FOLLOW_RANGE), bat.visible());
+	}
+
+	@Test
+	void flyingMobsShowTheFlyingSpeedAttribute() {
+		MobStats bee = new MobStats(10, 0, 0, 2, 0.3, 0.6, 0, 48, 0.7, 0.6, false, "creature");
+		assertEquals(List.of(Stat.HEALTH, Stat.ATTACK, Stat.SPEED, Stat.FLYING_SPEED, Stat.FOLLOW_RANGE), bee.visible());
+		assertEquals("0.6", bee.value(Stat.FLYING_SPEED));
+		assertEquals("0.6", bee.tooltipArgs(Stat.FLYING_SPEED)[0]);
+		assertEquals(1, bee.tooltipArgs(Stat.FLYING_SPEED).length);
 	}
 }

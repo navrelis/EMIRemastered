@@ -33,6 +33,8 @@ final class FoodRecipe implements EmiRecipe {
 	static final int MAX_WIDTH = 224;
 	private static final int EFFECT_LABEL_X = 22;
 	private static final int CHANCE_GAP = 6;
+	/** Space between the right-aligned chance column and the right edge of the page. */
+	private static final int RIGHT_PAD = 3;
 	/** Best food first, then by saturation, then by id. */
 	static final Comparator<EmiRecipe> SORT = Comparator
 		.comparingInt((EmiRecipe r) -> r instanceof FoodRecipe f ? -f.facts.nutrition() : 0)
@@ -94,12 +96,12 @@ final class FoodRecipe implements EmiRecipe {
 		if (font == null) {
 			return WIDTH;
 		}
-		int needed = WIDTH;
+		int needed = Math.max(WIDTH, TEXT_X + Math.max(font.getWidth(hungerText(facts.nutrition())), font.getWidth(saturationText())) + RIGHT_PAD);
 		int labelX = StatsText.effectStacks() ? EFFECT_LABEL_X : 0;
 		List<EffectFact> effects = facts.effects();
 		for (int i = 0; i < Math.min(effects.size(), MAX_EFFECTS); i++) {
 			EffectFact effect = effects.get(i);
-			needed = Math.max(needed, labelX + font.getWidth(StatsText.effectLabel(effect.instance())) + CHANCE_GAP
+			needed = Math.max(needed, labelX + font.getWidth(StatsText.effectLabel(effect.instance())) + CHANCE_GAP + RIGHT_PAD
 				+ font.getWidth(StatsText.percent(effect.chance())));
 		}
 		return Math.min(needed, MAX_WIDTH);
@@ -115,6 +117,14 @@ final class FoodRecipe implements EmiRecipe {
 			y += 12 + Math.min(facts.effects().size(), MAX_EFFECTS) * rowHeight();
 		}
 		return y;
+	}
+
+	private static Text hungerText(int nutrition) {
+		return EmiPort.translatable("emi_stats.food.hunger", StatsText.number(nutrition));
+	}
+
+	private Text saturationText() {
+		return EmiPort.translatable("emi_stats.food.saturation", StatsText.number(StatsMath.round2(facts.saturation())));
 	}
 
 	private static int rowHeight() {
@@ -141,15 +151,14 @@ final class FoodRecipe implements EmiRecipe {
 
 		widgets.addDrawable(0, HUNGER_Y, HungerIcons.WIDTH, HungerIcons.HEIGHT,
 			(draw, mouseX, mouseY, delta) -> HungerIcons.drawShanks(draw, 0, 0, nutrition));
-		widgets.addText(EmiPort.translatable("emi_stats.food.hunger", StatsText.number(nutrition)), TEXT_X, HUNGER_Y + 1, -1, true);
+		widgets.addText(hungerText(nutrition), TEXT_X, HUNGER_Y + 1, -1, true);
 		widgets.addTooltipText(List.of(EmiPort.translatable("emi_stats.food.hunger.tooltip", StatsText.number(nutrition),
 			StatsText.number(nutrition / 2.0))), 0, HUNGER_Y, width, 10);
 
 		float fill = StatsMath.fraction(facts.saturation(), StatsMath.MAX_FOOD);
 		widgets.addDrawable(0, SATURATION_Y + 2, HungerIcons.WIDTH, 5,
 			(draw, mouseX, mouseY, delta) -> HungerIcons.drawBar(draw, 0, 0, fill));
-		widgets.addText(EmiPort.translatable("emi_stats.food.saturation", StatsText.number(StatsMath.round2(facts.saturation()))),
-			TEXT_X, SATURATION_Y, -1, true);
+		widgets.addText(saturationText(), TEXT_X, SATURATION_Y, -1, true);
 		widgets.addTooltipText(List.of(EmiPort.translatable("emi_stats.food.saturation.tooltip",
 			StatsText.number(StatsMath.round2(StatsMath.saturationModifier(nutrition, facts.saturation()))))),
 			0, SATURATION_Y, width, 10);
@@ -189,11 +198,11 @@ final class FoodRecipe implements EmiRecipe {
 			Text label = StatsText.effectLabel(effect.instance());
 			if (slots) {
 				widgets.addSlot(StatsText.effectStack(effect.instance(), 1.0f), 0, y).recipeContext(this);
-				widgets.addText(fit(font, label, width - EFFECT_LABEL_X - chanceWidth - CHANCE_GAP), EFFECT_LABEL_X, y + 5, -1, true);
-				widgets.addText(chance, width, y + 5, effect.chance() < 1 ? 0xFFFFD27F : GREEN, true).horizontalAlign(Alignment.END);
+				widgets.addText(fit(font, label, width - EFFECT_LABEL_X - chanceWidth - CHANCE_GAP - RIGHT_PAD), EFFECT_LABEL_X, y + 5, -1, true);
+				widgets.addText(chance, width - RIGHT_PAD, y + 5, effect.chance() < 1 ? 0xFFFFD27F : GREEN, true).horizontalAlign(Alignment.END);
 			} else {
-				widgets.addText(fit(font, label, width - chanceWidth - CHANCE_GAP), 0, y, -1, true);
-				widgets.addText(chance, width, y, effect.chance() < 1 ? 0xFFFFD27F : GREEN, true).horizontalAlign(Alignment.END);
+				widgets.addText(fit(font, label, width - chanceWidth - CHANCE_GAP - RIGHT_PAD), 0, y, -1, true);
+				widgets.addText(chance, width - RIGHT_PAD, y, effect.chance() < 1 ? 0xFFFFD27F : GREEN, true).horizontalAlign(Alignment.END);
 			}
 			y += rowHeight;
 		}
