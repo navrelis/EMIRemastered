@@ -1,0 +1,36 @@
+{
+  "description": "Ores module: ore generation pages (height graph, count, biomes, veins) and geode pages.",
+  "warmupTicks": 100,
+  "settleTicks": 15,
+  "steps": [
+    { "type": "resize", "w": 1280, "h": 720 },
+    { "type": "set_gui_scale", "n": 2 },
+    { "type": "command", "text": "/time set day" },
+    { "type": "wait", "ticks": 20 },
+
+    { "type": "emi_recipes", "item": "minecraft:diamond_ore" },
+    { "type": "emi_category", "id": "emi_ores:oregen" },
+    { "type": "screenshot", "name": "oregen-diamond" },
+    { "type": "close_screen" },
+
+    { "type": "emi_recipes", "item": "minecraft:iron_ore" },
+    { "type": "emi_category", "id": "emi_ores:oregen" },
+    { "type": "screenshot", "name": "oregen-iron" },
+    { "type": "close_screen" },
+
+    { "type": "emi_recipes", "item": "minecraft:ancient_debris" },
+    { "type": "emi_category", "id": "emi_ores:oregen" },
+    { "type": "screenshot", "name": "oregen-ancient-debris" },
+    { "type": "close_screen" },
+
+    { "type": "emi_recipes", "item": "minecraft:budding_amethyst" },
+    { "type": "emi_category", "id": "emi_ores:geode" },
+    { "type": "screenshot", "name": "geode-amethyst" },
+    { "type": "close_screen" },
+
+    { "type": "open_inventory" },
+    { "type": "emi_search", "text": "plains" },
+    { "type": "screenshot", "name": "search-biome-plains" },
+    { "type": "close_screen" }
+  ]
+}

@@ -31,11 +31,15 @@ public final class ToolsClient {
 	private ToolsClient() {
 	}
 
-	/** EMI offers a hovered recipe to {@code function}, which tells whether a given bind is pressed. */
+	/**
+	 * EMI offers a hovered recipe to {@code function}, which tells whether a given bind is pressed. Key binds are ignored
+	 * while a text field is being typed into, so Ctrl+C in a text field stays a normal copy.
+	 */
 	public static boolean onRecipeInteraction(@Nullable EmiRecipe recipe, Function<EmiBind, Boolean> function) {
 		if (!ToolsModule.enabled || recipe == null) {
 			return false;
 		}
+		function = TextInput.guard(function);
 		RecipeFormat format = ToolsSettings.copyRecipeFormat;
 		if (function.apply(ToolsSettings.copyRecipe)) {
 			RecipeClipboard.copy(recipe, format);
@@ -54,7 +58,7 @@ public final class ToolsClient {
 		if (!ToolsModule.enabled || ingredient == null || ingredient.isEmpty()) {
 			return false;
 		}
-		if (function.apply(ToolsSettings.openTagBrowser)) {
+		if (TextInput.guard(function).apply(ToolsSettings.openTagBrowser)) {
 			openTagBrowser(ingredient);
 			return true;
 		}
@@ -66,7 +70,7 @@ public final class ToolsClient {
 		if (!ToolsModule.enabled) {
 			return false;
 		}
-		if (function.apply(ToolsSettings.openTagBrowser)) {
+		if (TextInput.guard(function).apply(ToolsSettings.openTagBrowser)) {
 			openTagBrowser(null);
 			return true;
 		}

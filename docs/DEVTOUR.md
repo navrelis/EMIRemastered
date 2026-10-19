@@ -86,18 +86,21 @@ All settings are optional (defaults shown). `settleTicks` is how many ticks a sc
 | `open_inventory` | | opens the player inventory (EMI sidebars appear) |
 | `close_screen` | | closes the current screen |
 | `emi_search` | `text` | types into EMI's search box (needs an open screen); records the result count |
-| `emi_recipes` | `item` (item id) | `EmiApi.displayRecipes`; fails if EMI has no recipes for it; records the tabs |
+| `emi_recipes` | `item` (item id) or `effect` (status effect id, effects module) | `EmiApi.displayRecipes`; fails if EMI has no recipes for it; records the tabs |
 | `emi_uses` | `item` | `EmiApi.displayUses` (includes fuel, workstations) |
 | `emi_category` | `id` (e.g. `emi:fuel`) | switches the open recipe screen to that category's tab |
 | `emi_recipe_tab` | `index`, optional `page` (0-based) | switches the open recipe screen to a tab by position |
 | `emi_bom` | | opens the recipe tree (bill of materials) screen |
 | `open_emi_config` | | opens EMI's config screen |
 | `key` | `key`, optional `modifiers` (`shift`/`ctrl`/`alt`) | press + release of a key through the game's keyboard handler; `key` is a GLFW name without prefix (`E`, `F3`, `LEFT_CONTROL`, `KEY_R`, `GLFW_KEY_R`) or a number. Key bindings and open screens react as to a real key press (modifiers are passed to the event only; held-modifier checks via GLFW state do not see them) |
+| `emi_stack_key` | `item`, `key` | a key press on that stack through EMI's stack interaction (what EMI does for the stack under the mouse: view recipes/uses, favourite, item info, ...); records whether it was handled and the screen change |
+| `screen_scroll` | `amount` (-3) | mouse wheel in the middle of the current screen (negative = down) |
 | `command` | `text` (`/time set day`), optional `waitTicks` | runs a command on the integrated server with op level 4 (works without cheats) |
 | `set_gui_scale` | `n` (0 = auto) | changes the GUI scale option |
 | `resize` | `w`, `h` | resizes the window (windowed mode) |
 | `note` | `text` | writes a note into summary.json |
 | `emi_wait_loaded` | | waits until EMI reports loaded again |
+| `click` | `x`, `y` (GUI-scaled), optional `button` | left click (press + release) in the open screen, for example on a recipe page arrow |
 | `call` | `class`, `method` | calls a public static no-arg method (escape hatch) |
 
 The default window is 854x480; the default tour starts with `resize 1280x720` and `set_gui_scale 2`.

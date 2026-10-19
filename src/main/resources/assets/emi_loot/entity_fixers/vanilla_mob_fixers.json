@@ -1,0 +1,71 @@
+{
+	"minecraft:cod": {
+		"offset": -17,
+		"z": -90.0
+	},
+	"minecraft:chicken": {
+		"offset": -6
+	},
+	"minecraft:squid": {
+		"offset": -14
+	},
+	"minecraft:glow_squid": {
+		"offset": -14
+	},
+	"minecraft:cave_spider": {
+		"offset": -9
+	},
+	"minecraft:salmon": {
+		"offset": -13,
+		"z": -90.0
+	},
+	"minecraft:cat": {
+		"offset": -9
+	},
+	"minecraft:rabbit": {
+		"offset": -14
+	},
+	"minecraft:tropical_fish": {
+		"offset": -16,
+		"z": -90.0
+	},
+	"minecraft:pufferfish": {
+		"offset": -18
+	},
+	"minecraft:warden": {
+		"offset": 3
+	},
+	"minecraft:enderman": {
+		"offset": 1
+	},
+	"minecraft:slime": {
+		"offset": 1
+	},
+	"minecraft:magma_cube": {
+		"offset": 1
+	},
+	"minecraft:dolphin": {
+		"offset": -9
+	},
+	"minecraft:guardian": {
+		"offset": -7,
+		"scale": 1.1
+	},
+	"minecraft:phantom": {
+		"offset": -9
+	},
+	"minecraft:turtle": {
+		"offset": -6
+	},
+	"minecraft:iron_golem": {
+		"scale": 1.35,
+		"offset": 2
+	},
+	"minecraft:shulker": {
+		"scale": 1.25,
+		"offset": -7
+	},
+	"minecraft:wither": {
+		"offset": 5
+	}
+}

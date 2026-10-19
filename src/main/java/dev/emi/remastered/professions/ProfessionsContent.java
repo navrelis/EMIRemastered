@@ -6,7 +6,12 @@ import java.util.List;
 import dev.emi.emi.api.EmiRegistry;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.runtime.EmiLog;
+import dev.emi.remastered.professions.trade.TradeCollector;
+import dev.emi.remastered.professions.trade.TradeEntry;
+import dev.emi.remastered.professions.trade.TradeRecipe;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientWorldEvents;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.entry.RegistryEntry;
@@ -32,12 +37,14 @@ public class ProfessionsContent {
 		registry.addWorkstation(ProfessionsCategories.PROFESSION, EmiStack.of(Items.VILLAGER_SPAWN_EGG));
 
 		int count = 0;
+		List<ProfessionEntry> entries = new ArrayList<>();
 		for (VillagerProfession profession : Registries.VILLAGER_PROFESSION) {
 			if (profession == VillagerProfession.NONE) {
 				continue;
 			}
 			Identifier id = Registries.VILLAGER_PROFESSION.getId(profession);
 			ProfessionEntry entry = new ProfessionEntry(profession, id, findWorkstations(profession, id));
+			entries.add(entry);
 			if (entry.workstations().isEmpty()) {
 				continue;
 			}
@@ -45,6 +52,33 @@ public class ProfessionsContent {
 			count++;
 		}
 		EmiLog.info("[Professions] Registered " + count + " profession pages");
+		if (ProfessionsSettings.showTrades) {
+			registerTrades(registry, entries);
+		}
+	}
+
+	private static void registerTrades(EmiRegistry registry, List<ProfessionEntry> professions) {
+		ClientWorld world = MinecraftClient.getInstance().world;
+		if (world == null) {
+			EmiLog.info("[Professions] No client world, skipping villager trades");
+			return;
+		}
+		long start = System.currentTimeMillis();
+		TradeCollector.Result result = TradeCollector.collect(world, professions, ProfessionsSettings.tradeRolls);
+		registry.addCategory(ProfessionsCategories.VILLAGER_TRADES);
+		registry.addCategory(ProfessionsCategories.WANDERING_TRADER);
+		for (TradeEntry trade : result.villager()) {
+			registry.addRecipe(new TradeRecipe(trade));
+		}
+		for (TradeEntry trade : result.wanderer()) {
+			registry.addRecipe(new TradeRecipe(trade));
+		}
+		TradeCollector.Stats stats = result.stats();
+		stats.tradesPerOwner.forEach((owner, trades) -> EmiLog.info("[Professions] Trades " + owner + ": " + trades));
+		EmiLog.info("[Professions] Registered " + result.villager().size() + " villager trades and " + result.wanderer().size()
+			+ " wandering trader trades (" + (result.rebalanced() ? "rebalanced" : "vanilla") + " trade maps, " + stats.factories
+			+ " factories, " + stats.rolls + " rolls, " + stats.failures + " failed factories, " + stats.placeholderMaps
+			+ " placeholder maps, " + (System.currentTimeMillis() - start) + "ms)");
 	}
 
 	private static List<EmiStack> findWorkstations(VillagerProfession profession, Identifier id) {

@@ -1,0 +1,80 @@
+{
+  "type": "minecraft:entity",
+  "pools": [
+    {
+      "bonus_rolls": 0.0,
+      "conditions": [
+        {
+          "condition": "lootify:spawns_with"
+        }
+      ],
+      "functions": [
+        {
+          "function": "lootify:ominous_banner"
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:white_banner"
+        }
+      ],
+      "rolls": 1.0
+    },
+    {
+      "bonus_rolls": 0.0,
+      "conditions": [
+        {
+          "condition": "lootify:spawns_with"
+        },
+        {
+          "unenchanted_chance": 0.085,
+          "condition": "minecraft:random_chance_with_enchanted_bonus",
+          "enchanted_chance": 0.01,
+          "enchantment": "minecraft:looting"
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:iron_axe",
+          "functions": [
+            {
+              "function": "lootify:set_any_damage"
+            }
+          ]
+        }
+      ],
+      "rolls": 1.0
+    },
+    {
+      "bonus_rolls": 0.0,
+      "conditions": [
+        {
+          "condition": "lootify:spawns_with"
+        },
+        {
+          "unenchanted_chance": 0.085,
+          "condition": "minecraft:random_chance_with_enchanted_bonus",
+          "enchanted_chance": 0.01,
+          "enchantment": "minecraft:looting"
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:iron_axe",
+          "functions": [
+            {
+              "function": "lootify:set_any_damage"
+            },
+            {
+              "function": "minecraft:enchant_randomly"
+            }
+          ]
+        }
+      ],
+      "rolls": 1.0
+    }
+  ]
+}
