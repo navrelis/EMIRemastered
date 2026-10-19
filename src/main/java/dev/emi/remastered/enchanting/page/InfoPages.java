@@ -6,7 +6,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 /** The pages of an enchantment's info recipe, in order. Add new kinds of info by registering a page here. */
 public final class InfoPages {
 	private static final List<InfoPage> PAGES = new CopyOnWriteArrayList<>(List.of(
-		new OverviewPage(), new DescriptionPage(), new ExclusionsPage()));
+		new OverviewPage(), new SourcesPage(), new DescriptionPage(), new ExclusionsPage()));
 
 	private InfoPages() {
 	}

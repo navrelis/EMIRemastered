@@ -1,0 +1,30 @@
+{
+  "description": "Enchanting extras: enchantment pages (Sharpness, Mending; the sword list is ordered Fire Aspect, Knockback, Looting, Sweeping Edge, Bane of Arthropods, Sharpness, Smite, Mending, Unbreaking, Vanishing) and the Item Info screen of a plain enchantable item with its list of enchantments. The second page of an enchantment (Where to Find) is reached with the page buttons of the recipe; the Item Info page of an enchanted book needs a stack with components, which emi_stack_key cannot create: hover a book and press the Item Info key.",
+  "warmupTicks": 60,
+  "settleTicks": 10,
+  "stepTimeoutSeconds": 30,
+  "worldJoinTimeoutSeconds": 120,
+  "timeoutSeconds": 300,
+  "steps": [
+    { "type": "resize", "w": 1280, "h": 720 },
+    { "type": "set_gui_scale", "n": 2 },
+
+    { "type": "open_inventory" },
+    { "type": "emi_uses", "item": "minecraft:diamond_sword" },
+    { "type": "emi_category", "id": "emi_enchanting:enchantments" },
+    { "type": "emi_recipe_tab", "index": 4, "page": 5 },
+    { "type": "screenshot", "name": "sharpness" },
+    { "type": "emi_recipe_tab", "index": 4, "page": 7 },
+    { "type": "screenshot", "name": "mending" },
+    { "type": "close_screen" },
+
+    { "type": "open_inventory" },
+    { "type": "emi_stack_key", "item": "minecraft:diamond_sword", "key": "I" },
+    { "type": "screenshot", "name": "sword-item-info" },
+    { "type": "screen_scroll", "amount": -10 },
+    { "type": "screenshot", "name": "sword-item-info-details" },
+    { "type": "screen_scroll", "amount": -10 },
+    { "type": "screenshot", "name": "sword-item-info-end" },
+    { "type": "close_screen" }
+  ]
+}

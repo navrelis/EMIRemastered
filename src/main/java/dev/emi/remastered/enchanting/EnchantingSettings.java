@@ -19,6 +19,16 @@ public final class EnchantingSettings {
 	@ConfigValue("enchanting.show-for-items")
 	public static boolean showForItems = true;
 
+	@Comment("Whether the info page and the Item Info screen list where an enchantment can be found: enchanting table, "
+		+ "loot, trades, mob equipment, treasure and curse.")
+	@ConfigValue("enchanting.show-sources")
+	public static boolean showSources = true;
+
+	@Comment("Whether the Item Info screen shows the enchantments of enchanted books and items, and the enchantments "
+		+ "that fit a plain item.")
+	@ConfigValue("enchanting.show-in-item-info")
+	public static boolean showInItemInfo = true;
+
 	@Comment("The most enchanted book levels listed per enchantment. Enchantments with a higher maximum level "
 		+ "list levels up to this number and the maximum level.")
 	@ConfigValue("enchanting.book-level-limit")
