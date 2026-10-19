@@ -1,6 +1,6 @@
 # Plan
 
-Usage tally (work units: short = 1, long = 2): Opus 12 (F1, F2, Q3 x2, A1 x2) / Sonnet 45 -> Opus 21 %
+Usage tally (work units: short = 1, long = 2): Opus 12 (F1, F2, Q3 x2, A1 x2) / Sonnet 52 -> Opus 19 %
 
 Status: open / in progress / in review / done. `||` = can run in parallel.
 
@@ -26,17 +26,17 @@ Status: open / in progress / in review / done. `||` = can run in parallel.
 | ID | Task | Model | Status |
 |---|---|---|---|
 | Q1 | Dev-client screenshot tour + log check harness | Sonnet long | done |
-| Q2 | Known bugs (EMI repair AIOOBE, upstream issues of each module) | Sonnet | open |
+| Q2 | Known bugs (EMI repair AIOOBE, upstream issues of each module) | Sonnet | in progress (survey -> docs/KNOWN_BUGS.md) |
 | Q3 | A12 reload performance, before/after numbers | Opus long | in progress (wave 1, continued in its worktree) |
 
 ## Phase 3 Features (after the module each builds on is merged)
 | ID | Task | Builds on | Model | Status |
 |---|---|---|---|---|
 | A1 | Item Info screen + provider API ("How to get": recipes by output grouped, loot, mob drops, ores, trades, brewing; "no known source" marker); key bind on hovered stack | F2 | Opus long | done (client module-off check pending) |
-| A2 | Enchanting: real max level (cap mods), incompatibilities via canBeCombined, sources (table/loot/librarian), info provider | P4, A1 | Sonnet | open |
+| A2 | Enchanting: real max level (cap mods), incompatibilities via canBeCombined, sources (table/loot/librarian), info provider | P4, A1 | Sonnet | in progress |
 | A3 | Effects sources (in P2) | P2 | Sonnet | done (P2) |
 | A4 | Villager trades per profession/level (client dummy villager, wandering trader, Fabric TradeOfferHelper trades; Villager-API plans if reachable) | P3 | Sonnet long | done |
-| A5+B1 | `stats` module: food page, tool/weapon/armour stats pages, fuel/compost in info screen (A6) | F2, A1 | Sonnet long | open |
+| A5+B1 | `stats` module: food page, tool/weapon/armour stats pages, fuel/compost in info screen (A6) | F2, A1 | Sonnet long | in progress |
 | A7 | `mobs` module: mob pages (health, armour, attack, speed, spawn biomes via server sync, drops link) | P7 | Sonnet long | in review (code done, client checks blocked) |
 | A8 | Loot: structure/dimension filters, condition icons, Lootr per-player note | P7 | Sonnet | in progress (wip/a8-loot-extras) |
 | A9 | Ores: modded dimensions, compact biome list, Y-range highlight | P5 | Sonnet | in progress (wip/a9-ores-extras) |
@@ -46,8 +46,8 @@ Status: open / in progress / in review / done. `||` = can run in parallel.
 | B2 | `world` module: biome pages (climate, tags, spawns, ores) + structure pages (server sync) | P5, A7 | Sonnet long | open |
 | B3 | Tag browser screen (all tags, search, members) | F2 | Sonnet | in review (code done, client checks blocked by D13 fix) |
 | B4 | Copy recipe as text/JSON bind | F2 | Sonnet short | in progress (with B3) |
-| B5 | Advancement links in item info (icon/display) | A1 | Sonnet short | open |
-| X1 | Pack-dev export command `/emi export` (recipes, loot, sources to JSON/CSV) | A1 | Sonnet | open |
+| B5 | Advancement links in item info (icon/display) | A1 | Sonnet short | in progress |
+| X1 | Pack-dev export command `/emi export` (recipes, loot, sources to JSON/CSV) | A1 | Sonnet | in progress |
 | X2 | Let's Do port fixes + dedupe (P6) | - | Sonnet long | done (in P6) |
 
 ## Phase 4 Acceptance

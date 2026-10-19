@@ -39,3 +39,4 @@
 2026-10-19 | P2+A3 review (lead) | accepted: one-pass index (63-93 ms vs ~1.1 s upstream cold), emiffect:effect id kept + favourites string bug fixed, sources table, EffectsEmiPlugin initialize forwarding; merged, build green. Steps.java click step will clash with Q1b (resolve at merge). Manual: module-off client check
 2026-10-19 | A1 review (lead) | accepted: module info (ns emi_info), API in info.api + docs/INFO_PROVIDERS.md, recipes/no-source/fuel/compost providers, mixins into EmiApi/EmiScreenManager (HEAD, cancellable only when InfoScreen open), icon index 8; merged, build green. Follow-up: exempt dev.emi.remastered mixins from EMI 'tainted' warning
 2026-10-19 | A7 mobs (Sonnet) | code done, build+server green; client checks pending
+2026-10-19 | wave 3 delegated (Sonnet, no client launches until D13 fix): A2 enchanting extras, Q2 bug survey, A5+B1 stats module, B5 advancement provider, X1 /emiexport
