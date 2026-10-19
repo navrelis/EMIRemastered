@@ -241,9 +241,13 @@ public class MobInfoRecipe implements EmiRecipe {
 		Vector3f rotation = ClientResourceData.MOB_ROTATIONS.get(entity.getType());
 		EntityBounds.Box bounds = EntityBounds.measure(living, rotation == null ? null : new Vector3f(rotation).mul(0.017453292F));
 		if (bounds == null) {
+			Mobs.LOGGER.warn("Could not measure {} for its portrait, using the hit box scale", entity.getType());
 			return null;
 		}
-		PortraitFit fit = PortraitFit.of(bounds.minX(), bounds.minY(), bounds.maxX(), bounds.maxY(), PORTRAIT_BOX);
+		// the portrait turns with the mouse, so a long mob seen from the front may end up seen from the side
+		double centre = (bounds.minX() + bounds.maxX()) / 2.0;
+		double reach = Math.hypot(bounds.width(), bounds.depth()) / 2.0;
+		PortraitFit fit = PortraitFit.of(centre - reach, bounds.minY(), centre + reach, bounds.maxY(), PORTRAIT_BOX);
 		return fit == null ? null : EntityEmiStack.ofFitted(entity, fit.scale(), fit.offsetX(), fit.offsetY());
 	}
 

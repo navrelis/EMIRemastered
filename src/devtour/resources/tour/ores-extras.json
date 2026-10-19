@@ -16,8 +16,8 @@
     { "type": "close_screen" },
 
     { "type": "note", "text": "FX-WD: the player stands at Y 232, the peak of the emerald graph, so the orange marker runs through the middle label (it must leave the label free)" },
-    { "type": "command", "text": "/effect give @s minecraft:resistance 600 4 true" },
-    { "type": "command", "text": "/tp @s ~ 232 ~" },
+    { "type": "command", "text": "/effect give @p minecraft:resistance 600 4 true" },
+    { "type": "command", "text": "/execute as @p at @s run tp @s ~ 232 ~" },
     { "type": "wait", "ticks": 3 },
     { "type": "emi_recipes", "item": "minecraft:emerald_ore" },
     { "type": "emi_category", "id": "emi_ores:oregen" },

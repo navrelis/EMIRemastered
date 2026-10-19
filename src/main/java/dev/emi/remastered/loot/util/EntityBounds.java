@@ -25,7 +25,11 @@ public final class EntityBounds {
 	 * The extent of the rendered entity in the screen space of its portrait: x to the right, y down, one unit is one
 	 * block, the origin is the point the entity is rendered at (its feet, centred).
 	 */
-	public record Box(float minX, float minY, float maxX, float maxY) {
+	public record Box(float minX, float minY, float maxX, float maxY, float minZ, float maxZ) {
+		public float depth() {
+			return maxZ - minZ;
+		}
+
 		public float width() {
 			return maxX - minX;
 		}
@@ -82,13 +86,15 @@ public final class EntityBounds {
 		private float minY = Float.POSITIVE_INFINITY;
 		private float maxX = Float.NEGATIVE_INFINITY;
 		private float maxY = Float.NEGATIVE_INFINITY;
+		private float minZ = Float.POSITIVE_INFINITY;
+		private float maxZ = Float.NEGATIVE_INFINITY;
 
 		@Nullable
 		Box box() {
 			if (minX > maxX || minY > maxY) {
 				return null;
 			}
-			return new Box(minX, minY, maxX, maxY);
+			return new Box(minX, minY, maxX, maxY, minZ, maxZ);
 		}
 
 		@Override
@@ -102,6 +108,8 @@ public final class EntityBounds {
 			maxX = Math.max(maxX, x);
 			minY = Math.min(minY, y);
 			maxY = Math.max(maxY, y);
+			minZ = Math.min(minZ, z);
+			maxZ = Math.max(maxZ, z);
 			return this;
 		}
 
