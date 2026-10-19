@@ -70,3 +70,4 @@
 2026-10-19 | Q3 bench review (lead) | accepted: pack bench warm total 5761->2445 ms (pooled -40%), emi plugin -49..66%, join -21%, heap -60 MB (KB12), alloc/reload -37%; stable dump sections identical stock/after/stock-control; KB2 invalidator first; repair check ok; correction: priority boost opt-in only
 2026-10-19 | Q3 merged (lead) | EmiTagKey conflict resolved by agent (concurrent cache + listVersion, no recursive computeIfAbsent); repair check after FX2: 0 remainder errors; merged, build green (301 tests)
 2026-10-19 | DOC1 delegated (Sonnet short): KNOWN_BUGS rows + DEVTOUR tour list
+2026-10-19 | DOC2 delegated (Sonnet short): README, CREDITS, CHANGELOG, licences in jar

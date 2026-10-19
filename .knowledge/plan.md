@@ -1,6 +1,6 @@
 # Plan
 
-Usage tally (work units: short = 1, long = 2): Opus 21 (F1, F2, Q3 x6, A1 x2, FX1 x4) / Sonnet 84 -> Opus 20 % (session 4 re-delegation of interrupted wave 5 counted again)
+Usage tally (work units: short = 1, long = 2): Opus 21 (F1, F2, Q3 x6, A1 x2, FX1 x4) / Sonnet 86 -> Opus 20 % (session 4 re-delegation of interrupted wave 5 counted again)
 
 Status: open / in progress / in review / done. `||` = can run in parallel.
 
@@ -61,7 +61,8 @@ Status: open / in progress / in review / done. `||` = can run in parallel.
 | P8 | Info providers: villager trades (professions), effects | Sonnet long | done (merged; coveredCategories(stack) API; item-info toggle not client-checked) |
 | DOC1 | KNOWN_BUGS.md rows from FX1-FX3/Q3 + DEVTOUR.md tour list (world, fx2, fx3, p8, WorldTour) | Sonnet short | in progress |
 | ICON12 | world jump icon slot 12 (after T1) | Sonnet short | open |
-| -- | Later: KB7, KB13; README/CREDITS | - | open |
+| DOC2 | README, CREDITS.md (authors, refs, licences), CHANGELOG 2.0.0, licence files in jar | Sonnet short | in progress |
+| -- | Later: KB7, KB13 | - | open |
 
 ## Phase 4 Acceptance
 Pack install under game lock, end-to-end check, report, push.
