@@ -16,6 +16,7 @@ import dev.emi.emi.runtime.EmiDrawContext;
 import dev.emi.emi.screen.EmiScreenManager;
 import dev.emi.emi.search.EmiSearch;
 import dev.emi.emi.search.QueryType;
+import dev.emi.remastered.distractionfree.DistractionFree;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.TextFieldWidget;
@@ -257,7 +258,12 @@ public class EmiSearchWidget extends TextFieldWidget {
 		}
 
 		if (EmiConfig.enabled) {
-			super.renderWidget(context.raw(), mouseX, mouseY, delta);
+			// EMI Remastered: distraction-free "lower search bar opacity"
+			if (DistractionFree.lowerSearchOpacity()) {
+				renderTranslucent(context, mouseX, mouseY, delta);
+			} else {
+				super.renderWidget(context.raw(), mouseX, mouseY, delta);
+			}
 			if (highlight) {
 				int border = 0xffeeee00;
 				context.fill(this.x - 1, this.y - 1, this.width + 2, 1, border);
@@ -269,5 +275,28 @@ public class EmiSearchWidget extends TextFieldWidget {
 		context.resetColor();
 		view.popMatrix();
 		EmiPort.applyModelViewMatrix();
+	}
+
+	// EMI Remastered: the vanilla text field without its sprite background, and a translucent box instead. The text field is moved
+	// and narrowed by the background margin while it draws, so that the text stays where it is with the sprite.
+	private void renderTranslucent(EmiDrawContext context, int mouseX, int mouseY, float delta) {
+		int color = 70 << 24;
+		context.fill(this.getX(), this.getY(), this.getWidth(), this.getHeight(), color);
+		context.fill(this.getX() + 1, this.getY() + 1, this.getWidth() - 2, this.getHeight() - 2, color);
+		int x = this.getX();
+		int y = this.getY();
+		int width = this.getWidth();
+		this.setDrawsBackground(false);
+		this.setX(x + 4);
+		this.setY(y + (this.getHeight() - 8) / 2);
+		this.setWidth(width - 8);
+		try {
+			super.renderWidget(context.raw(), mouseX, mouseY, delta);
+		} finally {
+			this.setDrawsBackground(true);
+			this.setX(x);
+			this.setY(y);
+			this.setWidth(width);
+		}
 	}
 }

@@ -4,6 +4,7 @@
   "package": "dev.emi.remastered.devtour.mixin",
   "compatibilityLevel": "JAVA_21",
   "client": [
+    "GameRendererMixin",
     "InputUtilMixin",
     "MouseMixin",
     "WindowMixin"

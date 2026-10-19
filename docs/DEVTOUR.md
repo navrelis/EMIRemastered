@@ -39,8 +39,8 @@ Output, in `run/tour-out/<tour name>/` (the folder is emptied at the start of ev
 
 Built-in tours (in `src/devtour/resources/tour/`): `default` (EMI main UI), `config` (EMI config screen with the module
 groups, jump buttons, module switches), `plugin-manager` (Plugin Manager: list, tooltips, toggles, reload on close),
-`focus-check` (window focus / cursor lock check) and `all-steps` (touches every step
-type; its last step is meant to fail to show how failures are reported).
+`focus-check` (window focus / cursor lock check), `distraction-free`, `effects`, `enchanting`, `loot`, `ores` (one per
+module) and `all-steps` (touches every step type; its last step is meant to fail to show how failures are reported).
 
 ## How it works
 
@@ -88,13 +88,15 @@ All settings are optional (defaults shown). `settleTicks` is how many ticks a sc
 | `open_inventory` | | opens the player inventory (EMI sidebars appear) |
 | `close_screen` | | closes the current screen |
 | `emi_search` | `text` | types into EMI's search box (needs an open screen); records the result count |
-| `emi_recipes` | `item` (item id) | `EmiApi.displayRecipes`; fails if EMI has no recipes for it; records the tabs |
+| `emi_recipes` | `item` (item id) or `effect` (status effect id, effects module) | `EmiApi.displayRecipes`; fails if EMI has no recipes for it; records the tabs |
 | `emi_uses` | `item` | `EmiApi.displayUses` (includes fuel, workstations) |
 | `emi_category` | `id` (e.g. `emi:fuel`) | switches the open recipe screen to that category's tab |
 | `emi_recipe_tab` | `index`, optional `page` (0-based) | switches the open recipe screen to a tab by position |
 | `emi_bom` | | opens the recipe tree (bill of materials) screen |
 | `open_emi_config` | | opens EMI's config screen |
 | `key` | `key`, optional `modifiers` (`shift`/`ctrl`/`alt`) | press + release of a key through the game's keyboard handler; `key` is a GLFW name without prefix (`E`, `F3`, `LEFT_CONTROL`, `KEY_R`, `GLFW_KEY_R`) or a number. Key bindings and open screens react as to a real key press (modifiers are passed to the event only; held-modifier checks via GLFW state do not see them) |
+| `emi_stack_key` | `item`, `key` | a key press on that stack through EMI's stack interaction (what EMI does for the stack under the mouse: view recipes/uses, favourite, item info, ...); records whether it was handled and the screen change |
+| `screen_scroll` | `amount` (-3) | mouse wheel in the middle of the current screen (negative = down) |
 | `command` | `text` (`/time set day`), optional `waitTicks` | runs a command on the integrated server with op level 4 (works without cheats) |
 | `set_gui_scale` | `n` (0 = auto) | changes the GUI scale option |
 | `resize` | `w`, `h` | resizes the window (windowed mode) |
@@ -148,22 +150,46 @@ register("emi_favorite", (args, ctx) -> {
 `ctx.client` is the `MinecraftClient`; `ctx.screenshot(name)` takes a screenshot directly. Add the step to the table
 above. No other file needs a change; the new type can then be used in any tour json.
 
-## Dev clients never steal focus or the cursor
+## Dev clients never steal focus or the cursor (no-grab protection)
 
-The `emi_devtour` mod is on the classpath of every dev client run config (`runClient`, `runClientWorld`,
-`runClientTour`), so several clients can run next to each other without taking over the developer's PC. Its mixins
-(`src/devtour/java/dev/emi/remastered/devtour/mixin`, `emi_devtour.mixins.json`):
+Several dev clients (and the developer's own work) share one PC, so a dev client must never capture the mouse or take
+the keyboard focus. The `emi_devtour` mod (`src/devtour`, never shipped) carries the protection. It is on the classpath
+of **every** client run config: `runClient`, `runClientWorld`, `runClientTour` (and Loom's `runClientRenderDoc`), but
+not of `runServer`. Plain `runClient` / `runClientWorld` therefore behave like normal clients minus the grab; the
+screenshot tour itself only runs when `-Demi.tour` is set (only `runClientTour` sets it). Everything is dev-only: the
+mixins are not in the release jar. The mixin config uses `defaultRequire: 1`, so a Minecraft change that removes a
+target crashes the start-up instead of silently grabbing the cursor again.
 
-* `Mouse#lockCursor` / `unlockCursor` and `InputUtil#setCursorParameters` are cancelled: the OS cursor is never
-  captured, hidden or moved (`glfwSetCursorPos`, `glfwSetInputMode(GLFW_CURSOR)` are never called).
-* `Window.<init>` sets `GLFW_FOCUS_ON_SHOW=false` and `GLFW_FOCUSED=false` before `glfwCreateWindow`: the window is
-  shown without activating it.
+Neutralised vanilla calls (Yarn 1.21.1+build.3), `src/devtour/java/dev/emi/remastered/devtour/mixin`:
 
-`prepareDevOptions` (runs before every client launch) writes `soundCategory_master:0.0`, `onboardAccessibility:false`
-and `pauseOnLostFocus:false` into `run/options.txt`, so the unfocused game keeps ticking and rendering (screenshots
-work). The tour logic itself stays inactive unless `-Demi.tour` is set (only `runClientTour` does). Tour steps inject
-input through `Screen.mouseClicked/mouseScrolled/mouseReleased`, never through the OS cursor, `java.awt.Robot` or GLFW.
-Check with the `window_info` step (`gradlew runClientTour -Ptour=focus-check`): `focused=false cursorLocked=false`.
+| Mixin | Target | Effect |
+|---|---|---|
+| `MouseMixin` | `Mouse#lockCursor`, `Mouse#unlockCursor` | cancelled: the cursor is never captured or released |
+| `InputUtilMixin` | `InputUtil#setCursorParameters` | cancelled: the only caller of `glfwSetCursorPos` and `glfwSetInputMode(GLFW_CURSOR)` |
+| `InputUtilMixin` | `InputUtil#setRawMouseMotionMode` | cancelled: no `glfwSetInputMode(GLFW_RAW_MOUSE_MOTION)` |
+| `WindowMixin` | `Window.<init>` before `glfwCreateWindow` | `GLFW_FOCUS_ON_SHOW=false`, `GLFW_FOCUSED=false`: shown without activating |
+| `WindowMixin` | `Window#toggleFullscreen` | cancelled (F11, the fullscreen option, the start-up toggle) |
+| `WindowMixin` | `Window#updateWindowRegion` | `fullscreen`/`currentFullscreen` forced to false: the only `glfwSetWindowMonitor` caller never enters fullscreen |
+| `GameRendererMixin` | `GameRenderer#render` read of `GameOptions#pauseOnLostFocus` | always false: an unfocused client does not open the game menu |
+
+Other GLFW calls of Minecraft only read state or register callbacks (title, icon, vsync, size limits, monitors,
+clipboard, key/mouse callbacks); vanilla never calls `glfwFocusWindow` or `glfwRequestWindowAttention`. With the cursor
+never locked, Minecraft's other cursor-lock code paths (`MinecraftClient#setScreen`, `Mouse#onMouseButton`) just do
+nothing; screens open and the world renders as usual.
+
+`prepareDevOptions` is a dependency of `runClient`, `runClientWorld` and `runClientTour` and runs before every launch
+(never up to date). It rewrites exactly these keys in `run/options.txt` (creating the file if needed, keeping every
+other line):
+
+* `soundCategory_master:0.0` (dev clients never play sound)
+* `onboardAccessibility:false` (a fresh client would show the accessibility onboarding screen and block quick play)
+* `pauseOnLostFocus:false` (the unfocused game keeps ticking and rendering, so screenshots work)
+
+Tour steps inject input in-process only: `Screen.mouseClicked/mouseReleased/mouseScrolled/mouseMoved`, the game's
+`Keyboard.onKey` handler and the virtual mouse position of `Mouse` (`click`, `scroll`, `hover`, `key`, ...). Nothing
+uses GLFW input, `java.awt.Robot` or any OS input. The only window call is `resize` (`glfwSetWindowSize`, no
+activation). Check the protection with `gradlew runClientTour -Ptour=focus-check` (step `window_info`): it must report
+`focused=false cursorLocked=false cursorMode=212993` (GLFW_CURSOR_NORMAL).
 Limitation: a real mouse that moves over the game window still moves the in-game cursor.
 
 ## Release safety

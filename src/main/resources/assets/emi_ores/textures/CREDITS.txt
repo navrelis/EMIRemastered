@@ -1,0 +1,11 @@
+EMI Ores textures - attribution
+
+Vanilla biome icons (assets/minecraft/textures/biome/*.png) are licensed under
+CC BY-NC-SA 3.0 (https://creativecommons.org/licenses/by-nc-sa/3.0/) by the Minecraft Fandom Wiki
+contributors, taken from the Biome wiki page (https://minecraft.fandom.com/wiki/Biome).
+
+The biome icons were added to EMI Ores by Abbie (https://github.com/Abbie5/emi-ores) and are carried
+over unchanged into EMI Remastered. These icons are NOT covered by the LGPL-3.0 / MIT licence of the
+code; they stay under CC BY-NC-SA 3.0 (attribution, non-commercial, share-alike).
+
+The EMI Ores code is licensed LGPL-3.0-only, see LICENSE-LGPL-3.0.txt in the parent directory.

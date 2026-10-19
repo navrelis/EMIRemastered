@@ -1,3 +1,22 @@
 {
-  "config.emi.group.professions": "Berufe"
+  "emi.category.emiprofessions.professions": "Berufe",
+  "emi.category.emiprofessions.villager_trades": "Dorfbewohner-Handel",
+  "emi.category.emiprofessions.wandering_trader": "Fahrender Händler",
+  "emiprofessions.trade.title": "%1$s - %2$s",
+  "emiprofessions.trade.level": "Stufe %s",
+  "emiprofessions.trade.pool": "Gruppe %1$s (%2$s Angebote)",
+  "emiprofessions.trade.pool_plain": "Gruppe %s",
+  "emiprofessions.trade.max_uses": "Max. Verwendungen: %s",
+  "emiprofessions.trade.experience": "Dorfbewohner-Erfahrung: %s",
+  "emiprofessions.trade.types": "Dorfbewohnertypen: %s",
+  "emiprofessions.trade.map_placeholder": "Karte (Platzhalter)",
+  "emiprofessions.trade.map_note": "Platzhalter: Die echte Karte entsteht beim Handel und führt zu %s",
+  "emiprofessions.trade.villager_api": "Hinzugefügt von Villager API",
+  "config.emi.group.professions": "Berufe",
+  "config.emi.professions.show_villager_model": "Dorfbewohner-Modell anzeigen",
+  "config.emi.tooltip.professions.show_villager_model": "Ob Berufsseiten das Modell des Dorfbewohners neben der Arbeitsstätte darstellen.",
+  "config.emi.professions.show_trades": "Dorfbewohner-Handel anzeigen",
+  "config.emi.tooltip.professions.show_trades": "Zeigt die Angebote jedes Dorfbewohner-Berufs und des Fahrenden Händlers als Rezepte.\nBenötigt ein EMI-Neuladen.",
+  "config.emi.professions.trade_rolls": "Würfe pro Handelsfabrik",
+  "config.emi.tooltip.professions.trade_rolls": "Wie oft jede Handelsfabrik gewürfelt wird, um die Varianten zufälliger Angebote wie verzauberter Bücher zu finden (1 bis 64).\nBenötigt ein EMI-Neuladen."
 }

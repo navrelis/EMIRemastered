@@ -1,3 +1,22 @@
 {
-  "config.emi.group.professions": "Professions"
+  "emi.category.emiprofessions.professions": "Professions",
+  "emi.category.emiprofessions.villager_trades": "Villager Trades",
+  "emi.category.emiprofessions.wandering_trader": "Wandering Trader",
+  "emiprofessions.trade.title": "%1$s - %2$s",
+  "emiprofessions.trade.level": "Level %s",
+  "emiprofessions.trade.pool": "Pool %1$s (%2$s picks)",
+  "emiprofessions.trade.pool_plain": "Pool %s",
+  "emiprofessions.trade.max_uses": "Max. uses: %s",
+  "emiprofessions.trade.experience": "Villager experience: %s",
+  "emiprofessions.trade.types": "Villager types: %s",
+  "emiprofessions.trade.map_placeholder": "Map (placeholder)",
+  "emiprofessions.trade.map_note": "Placeholder: the real map is created when trading and leads to %s",
+  "emiprofessions.trade.villager_api": "Added by Villager API",
+  "config.emi.group.professions": "Professions",
+  "config.emi.professions.show_villager_model": "Show Villager Model",
+  "config.emi.tooltip.professions.show_villager_model": "Whether profession pages render the villager model next to the workstation.",
+  "config.emi.professions.show_trades": "Show Villager Trades",
+  "config.emi.tooltip.professions.show_trades": "Show the trades of every villager profession and of the wandering trader as recipes.\nNeeds an EMI reload.",
+  "config.emi.professions.trade_rolls": "Rolls per Trade Factory",
+  "config.emi.tooltip.professions.trade_rolls": "How often every trade factory is rolled to find the variants of random trades such as enchanted books (1 to 64).\nNeeds an EMI reload."
 }

@@ -1,3 +1,33 @@
 {
-  "config.emi.group.letsdo": "Let's Do"
+  "config.emi.group.letsdo": "Let's Do",
+
+  "emi.category.emi_letsdo_compat.fondue_fill": "Fondue mit Käse füllen",
+  "emi.category.emi_letsdo_compat.fondue_use": "Gefülltes Fondue benutzen",
+  "emi.category.emi_letsdo_compat.cake_cut": "Kuchen schneiden",
+  "emi.category.emi_letsdo_compat.grape_mashing": "Trauben stampfen",
+  "emi.category.meadow.cheese": "Käseherstellung",
+  "emi.category.meadow.cooking": "Kochkessel",
+  "emi.category.meadow.woodcutting": "Holzbearbeitung",
+  "emi.category.herbalbrews.cauldron_brewing": "Kesselbrauen",
+  "emi.category.herbalbrews.cooking": "Teekessel",
+  "emi.category.beachparty.mini_fridge_mixing": "Minikühlschrank-Mixen",
+  "emi.category.beachparty.tiki_bar_mixing": "Tikibar-Mixen",
+
+  "tag.item.meadow.bread": "Brot",
+  "tag.item.meadow.cheese": "Käse",
+  "tag.item.meadow.cheese_wheels": "Käseräder",
+  "tag.item.herbalbrews.container_items": "Flaschen",
+  "tag.item.herbalbrews.small_water_fill": "Kleine Wasserbehälter",
+  "tag.item.herbalbrews.large_water_fill": "Große Wasserbehälter",
+  "tag.item.herbalbrews.heat_items": "Wärmequellen",
+  "tag.item.bakery.knives": "Messer",
+
+  "emi_letsdo_compat.grape_mashing.click": "§e§l[RECHTSKLICK]§r auf den Topf mit §5§nTrauben§r in der Hand.",
+  "emi_letsdo_compat.grape_mashing.jump": "§e§l[SPRINGE]§r auf den Topf, um die §5§nTrauben§r zu stampfen.",
+  "emi_letsdo_compat.grape_mashing.bottle": "§e§l[BENUTZE]§r eine Flasche, um den §5§nSaft§r abzufüllen.",
+  "emi_letsdo_compat.fondue.heat": "Der Fonduetopf muss auf einer Wärmequelle stehen.",
+  "emi_letsdo_compat.fondue_fill.full": "Füllt den Topf vollständig (3 von 3).",
+  "emi_letsdo_compat.fondue_fill.part": "Fügt 1 von 3 Portionen hinzu; der Topf fasst 3.",
+  "emi_letsdo_compat.fondue_use.portion": "Tauche den Gegenstand in den Topf: verbraucht 1 von 3 Portionen.",
+  "emi_letsdo_compat.cake_cut.knife": "Rechtsklick mit einem Messer auf den Kuchen: 4 Schnitte, je ein Stück."
 }

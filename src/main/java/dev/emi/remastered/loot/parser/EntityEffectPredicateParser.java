@@ -1,0 +1,79 @@
+package dev.emi.remastered.loot.parser;
+
+import dev.emi.remastered.loot.EMILoot;
+import dev.emi.remastered.loot.parser.processor.ListProcessors;
+import dev.emi.remastered.loot.util.LText;
+import net.minecraft.entity.effect.StatusEffect;
+import net.minecraft.predicate.NumberRange;
+import net.minecraft.predicate.entity.EntityEffectPredicate;
+import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+
+public class EntityEffectPredicateParser {
+
+    public static Text parseEntityEffectPredicate(EntityEffectPredicate predicate) {
+        Map<RegistryEntry<StatusEffect>, EntityEffectPredicate.EffectData> effects = predicate.effects();
+        List<MutableText> list = new LinkedList<>();
+        for (Map.Entry<RegistryEntry<StatusEffect>, EntityEffectPredicate.EffectData> entry : effects.entrySet()) {
+            Text name = entry.getKey().value().getName();
+            EntityEffectPredicate.EffectData data = entry.getValue();
+            NumberRange.IntRange amplifier = data.amplifier();
+            if (!amplifier.equals(NumberRange.IntRange.ANY)) {
+                Optional<Integer> min = amplifier.min();
+                Optional<Integer> max = amplifier.max();
+                if (Objects.equals(min, max) && min.isPresent()) {
+                    list.add(LText.translatable("emi_loot.entity_predicate.effect.amplifier", name, min.get() + 1));
+                } else if (min.isPresent() && max.isPresent()) {
+                    list.add( LText.translatable("emi_loot.entity_predicate.effect.amplifier_2", name, min.get() + 1, max.get() + 1));
+                } else {
+                    list.add( LText.translatable("emi_loot.entity_predicate.effect.amplifier_3", name));
+                }
+            }
+
+            NumberRange.IntRange duration = data.duration();
+            if (!duration.equals(NumberRange.IntRange.ANY)) {
+                Optional<Integer> min = duration.min();
+                Optional<Integer> max = duration.max();
+                if (Objects.equals(min, max) && min.isPresent()) {
+                    list.add( LText.translatable("emi_loot.entity_predicate.effect.duration", name, min.get() + 1));
+                } else if (min.isPresent() && max.isPresent()) {
+                    list.add( LText.translatable("emi_loot.entity_predicate.effect.duration_2", name, min.get() + 1, max.get() + 1));
+                } else {
+                    list.add( LText.translatable("emi_loot.entity_predicate.effect.duration_3", name));
+                }
+            }
+
+            Optional<Boolean> ambient = data.ambient();
+            if (ambient.isPresent()) {
+                if (ambient.get()) {
+                    list.add( LText.translatable("emi_loot.entity_predicate.effect.ambient_true", name));
+                } else {
+                    list.add( LText.translatable("emi_loot.entity_predicate.effect.ambient_false", name));
+                }
+            }
+
+            Optional<Boolean> visible = data.visible();
+            if (visible.isPresent()) {
+                if (visible.get()) {
+                    list.add( LText.translatable("emi_loot.entity_predicate.effect.visible_true", name));
+                } else {
+                    list.add( LText.translatable("emi_loot.entity_predicate.effect.visible_false", name));
+                }
+            }
+            list.add(LText.translatable("emi_loot.entity_predicate.effect.fallback", name));
+
+        }
+        if (!list.isEmpty()) {
+            return LText.translatable("emi_loot.entity_predicate.effect_1", ListProcessors.buildAndList(list));
+        }
+        if (EMILoot.isDebug()) EMILoot.LOGGER.warn("Unparsable entity effect predicate in table: "  + LootTableParser.currentTable);
+        return LText.translatable("emi_loot.predicate.invalid");
+    }
+}

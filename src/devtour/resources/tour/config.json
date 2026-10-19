@@ -1,5 +1,5 @@
 {
-  "description": "EMI config screen with the module groups: module switches (toggled and restored), module setting groups, jump buttons and icons, Plugins button, small window, GUI scale 3.",
+  "description": "EMI config screen with the module groups: module switches (toggled and restored), module setting groups, jump buttons and icons, Plugins button, small window, GUI scale 3, GUI scale 1 (all module jump icons).",
   "warmupTicks": 60,
   "settleTicks": 10,
   "steps": [
@@ -72,6 +72,14 @@
     { "type": "set_gui_scale", "n": 3 },
     { "type": "wait", "ticks": 10 },
     { "type": "screenshot", "name": "scale-3" },
+
+    { "type": "set_gui_scale", "n": 1 },
+    { "type": "wait", "ticks": 10 },
+    { "type": "hover", "x": 1270, "y": 5 },
+    { "type": "screenshot", "name": "scale-1-all-module-jumps" },
+    { "type": "click", "text": "Effects" },
+    { "type": "screenshot", "name": "scale-1-jump-effects" },
+
     { "type": "set_gui_scale", "n": 2 },
     { "type": "screen_close" }
   ]
