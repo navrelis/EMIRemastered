@@ -1,0 +1,51 @@
+{
+  "description": "Effects module: effect pages with sources (potions, food, stew, beacon, mobs, cures) and the effects in the item list.",
+  "warmupTicks": 60,
+  "settleTicks": 10,
+  "stepTimeoutSeconds": 30,
+  "worldJoinTimeoutSeconds": 120,
+  "timeoutSeconds": 300,
+  "steps": [
+    { "type": "resize", "w": 1280, "h": 720 },
+    { "type": "set_gui_scale", "n": 2 },
+
+    { "type": "open_inventory" },
+    { "type": "emi_search", "text": "regeneration" },
+    { "type": "screenshot", "name": "search-regeneration" },
+    { "type": "emi_search", "text": "" },
+
+    { "type": "emi_recipes", "effect": "minecraft:regeneration" },
+    { "type": "screenshot", "name": "regeneration" },
+    { "type": "emi_recipes", "effect": "minecraft:speed" },
+    { "type": "screenshot", "name": "speed" },
+    { "type": "click", "x": 383, "y": 270 },
+    { "type": "screenshot", "name": "speed-page2" },
+    { "type": "emi_recipes", "effect": "minecraft:poison" },
+    { "type": "screenshot", "name": "poison" },
+    { "type": "click", "x": 383, "y": 270 },
+    { "type": "screenshot", "name": "poison-page2" },
+    { "type": "click", "x": 383, "y": 270 },
+    { "type": "screenshot", "name": "poison-page3" },
+    { "type": "click", "x": 383, "y": 270 },
+    { "type": "screenshot", "name": "poison-wrap-to-page1" },
+    { "type": "click", "x": 255, "y": 270 },
+    { "type": "screenshot", "name": "poison-back-to-page3" },
+    { "type": "emi_recipes", "effect": "minecraft:strength" },
+    { "type": "screenshot", "name": "strength" },
+    { "type": "emi_recipes", "effect": "minecraft:raid_omen" },
+    { "type": "screenshot", "name": "raid-omen" },
+    { "type": "emi_recipes", "effect": "minecraft:wither" },
+    { "type": "screenshot", "name": "wither" },
+    { "type": "emi_recipes", "effect": "minecraft:night_vision" },
+    { "type": "screenshot", "name": "night-vision" },
+    { "type": "emi_recipes", "effect": "minecraft:fire_resistance" },
+    { "type": "screenshot", "name": "fire-resistance" },
+    { "type": "emi_recipes", "effect": "minecraft:health_boost" },
+    { "type": "screenshot", "name": "health-boost-no-sources" },
+
+    { "type": "emi_uses", "item": "minecraft:golden_apple" },
+    { "type": "screenshot", "name": "uses-golden-apple" },
+
+    { "type": "close_screen" }
+  ]
+}

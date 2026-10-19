@@ -86,7 +86,7 @@ All settings are optional (defaults shown). `settleTicks` is how many ticks a sc
 | `open_inventory` | | opens the player inventory (EMI sidebars appear) |
 | `close_screen` | | closes the current screen |
 | `emi_search` | `text` | types into EMI's search box (needs an open screen); records the result count |
-| `emi_recipes` | `item` (item id) | `EmiApi.displayRecipes`; fails if EMI has no recipes for it; records the tabs |
+| `emi_recipes` | `item` (item id) or `effect` (status effect id, effects module) | `EmiApi.displayRecipes`; fails if EMI has no recipes for it; records the tabs |
 | `emi_uses` | `item` | `EmiApi.displayUses` (includes fuel, workstations) |
 | `emi_category` | `id` (e.g. `emi:fuel`) | switches the open recipe screen to that category's tab |
 | `emi_recipe_tab` | `index`, optional `page` (0-based) | switches the open recipe screen to a tab by position |
@@ -98,6 +98,7 @@ All settings are optional (defaults shown). `settleTicks` is how many ticks a sc
 | `resize` | `w`, `h` | resizes the window (windowed mode) |
 | `note` | `text` | writes a note into summary.json |
 | `emi_wait_loaded` | | waits until EMI reports loaded again |
+| `click` | `x`, `y` (GUI-scaled), optional `button` | left click (press + release) in the open screen, for example on a recipe page arrow |
 | `call` | `class`, `method` | calls a public static no-arg method (escape hatch) |
 
 The default window is 854x480; the default tour starts with `resize 1280x720` and `set_gui_scale 2`.
