@@ -1,6 +1,8 @@
 package dev.emi.emi.registry;
 
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -18,6 +20,8 @@ import net.minecraft.util.JsonHelper;
 public class EmiIngredientSerializers {
 	public static final Map<Class<?>, EmiIngredientSerializer<?>> BY_CLASS = Maps.newHashMap();
 	public static final Map<String, EmiIngredientSerializer<?>> BY_TYPE = Maps.newHashMap();
+	// EMI Remastered: types already reported as unknown, kept across reloads so the line appears once per session
+	private static final Set<String> REPORTED_UNKNOWN_TYPES = ConcurrentHashMap.newKeySet();
 
 	public static void clear() {
 		BY_CLASS.clear();
@@ -44,7 +48,12 @@ public class EmiIngredientSerializers {
 			String type;
 			if (element.isJsonObject()) {
 				JsonObject json = element.getAsJsonObject();
-				type = json.get("type").getAsString();
+				JsonElement typeElement = json.get("type"); // EMI Remastered: an object without a type is unreadable, not an exception
+				if (typeElement == null || typeElement.isJsonNull()) {
+					EmiLog.warn("Stack without a type: " + element);
+					return EmiStack.EMPTY;
+				}
+				type = typeElement.getAsString();
 				if (type.equals("emi:item")) {
 					json.addProperty("type", "item");
 					if (!json.has("id")) {
@@ -72,7 +81,15 @@ public class EmiIngredientSerializers {
 					type = "tag";
 				}
 			}
-			return ((EmiIngredientSerializer) BY_TYPE.get(type)).deserialize(element);
+			EmiIngredientSerializer serializer = BY_TYPE.get(type);
+			if (serializer == null) {
+				// EMI Remastered: a missing mod or disabled plugin is normal, the callers keep the raw entry
+				if (REPORTED_UNKNOWN_TYPES.add(type)) {
+					EmiLog.warn("Unknown stack type \"" + type + "\" (mod missing or its EMI plugin disabled), entries of this type are kept but not shown");
+				}
+				return EmiStack.EMPTY;
+			}
+			return serializer.deserialize(element);
 		} catch (Exception e) {
 			EmiLog.error("Exception deserializing stack " + element, e);
 			return EmiStack.EMPTY;
