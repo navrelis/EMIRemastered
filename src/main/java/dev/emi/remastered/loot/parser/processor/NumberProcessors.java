@@ -1,0 +1,148 @@
+package dev.emi.remastered.loot.parser.processor;
+
+import dev.emi.remastered.loot.EMILoot;
+import dev.emi.remastered.loot.mixin.BoundedIntUnaryOperatorAccessor;
+import dev.emi.remastered.loot.parser.LootTableParser;
+import dev.emi.remastered.loot.util.LText;
+import net.minecraft.loot.operator.BoundedIntUnaryOperator;
+import net.minecraft.loot.provider.number.BinomialLootNumberProvider;
+import net.minecraft.loot.provider.number.ConstantLootNumberProvider;
+import net.minecraft.loot.provider.number.LootNumberProvider;
+import net.minecraft.loot.provider.number.LootNumberProviderType;
+import net.minecraft.loot.provider.number.LootNumberProviderTypes;
+import net.minecraft.loot.provider.number.ScoreLootNumberProvider;
+import net.minecraft.loot.provider.number.UniformLootNumberProvider;
+import net.minecraft.predicate.NumberRange;
+import net.minecraft.text.MutableText;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+
+public class NumberProcessors {
+
+    public static MutableText processBoolean(Boolean input, String keyTrue, String keyFalse, Object ... args) {
+        if (input != null) {
+            if (input) {
+                return LText.translatable(keyTrue, args);
+            } else {
+                return LText.translatable(keyFalse, args);
+            }
+        }
+        if (EMILoot.isDebug()) EMILoot.LOGGER.warn("Boolean null for keys: " + keyTrue + " / " + keyFalse + " in table: "  + LootTableParser.currentTable);
+        return LText.empty();
+    }
+
+    public static MutableText processNumberRange(NumberRange<?> range, String exact, String between, String atLeast, String atMost, String fallback, Object ... args) {
+        if (!range.equals(NumberRange.IntRange.ANY) && !range.equals(NumberRange.DoubleRange.ANY)) {
+            Optional<? extends Number> min = range.min();
+            Optional<? extends Number> max = range.max();
+            if (Objects.equals(min, max) && min.isPresent()) {
+                List<Object> realArgs = (args.length > 0) ? new ArrayList<>(Arrays.stream(args).toList()) : new ArrayList<>();
+                realArgs.add(0, min.get());
+                return LText.translatable(exact, realArgs.toArray());
+            } else if (min.isPresent() && max.isPresent()) {
+                List<Object> realArgs = (args.length > 0) ? new ArrayList<>(Arrays.stream(args).toList()) : new ArrayList<>();
+                realArgs.add(0, max.get());
+                realArgs.add(0, min.get());
+                return LText.translatable(between, realArgs.toArray());
+            } else if (min.isPresent()) {
+                List<Object> realArgs = (args.length > 0) ? new ArrayList<>(Arrays.stream(args).toList()) : new ArrayList<>();
+                realArgs.add(0, min.get());
+                return LText.translatable(atLeast, realArgs.toArray());
+            } else if (max.isPresent()) {
+                List<Object> realArgs = (args.length > 0) ? new ArrayList<>(Arrays.stream(args).toList()) : new ArrayList<>();
+                realArgs.add(0, max.get());
+                return LText.translatable(atMost, realArgs.toArray());
+            } else {
+                if (fallback.isEmpty()) return LText.empty();
+                return LText.translatable(fallback);
+            }
+        }
+        if (EMILoot.isDebug()) EMILoot.LOGGER.warn("Non-specific number range for keys: " + exact + " / " + between + " in table: "  + LootTableParser.currentTable);
+        return LText.translatable("emi_loot.predicate.invalid");
+    }
+
+    public static MutableText processBoundedIntUnaryOperator(BoundedIntUnaryOperator operator) {
+        LootNumberProvider min = ((BoundedIntUnaryOperatorAccessor)operator).emi_loot$getMin();
+        LootNumberProvider max = ((BoundedIntUnaryOperatorAccessor)operator).emi_loot$getMax();
+        if (min != null && max != null) {
+            if (min.getType() == LootNumberProviderTypes.CONSTANT && max.getType() == LootNumberProviderTypes.CONSTANT) {
+                float minVal = ((ConstantLootNumberProvider)min).value();
+                float maxVal = ((ConstantLootNumberProvider)max).value();
+                if (minVal == maxVal) {
+                    return processLootNumberProvider(min);
+                }
+            }
+            return LText.translatable("emi_loot.operator.between", processLootNumberProvider(min), processLootNumberProvider(max));
+
+        } else if (min != null) {
+            return LText.translatable("emi_loot.operator.min", processLootNumberProvider(min));
+        } else if (max != null) {
+            return LText.translatable("emi_loot.operator.max", processLootNumberProvider(max));
+        }
+        if (EMILoot.isDebug()) EMILoot.LOGGER.warn("Null or undefined bounded int unary operator in table: "  + LootTableParser.currentTable);
+        return LText.translatable("emi_loot.operator.unknown");
+    }
+
+    public static MutableText processLootNumberProvider(LootNumberProvider provider) {
+        LootNumberProviderType type = provider.getType();
+        if(type == LootNumberProviderTypes.CONSTANT) {
+            return LText.translatable ("emi_loot.number_provider.constant",((ConstantLootNumberProvider)provider).value());
+        } else if(type == LootNumberProviderTypes.BINOMIAL) {
+            LootNumberProvider n = ((BinomialLootNumberProvider)provider).n();
+            LootNumberProvider p = ((BinomialLootNumberProvider)provider).p();
+            float nVal = getRollAvg(n);
+            float pVal = getRollAvg(p);
+            MutableText nValText = processLootNumberProvider(n);
+            MutableText pValText = processLootNumberProvider(p);
+            float avg = nVal * pVal;
+            return LText.translatable("emi_loot.number_provider.binomial", nValText, pValText, avg);
+        } else if(type == LootNumberProviderTypes.UNIFORM) {
+            LootNumberProvider min = ((UniformLootNumberProvider)provider).min();
+            LootNumberProvider max = ((UniformLootNumberProvider)provider).max();
+            float minVal = getRollAvg(min);
+            float maxVal = getRollAvg(max);
+            MutableText minValText = processLootNumberProvider(min);
+            MutableText maxValText = processLootNumberProvider(max);
+            float avg = (minVal + maxVal) / 2f;
+            return LText.translatable("emi_loot.number_provider.uniform", minValText, maxValText, avg);
+        } else if (type == LootNumberProviderTypes.SCORE) {
+            //LootScoreProvider lootScoreProvider = ((ScoreLootNumberProvider)provider).target();
+            String lootScore = ((ScoreLootNumberProvider)provider).score();
+            float lootScale = ((ScoreLootNumberProvider)provider).scale();
+            return LText.translatable("emi_loot.number_provider.score", lootScore, lootScale);
+        } else {
+            if (EMILoot.isDebug()) EMILoot.LOGGER.warn("Non-specific or undefined number provider in table: "  + LootTableParser.currentTable);
+            return LText.translatable("emi_loot.number_provider.unknown");
+        }
+    }
+
+    public static float getRollAvg(LootNumberProvider provider) {
+        LootNumberProviderType type = provider.getType();
+        if(type == LootNumberProviderTypes.CONSTANT) {
+            return ((ConstantLootNumberProvider)provider).value();
+        } else if(type == LootNumberProviderTypes.BINOMIAL) {
+            LootNumberProvider n = ((BinomialLootNumberProvider)provider).n();
+            LootNumberProvider p = ((BinomialLootNumberProvider)provider).p();
+            float nVal = getRollAvg(n);
+            float pVal = getRollAvg(p);
+            return nVal * pVal;
+        } else if(type == LootNumberProviderTypes.UNIFORM) {
+            LootNumberProvider min = ((UniformLootNumberProvider)provider).min();
+            LootNumberProvider max = ((UniformLootNumberProvider)provider).max();
+            float minVal = getRollAvg(min);
+            float maxVal = getRollAvg(max);
+            return (minVal + maxVal) / 2f;
+        } else if (type == LootNumberProviderTypes.SCORE) {
+            return 0f;
+        } else {
+            if (EMILoot.isDebug()) EMILoot.LOGGER.warn("Loot number provider with unknown type: " + provider.getType().toString());
+            return 0f;
+        }
+    }
+
+
+}

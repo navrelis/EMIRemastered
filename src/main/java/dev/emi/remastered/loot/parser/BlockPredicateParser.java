@@ -1,0 +1,46 @@
+package dev.emi.remastered.loot.parser;
+
+import dev.emi.remastered.loot.EMILoot;
+import dev.emi.remastered.loot.parser.processor.ListProcessors;
+import dev.emi.remastered.loot.util.LText;
+import net.minecraft.block.Block;
+import net.minecraft.predicate.BlockPredicate;
+import net.minecraft.predicate.NbtPredicate;
+import net.minecraft.predicate.StatePredicate;
+import net.minecraft.registry.entry.RegistryEntryList;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
+
+import java.util.List;
+import java.util.Optional;
+
+public class BlockPredicateParser {
+
+    public static Text parseBlockPredicate(BlockPredicate predicate) {
+        return LText.translatable("emi_loot.block_predicate.base", parseBlockPredicateInternal(predicate));
+    }
+
+    private static Text parseBlockPredicateInternal(BlockPredicate predicate) {
+        Optional<RegistryEntryList<Block>> blocks = predicate.blocks();
+        if (blocks.isPresent() && blocks.get().getTagKey().isPresent()) {
+            return LText.translatable("emi_loot.block_predicate.tag", blocks.get().getTagKey().get().id().toString());
+        }
+        if (blocks.isPresent() && blocks.get().size() > 0) {
+            List<MutableText> list = blocks.get().stream().map(entry -> entry.value().getName()).toList();
+            return LText.translatable("emi_loot.block_predicate.list_1", ListProcessors.buildOrList(list));
+        }
+
+        Optional<StatePredicate> statePredicate = predicate.state();
+        if (statePredicate.isPresent()) {
+            return StatePredicateParser.parseStatePredicate(statePredicate.get());
+        }
+
+        Optional<NbtPredicate> nbt = predicate.nbt();
+        if (nbt.isPresent()) {
+            return NbtPredicateParser.parseNbtPredicate(nbt.get());
+        }
+
+        if (EMILoot.isDebug()) EMILoot.LOGGER.warn("Empty or unparsable block predicate in table: "  + LootTableParser.currentTable);
+        return LText.translatable("emi_loot.predicate.invalid");
+    }
+}

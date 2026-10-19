@@ -1,0 +1,36 @@
+package dev.emi.remastered.loot.parser.condition;
+
+import dev.emi.remastered.loot.parser.LootTableParser;
+import dev.emi.remastered.loot.parser.processor.NumberProcessors;
+import dev.emi.remastered.loot.util.LText;
+import dev.emi.remastered.loot.util.TextKey;
+import net.minecraft.item.ItemStack;
+import net.minecraft.loot.condition.LootCondition;
+import net.minecraft.loot.condition.TimeCheckLootCondition;
+import net.minecraft.loot.operator.BoundedIntUnaryOperator;
+import net.minecraft.text.Text;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
+public class TimeCheckConditionParser implements ConditionParser {
+
+    @Override
+    public List<LootTableParser.LootConditionResult> parseCondition(LootCondition condition, ItemStack stack, boolean parentIsAlternative) {
+        Optional<Long> period = ((TimeCheckLootCondition)condition).period(); // TODO?
+        BoundedIntUnaryOperator value = ((TimeCheckLootCondition)condition).value();
+        Text processedValue = NumberProcessors.processBoundedIntUnaryOperator(value);
+        if (period.isPresent()) {
+            return Collections.singletonList(
+                    new LootTableParser.LootConditionResult(TextKey.of(
+                            "emi_loot.condition.time_check_period",
+							LText.literal(period.get().toString()),
+                            processedValue
+                    )
+                    )
+            );
+        }
+        return Collections.singletonList(new LootTableParser.LootConditionResult(TextKey.of("emi_loot.condition.time_check", processedValue)));
+    }
+}

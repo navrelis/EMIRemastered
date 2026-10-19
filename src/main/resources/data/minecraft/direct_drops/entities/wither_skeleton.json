@@ -1,0 +1,43 @@
+{
+  "type": "minecraft:entity",
+  "pools": [
+    {
+      "bonus_rolls": 0.0,
+      "conditions": [
+        {
+          "condition": "lootify:creeper"
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:wither_skeleton_skull"
+        }
+      ],
+      "rolls": 1.0
+    },
+    {
+      "bonus_rolls": 0.0,
+      "conditions": [
+        {
+          "unenchanted_chance": 0.085,
+          "condition": "minecraft:random_chance_with_enchanted_bonus",
+          "enchanted_chance": 0.01,
+          "enchantment": "minecraft:looting"
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:stone_sword",
+          "functions": [
+            {
+              "function": "lootify:set_any_damage"
+            }
+          ]
+        }
+      ],
+      "rolls": 1.0
+    }
+  ]
+}
