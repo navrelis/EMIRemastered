@@ -21,6 +21,7 @@
     { "type": "screenshot", "name": "banner-icon-tooltip" },
     { "type": "close_screen" },
 
+    { "type": "command", "text": "/clear @p", "waitTicks": 5 },
     { "type": "command", "text": "/give @p minecraft:enchanted_book[stored_enchantments={levels:{\"minecraft:smite\":3}}]", "waitTicks": 5 },
     { "type": "command", "text": "/give @p minecraft:enchanted_book[stored_enchantments={levels:{\"minecraft:sharpness\":7}}]", "waitTicks": 5 },
     { "type": "command", "text": "/give @p minecraft:enchanted_book[stored_enchantments={levels:{\"minecraft:sharpness\":12}}]", "waitTicks": 5 },
