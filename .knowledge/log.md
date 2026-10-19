@@ -91,3 +91,5 @@
 2026-10-19 | FX-WD client review (lead) | accepted: 4 tours ok, lead viewed bat portrait + diamond ore info; silverfish fit fixed by horizontal reach; merged, build green
 2026-10-19 | T2 delegated (Sonnet long): server smoke + all tours regression on merged remastered
 2026-10-19 | KB7 review (lead) | accepted: invs apart from remainders, usedRemainder per node (accumulated over tag stacks), countRecipes adds it; activator rail before 2/2 after 3/3; merged, build green; credit aMelonRind/emi (MIT) in DOC3
+2026-10-19 | DOC3 delegated (Sonnet short): TOUR_REPORT/KNOWN_BUGS statuses, CREDITS (aMelonRind), CHANGELOG session 5, DEVTOUR kb7
+2026-10-19 | DOC3 review (lead) | accepted: Status column in TOUR_REPORT, KB7/KB43 fixed, KB44 closed not reproducible, counts recomputed, CREDITS + CHANGELOG; merged

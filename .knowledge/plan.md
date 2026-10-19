@@ -68,7 +68,7 @@ Status: open / in progress / in review / done. `||` = can run in parallel.
 | DOC2 | README, CREDITS.md (authors, refs, licences), CHANGELOG 2.0.0, licence files in jar | Sonnet short | done (merged; jar has CREDITS.md, LICENSE, LGPL text; 0 devtour entries) |
 | KB7 | Favourite remainder counts (port aMelonRind/emi 2508321, e7fd7d9) | Sonnet long | done (merged; kb7 tour before 2/2 -> after 3/3, 5 tests) |
 | T2 | Regression: server smoke + all tours on merged remastered, findings list | Sonnet long | in progress (port 25666) |
-| DOC3 | KNOWN_BUGS (KB7, KB43, KB44) + TOUR_REPORT statuses after wave 6, CREDITS for KB7 port | Sonnet short | open (after KB7, T2) |
+| DOC3 | KNOWN_BUGS (KB7, KB43, KB44) + TOUR_REPORT statuses after wave 6, CREDITS for KB7 port | Sonnet short | done (merged; T2 findings may need a follow-up) |
 | -- | Later: KB13 (Sodium vertex path, needs pack measurement), T1-29 core string | - | open |
 
 ## Phase 4 Acceptance
