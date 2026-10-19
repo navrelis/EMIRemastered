@@ -28,6 +28,7 @@ import dev.emi.remastered.mobs.data.MobFormat;
 import dev.emi.remastered.mobs.data.MobStats;
 import dev.emi.remastered.mobs.data.MobStats.Stat;
 import dev.emi.remastered.mobs.data.PortraitFit;
+import dev.emi.remastered.mobs.data.SpawnOverrides;
 import dev.emi.remastered.mobs.data.SpawnRow;
 import dev.emi.remastered.module.Modules;
 import net.minecraft.client.MinecraftClient;
@@ -93,10 +94,14 @@ public class MobInfoRecipe implements EmiRecipe {
 	@SuppressWarnings("unchecked")
 	public static MobStats readStats(EntityType<?> type) {
 		DefaultAttributeContainer attributes = DefaultAttributeRegistry.get((EntityType<? extends LivingEntity>) type);
+		String typeId = Registries.ENTITY_TYPE.getId(type).toString();
 		return new MobStats(
 			attribute(attributes, EntityAttributes.GENERIC_MAX_HEALTH), attribute(attributes, EntityAttributes.GENERIC_ARMOR),
-			attribute(attributes, EntityAttributes.GENERIC_ARMOR_TOUGHNESS), attribute(attributes, EntityAttributes.GENERIC_ATTACK_DAMAGE),
-			attribute(attributes, EntityAttributes.GENERIC_MOVEMENT_SPEED), attribute(attributes, EntityAttributes.GENERIC_KNOCKBACK_RESISTANCE),
+			attribute(attributes, EntityAttributes.GENERIC_ARMOR_TOUGHNESS),
+			SpawnOverrides.attackDamage(typeId, attribute(attributes, EntityAttributes.GENERIC_ATTACK_DAMAGE)),
+			MobStats.walkingSpeed(attribute(attributes, EntityAttributes.GENERIC_MOVEMENT_SPEED),
+				EntityAttributes.GENERIC_MOVEMENT_SPEED.value().getDefaultValue()),
+			attribute(attributes, EntityAttributes.GENERIC_FLYING_SPEED), attribute(attributes, EntityAttributes.GENERIC_KNOCKBACK_RESISTANCE),
 			attribute(attributes, EntityAttributes.GENERIC_FOLLOW_RANGE),
 			type.getDimensions().width(), type.getDimensions().height(), type.isFireImmune(), type.getSpawnGroup().getName());
 	}

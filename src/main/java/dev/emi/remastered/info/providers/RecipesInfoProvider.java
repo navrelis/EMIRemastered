@@ -30,6 +30,7 @@ import dev.emi.remastered.info.core.CoveredCategories;
 import dev.emi.remastered.info.core.TagNames;
 import net.minecraft.item.Items;
 import net.minecraft.registry.tag.TagKey;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
@@ -159,8 +160,20 @@ public final class RecipesInfoProvider implements ItemInfoProvider {
 			InfoSection section = collector.addSection(EmiPort.id("emi_info", "tags"), InfoSection.Kind.DETAILS,
 				EmiPort.translatable("emi_info.section.tags", tags.size()))
 				.icon(VanillaPlugin.TAG);
-			for (int i = 0; i < tags.size() && i < MAX_TAG_LINES; i++) {
-				section.text(tagName(tags.get(i).key), List.of(EmiPort.literal("#" + tags.get(i).key.id(), Formatting.GRAY)));
+			int shown = Math.min(tags.size(), MAX_TAG_LINES);
+			List<Text> names = new ArrayList<>(shown);
+			List<String> ids = new ArrayList<>(shown);
+			for (int i = 0; i < shown; i++) {
+				names.add(tagName(tags.get(i).key));
+				ids.add(tags.get(i).key.id().toString());
+			}
+			List<TagNames.Label> labels = TagNames.disambiguate(names.stream().map(Text::getString).toList(), ids);
+			for (int i = 0; i < shown; i++) {
+				MutableText name = names.get(i).copy();
+				if (!labels.get(i).suffix().isEmpty()) {
+					name.append(EmiPort.literal(labels.get(i).suffix(), Formatting.GRAY));
+				}
+				section.text(name, List.of(EmiPort.literal("#" + ids.get(i), Formatting.GRAY)));
 			}
 			section.link(EmiPort.translatable("emi_info.tags.open", tags.size()), InfoLink.usesOf(stack, VanillaPlugin.TAG));
 		}

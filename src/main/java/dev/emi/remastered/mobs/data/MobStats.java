@@ -7,7 +7,7 @@ import java.util.List;
  * The numbers shown on a mob page, read from the default attributes of the entity type. Attributes a mob does not
  * define are NaN and are not shown. Pure logic: the Minecraft side fills the record, the page formats it here.
  */
-public record MobStats(double health, double armor, double toughness, double attackDamage, double movementSpeed,
+public record MobStats(double health, double armor, double toughness, double attackDamage, double movementSpeed, double flyingSpeed,
 		double knockbackResistance, double followRange, double width, double height, boolean fireImmune, String group) {
 
 	public enum Stat {
@@ -16,6 +16,7 @@ public record MobStats(double health, double armor, double toughness, double att
 		TOUGHNESS("toughness"),
 		ATTACK("attack"),
 		SPEED("speed"),
+		FLYING_SPEED("flying_speed"),
 		KNOCKBACK_RESISTANCE("knockback_resistance"),
 		FOLLOW_RANGE("follow_range");
 
@@ -38,6 +39,7 @@ public record MobStats(double health, double armor, double toughness, double att
 			case TOUGHNESS -> toughness;
 			case ATTACK -> attackDamage;
 			case SPEED -> movementSpeed;
+			case FLYING_SPEED -> flyingSpeed;
 			case KNOCKBACK_RESISTANCE -> knockbackResistance;
 			case FOLLOW_RANGE -> followRange;
 		};
@@ -72,6 +74,7 @@ public record MobStats(double health, double armor, double toughness, double att
 		return switch (stat) {
 			case HEALTH, ATTACK, ARMOR, TOUGHNESS -> MobFormat.number(value, 1);
 			case SPEED -> MobFormat.blocksPerSecond(value);
+			case FLYING_SPEED -> MobFormat.number(value, 2);
 			case KNOCKBACK_RESISTANCE -> MobFormat.number(value * 100.0, 0) + "%";
 			case FOLLOW_RANGE -> MobFormat.number(value, 0);
 		};
@@ -83,10 +86,18 @@ public record MobStats(double health, double armor, double toughness, double att
 		return switch (stat) {
 			case HEALTH, ATTACK -> new Object[] {MobFormat.number(value, 2), MobFormat.hearts(value)};
 			case ARMOR -> new Object[] {MobFormat.number(value, 2), MobFormat.number(value / 2.0, 2)};
-			case TOUGHNESS, FOLLOW_RANGE -> new Object[] {MobFormat.number(value, 2)};
+			case TOUGHNESS, FOLLOW_RANGE, FLYING_SPEED -> new Object[] {MobFormat.number(value, 2)};
 			case SPEED -> new Object[] {MobFormat.number(value, 3), MobFormat.blocksPerSecond(value)};
 			case KNOCKBACK_RESISTANCE -> new Object[] {MobFormat.number(value * 100.0, 0)};
 		};
+	}
+
+	/**
+	 * The movement speed to show. Every living entity type has the movement speed attribute, and a mob that does not walk
+	 * (bat, ghast...) leaves it at the attribute's default, which says nothing about how it moves: NaN, so no row.
+	 */
+	public static double walkingSpeed(double movementSpeed, double attributeDefault) {
+		return Double.isNaN(movementSpeed) || movementSpeed == attributeDefault ? Double.NaN : movementSpeed;
 	}
 
 	public String sizeText() {
