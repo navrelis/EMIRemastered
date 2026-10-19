@@ -32,6 +32,8 @@
     { "type": "screenshot", "name": "info-diamond-sword" },
     { "type": "screen_scroll", "amount": -10 },
     { "type": "screenshot", "name": "info-diamond-sword-details" },
+    { "type": "screen_scroll", "amount": -100 },
+    { "type": "screenshot", "name": "info-diamond-sword-end" },
     { "type": "close_screen" },
 
     { "type": "open_inventory" },
@@ -39,6 +41,8 @@
     { "type": "screenshot", "name": "info-diamond-pickaxe" },
     { "type": "screen_scroll", "amount": -10 },
     { "type": "screenshot", "name": "info-diamond-pickaxe-details" },
+    { "type": "screen_scroll", "amount": -100 },
+    { "type": "screenshot", "name": "info-diamond-pickaxe-end" },
     { "type": "close_screen" },
 
     { "type": "open_inventory" },
@@ -46,12 +50,16 @@
     { "type": "screenshot", "name": "info-iron-chestplate" },
     { "type": "screen_scroll", "amount": -10 },
     { "type": "screenshot", "name": "info-iron-chestplate-details" },
+    { "type": "screen_scroll", "amount": -100 },
+    { "type": "screenshot", "name": "info-iron-chestplate-end" },
     { "type": "close_screen" },
 
     { "type": "open_inventory" },
     { "type": "emi_stack_key", "item": "minecraft:netherite_chestplate", "key": "I" },
     { "type": "screen_scroll", "amount": -10 },
     { "type": "screenshot", "name": "info-netherite-chestplate-toughness-knockback" },
+    { "type": "screen_scroll", "amount": -100 },
+    { "type": "screenshot", "name": "info-netherite-chestplate-end" },
     { "type": "close_screen" },
 
     { "type": "open_inventory" },
@@ -59,6 +67,8 @@
     { "type": "screenshot", "name": "info-golden-apple" },
     { "type": "screen_scroll", "amount": -10 },
     { "type": "screenshot", "name": "info-golden-apple-details" },
+    { "type": "screen_scroll", "amount": -100 },
+    { "type": "screenshot", "name": "info-golden-apple-end" },
     { "type": "close_screen" }
   ]
 }
