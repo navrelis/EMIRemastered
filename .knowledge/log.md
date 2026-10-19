@@ -90,3 +90,4 @@
 2026-10-19 | KB7 delegated (Sonnet long): port fork fix for synthetic favourite remainders, worktree kb7
 2026-10-19 | FX-WD client review (lead) | accepted: 4 tours ok, lead viewed bat portrait + diamond ore info; silverfish fit fixed by horizontal reach; merged, build green
 2026-10-19 | T2 delegated (Sonnet long): server smoke + all tours regression on merged remastered
+2026-10-19 | KB7 review (lead) | accepted: invs apart from remainders, usedRemainder per node (accumulated over tag stacks), countRecipes adds it; activator rail before 2/2 after 3/3; merged, build green; credit aMelonRind/emi (MIT) in DOC3
