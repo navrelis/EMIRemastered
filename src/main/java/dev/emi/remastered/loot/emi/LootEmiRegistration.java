@@ -13,6 +13,7 @@ import dev.emi.remastered.loot.client.ClientLootTables;
 import dev.emi.remastered.loot.client.ClientMobLootTable;
 import dev.emi.remastered.loot.client.LootReceiver;
 import net.minecraft.block.Blocks;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.Items;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
@@ -63,13 +64,19 @@ public class LootEmiRegistration {
             try {
                 List<LootReceiver> snapshot = new ArrayList<>(source);
                 List<D> result = new ArrayList<>(snapshot.size());
+                BatchFailureLog failures = new BatchFailureLog(EMILoot.LOGGER, name + " loot recipe data");
                 for (LootReceiver lr : snapshot) {
+                    if (worldGone()) {
+                        EMILoot.LOGGER.warn("The world is gone while creating {} loot recipes; the rest of the batch is skipped ({} of {} done)", name, result.size(), snapshot.size());
+                        break;
+                    }
                     try {
                         result.add(factory.apply(lr));
                     } catch (Throwable e) {
-                        EMILoot.LOGGER.error("Critical error encountered while creating a {} loot recipe; recipe skipped: {}", name, lr.getId(), e);
+                        failures.fail("creating a " + name + " loot recipe: " + lr.getId(), e);
                     }
                 }
+                failures.summarize();
                 return result;
             } catch (Throwable e) {
                 EMILoot.LOGGER.error("Critical error encountered while creating all {} Recipes. Recipes completely skipped!", name, e);
@@ -85,13 +92,19 @@ public class LootEmiRegistration {
         return dataFuture.thenApplyAsync(data -> {
             long t = Util.getMeasuringTimeNano();
             List<R> recipes = new ArrayList<>(data.size());
+            BatchFailureLog failures = new BatchFailureLog(EMILoot.LOGGER, name + " loot recipes");
             for (D d : data) {
+                if (worldGone()) {
+                    EMILoot.LOGGER.warn("The world is gone while building {} loot recipes; the rest of the batch is skipped ({} of {} done)", name, recipes.size(), data.size());
+                    break;
+                }
                 try {
                     recipes.add(factory.apply(d));
                 } catch (Throwable e) {
-                    EMILoot.LOGGER.error("Critical error encountered while building a {} loot recipe; recipe skipped", name, e);
+                    failures.fail("building a " + name + " loot recipe", e);
                 }
             }
+            failures.summarize();
             EMILoot.LOGGER.info("Built {} {} loot recipes in {}ms", recipes.size(), name.toLowerCase(), (Util.getMeasuringTimeNano() - t)/1000000);
             return recipes;
         }).exceptionally(e -> {
@@ -100,14 +113,25 @@ public class LootEmiRegistration {
         });
     }
 
+    /**
+     * The loot recipes need the registries of the client world; without a world every recipe would fail.
+     */
+    private static boolean worldGone() {
+        return MinecraftClient.getInstance().world == null;
+    }
+
     public static void register(EmiRegistry registry) {
-        startAll();
         registry.addCategory(TRIAL_CATEGORY);
         registry.addCategory(CHEST_CATEGORY);
         registry.addCategory(BLOCK_CATEGORY);
         registry.addCategory(MOB_CATEGORY);
         registry.addCategory(GAMEPLAY_CATEGORY);
         registry.addCategory(ARCHAEOLOGY_CATEGORY);
+        if (worldGone()) {
+            EMILoot.LOGGER.warn("The world is gone; all loot recipes are skipped for this reload");
+            return;
+        }
+        startAll();
 
         CompletableFuture<List<ChestLootRecipe>> chestRecipeFuture = startRecipes("Chest", chestFuture, ChestLootRecipe::new);
         CompletableFuture<List<BlockLootRecipe>> blockRecipeFuture = startRecipes("Block", blockFuture, BlockLootRecipe::init);
@@ -150,12 +174,14 @@ public class LootEmiRegistration {
             // already logged where the future failed
             return;
         }
+        BatchFailureLog failures = new BatchFailureLog(EMILoot.LOGGER, name + " loot recipe registration");
         for (R recipe : recipes) {
             try {
                 registry.addRecipe(recipe);
             } catch (Throwable e) {
-                EMILoot.LOGGER.error("Failed to register a {} loot recipe: {}", name, recipe.getId(), e);
+                failures.fail("registering a " + name + " loot recipe: " + recipe.getId(), e);
             }
         }
+        failures.summarize();
     }
 }

@@ -55,14 +55,24 @@ public class EmiSearch {
 	public static SuffixArray<SearchStack> names, tooltips, mods;
 	public static SuffixArray<EmiStack> aliases;
 
+	/** EMI Remastered: true only on a thread that is currently baking, so only that thread sees the mod name tooltip line suppressed (KB10). */
+	public static final ThreadLocal<Boolean> BAKING = ThreadLocal.withInitial(() -> false);
+
 	public static void bake() {
+		BAKING.set(true);
+		try {
+			bakeInternal();
+		} finally {
+			BAKING.remove();
+		}
+	}
+
+	private static void bakeInternal() {
 		SuffixArray<SearchStack> names = new SuffixArray<>();
 		SuffixArray<SearchStack> tooltips = new SuffixArray<>();
 		SuffixArray<SearchStack> mods = new SuffixArray<>();
 		SuffixArray<EmiStack> aliases = new SuffixArray<>();
 		Set<EmiStack> bakedStacks = Sets.newIdentityHashSet();
-		boolean old = EmiConfig.appendItemModId;
-		EmiConfig.appendItemModId = false;
 		for (EmiStack stack : EmiStackList.stacks) {
 			try {
 				SearchStack searchStack = new SearchStack(stack);
@@ -121,7 +131,6 @@ public class EmiSearch {
 				}
 			}
 		}
-		EmiConfig.appendItemModId = old;
 		names.build();
 		tooltips.build();
 		mods.build();

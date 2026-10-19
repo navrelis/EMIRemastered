@@ -75,8 +75,9 @@ public final class EnchantmentCatalog {
 				for (RegistryEntry.Reference<Enchantment> other : matrix.incompatibleWith(entry)) {
 					exclusions.add(new EnchantmentInfo.Exclusion(other, EmiIngredient.of(books.get(other))));
 				}
-				infos.add(new EnchantmentInfo(entry, entry.registryKey().getValue(), entry.value().getMaxLevel(), levelCap,
-					entryBooks, EmiIngredient.of(entryBooks), validItems, exclusions,
+				int maxLevel = entry.value().getMaxLevel();
+				infos.add(new EnchantmentInfo(entry, entry.registryKey().getValue(), maxLevel, levelCap,
+					entryBooks, aboveMaxBooks(entry, maxLevel, levelCap), EmiIngredient.of(entryBooks), validItems, exclusions,
 					EnchantmentFacts.sourcesOf(entry, tradeRebalance), tradeRebalance));
 			} catch (Throwable t) {
 				warn(entry, "build its info page", t);
@@ -93,6 +94,26 @@ public final class EnchantmentCatalog {
 		}
 		if (maxLevel > limit) {
 			books.add(EmiStack.of(EnchantedBookItem.forEnchantment(new EnchantmentLevelEntry(entry, maxLevel))));
+		}
+		return books;
+	}
+
+	/**
+	 * Books above the maximum level, for stacks that got there with commands, loot or a mod that lifts the level cap.
+	 * Limited to a few levels, see {@link LevelCap#aboveMaxTop}.
+	 */
+	private static List<EmiStack> aboveMaxBooks(RegistryEntry<Enchantment> entry, int maxLevel, int levelCap) {
+		if (!EnchantingSettings.showAboveMax) {
+			return List.of();
+		}
+		List<EmiStack> books = new ArrayList<>();
+		try {
+			int top = LevelCap.aboveMaxTop(maxLevel, levelCap, Math.max(1, EnchantingSettings.bookLevelLimit));
+			for (int level = maxLevel + 1; level <= top; level++) {
+				books.add(EmiStack.of(EnchantedBookItem.forEnchantment(new EnchantmentLevelEntry(entry, level))));
+			}
+		} catch (Throwable t) {
+			warn(entry, "list its books above the maximum level", t);
 		}
 		return books;
 	}

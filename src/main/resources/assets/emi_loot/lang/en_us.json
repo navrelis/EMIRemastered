@@ -131,7 +131,7 @@
   "emi_loot.function.copy_name.this": "this",
   "emi_loot.function.copy_name.killer": "this mobs killer",
   "emi_loot.function.copy_name.killer_direct": "this mobs direct killer",
-  "emi_loot.function.copy_name.block_entity": "this blocks block entity",
+  "emi_loot.function.copy_name.block_entity": "the block entity of this block",
   "emi_loot.function.copy_nbt": "Custom NBT data is copied onto this item",
   "emi_loot.function.decay": "Must survive explosion",
   "emi_loot.function.fill_player_head": "Fills this player head in with identifying info",
