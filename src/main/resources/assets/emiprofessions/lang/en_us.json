@@ -3,6 +3,7 @@
   "emi.category.emiprofessions.villager_trades": "Villager Trades",
   "emi.category.emiprofessions.wandering_trader": "Wandering Trader",
   "emiprofessions.trade.title": "%1$s - %2$s",
+  "emiprofessions.trade.title_amount": "%1$s - %2$s · %3$s×",
   "emiprofessions.trade.level": "Level %s",
   "emiprofessions.trade.pool": "Pool %1$s (%2$s picks)",
   "emiprofessions.trade.pool_plain": "Pool %s",
