@@ -31,3 +31,4 @@
 2026-10-19 | P7 review (lead) | accepted: faithful port, 11 AW class lines (no EMI lines removed), 6 S2C payloads canSend-guarded, settings restored to upstream set; merged 5e68fda, build+tests green. Note: lootify condition/function types registered like upstream
 2026-10-19 | A8 loot extras (Sonnet), A9 ores extras + sync marker (Sonnet), A7 mobs module (Sonnet, long) | delegated, own worktrees from c7cf633
 2026-10-19 | P1+A10 review (lead) | accepted: upstream behaviour, no mixins, marked edits in EmiScreenManager (isVisible delegates to new isBaseVisible + DF hiding, same as upstream mixin; no signature changes) and EmiSearchWidget; module off = stock; merged, build+tests green. Manual: real clicks on Show/Hide buttons, crafting-table scope
+2026-10-19 | owner: dev clients grab his mouse -> all agents told: no OS input, no client launches until no-grab fix lands (Q1b, urgent)
