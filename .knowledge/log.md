@@ -40,3 +40,4 @@
 2026-10-19 | A1 review (lead) | accepted: module info (ns emi_info), API in info.api + docs/INFO_PROVIDERS.md, recipes/no-source/fuel/compost providers, mixins into EmiApi/EmiScreenManager (HEAD, cancellable only when InfoScreen open), icon index 8; merged, build green. Follow-up: exempt dev.emi.remastered mixins from EMI 'tainted' warning
 2026-10-19 | A7 mobs (Sonnet) | code done, build+server green; client checks pending
 2026-10-19 | wave 3 delegated (Sonnet, no client launches until D13 fix): A2 enchanting extras, Q2 bug survey, A5+B1 stats module, B5 advancement provider, X1 /emiexport
+2026-10-19 | auto-handoff: all agents stopped; partial work uncommitted in worktrees; see F:\Coding\EMI_Remastered\handoff-2026-10-19-5b513619.md
