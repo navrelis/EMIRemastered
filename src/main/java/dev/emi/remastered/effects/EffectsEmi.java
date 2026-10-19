@@ -9,6 +9,7 @@ import dev.emi.emi.api.render.EmiTexture;
 import dev.emi.emi.api.stack.EmiRegistryAdapter;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.runtime.EmiLog;
+import dev.emi.remastered.info.api.ItemInfoRegistry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.item.Items;
@@ -35,6 +36,8 @@ final class EffectsEmi {
 	static void register(EmiRegistry registry) {
 		long start = System.nanoTime();
 		registry.addCategory(CATEGORY);
+		// replaces the instance of the previous reload; it reads the effect pages registered below
+		ItemInfoRegistry.register(new EffectInfoProvider());
 
 		Map<StatusEffect, EffectSources> index = EffectSourceCollector.collect();
 		if (EffectsSettings.showHardcodedSources) {

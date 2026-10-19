@@ -25,6 +25,10 @@ public final class EffectsSettings {
 	@ConfigValue("effects.show-hardcoded-sources")
 	public static boolean showHardcodedSources = true;
 
+	@Comment("Show the effects an item applies (potions, tipped arrows, suspicious stew, ...) and the sources of an effect on the Item Info page. Open pages update after an EMI reload.")
+	@ConfigValue("effects.item-info")
+	public static boolean itemInfo = true;
+
 	private EffectsSettings() {
 	}
 }
