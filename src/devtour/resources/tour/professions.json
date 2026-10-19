@@ -1,0 +1,38 @@
+{
+  "description": "Professions module: villager trade pages (trades of an item, uses of emerald, a trade-only enchanted item) plus the empty-slot check of the block drops page of the crafting table (T1 finding).",
+  "warmupTicks": 60,
+  "settleTicks": 12,
+  "stepTimeoutSeconds": 30,
+  "worldJoinTimeoutSeconds": 120,
+  "timeoutSeconds": 300,
+  "steps": [
+    { "type": "resize", "w": 1280, "h": 720 },
+    { "type": "set_gui_scale", "n": 2 },
+    { "type": "open_inventory" },
+
+    { "type": "emi_recipes", "item": "minecraft:iron_pickaxe" },
+    { "type": "emi_category", "id": "emiprofessions:villager_trades" },
+    { "type": "screenshot", "name": "iron-pickaxe-trades" },
+    { "type": "click", "x": 383, "y": 270, "optional": true },
+    { "type": "screenshot", "name": "iron-pickaxe-trades-page2" },
+    { "type": "close_screen" },
+
+    { "type": "emi_uses", "item": "minecraft:emerald" },
+    { "type": "emi_category", "id": "emiprofessions:villager_trades" },
+    { "type": "screenshot", "name": "emerald-uses-trades" },
+    { "type": "close_screen" },
+
+    { "type": "emi_recipes", "item": "minecraft:bell" },
+    { "type": "screenshot", "name": "bell" },
+    { "type": "close_screen" },
+
+    { "type": "emi_recipes", "item": "minecraft:crafting_table" },
+    { "type": "emi_category", "id": "emi_loot:block_drops" },
+    { "type": "screenshot", "name": "crafting-table-block-drops" },
+    { "type": "close_screen" },
+    { "type": "emi_uses", "item": "minecraft:crafting_table" },
+    { "type": "emi_category", "id": "emi_loot:block_drops" },
+    { "type": "screenshot", "name": "crafting-table-uses-block-drops" },
+    { "type": "close_screen" }
+  ]
+}
