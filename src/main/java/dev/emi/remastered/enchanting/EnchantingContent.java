@@ -1,13 +1,17 @@
 package dev.emi.remastered.enchanting;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import dev.emi.emi.api.EmiRegistry;
 import dev.emi.emi.runtime.EmiLog;
 import dev.emi.emi.runtime.EmiReloadLog;
+import dev.emi.remastered.enchanting.info.EnchantmentInfoProvider;
 import dev.emi.remastered.enchanting.recipe.EnchantmentCatalog;
+import dev.emi.remastered.enchanting.recipe.EnchantmentIndex;
 import dev.emi.remastered.enchanting.recipe.EnchantmentInfo;
 import dev.emi.remastered.enchanting.recipe.EnchantmentRecipe;
+import dev.emi.remastered.info.api.ItemInfoRegistry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.resource.featuretoggle.FeatureFlags;
@@ -29,8 +33,9 @@ public final class EnchantingContent {
 	public static void init() {
 	}
 
-	/** Client, only when the module is enabled at startup. Nothing to set up. */
+	/** Client, only when the module is enabled at startup: adds the enchantment sections to the Item Info screen. */
 	public static void initClient() {
+		ItemInfoRegistry.register(new EnchantmentInfoProvider());
 	}
 
 	/** EMI registration, called on every EMI reload while the module is enabled. */
@@ -38,20 +43,22 @@ public final class EnchantingContent {
 		registry.addCategory(EnchantmentRecipe.CATEGORY);
 		ClientWorld world = MinecraftClient.getInstance().world;
 		if (world == null) {
+			EnchantmentIndex.set(List.of());
 			return;
 		}
 		long start = System.currentTimeMillis();
 		List<EnchantmentInfo> infos = EnchantmentCatalog.build(world.getRegistryManager(),
 			world.getEnabledFeatures().contains(FeatureFlags.TRADE_REBALANCE));
-		int added = 0;
+		List<EnchantmentInfo> added = new ArrayList<>();
 		for (EnchantmentInfo info : infos) {
 			try {
 				registry.addRecipe(new EnchantmentRecipe(info));
-				added++;
+				added.add(info);
 			} catch (Throwable t) {
 				EmiReloadLog.warn("EMI Enchanting: could not add the recipe of " + info.id(), t);
 			}
 		}
-		EmiLog.info("EMI Enchanting: " + added + " enchantment info recipes in " + (System.currentTimeMillis() - start) + "ms");
+		EnchantmentIndex.set(added);
+		EmiLog.info("EMI Enchanting: " + added.size() + " enchantment info recipes in " + (System.currentTimeMillis() - start) + "ms");
 	}
 }
