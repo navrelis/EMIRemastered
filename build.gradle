@@ -58,7 +58,7 @@ repositories {
 
 // ---------------------------------------------------------------------------
 // Dev tour source set (src/devtour): compiled against main + the full main classpath and run
-// ONLY by the clientTour run config. The release jar / sources jar only package sourceSets.main.
+// by the dev client run configs only. The release jar / sources jar only package sourceSets.main.
 // ---------------------------------------------------------------------------
 sourceSets {
 	devtour {
@@ -85,8 +85,11 @@ loom {
 	}
 
 	runs {
+		// All dev client run configs carry the emi_devtour mod (src/devtour): no cursor capture, no focus steal; the
+		// screenshot tour itself only runs when -Demi.tour is set (clientTour). Never part of the release jar.
 		client {
 			runDir "run"
+			source sourceSets.devtour
 		}
 		server {
 			runDir "run"
@@ -97,6 +100,7 @@ loom {
 			client()
 			name = "Minecraft Client (devworld)"
 			runDir "run"
+			source sourceSets.devtour
 			programArgs "--quickPlaySingleplayer", "devworld"
 		}
 		// Dev-only screenshot tour: clientWorld + the emi_devtour mod (src/devtour) on the classpath.
@@ -285,17 +289,27 @@ def prepareDevWorld = tasks.register("prepareDevWorld", Copy) {
 	}
 }
 
-// A fresh client shows the accessibility onboarding screen first, which blocks quick play.
+// Dev clients must never play sound and must keep running while unfocused (pauseOnLostFocus:false); a fresh client
+// shows the accessibility onboarding screen first, which blocks quick play. Runs before every client launch and
+// rewrites these keys, keeping all other lines.
 def prepareDevOptions = tasks.register("prepareDevOptions") {
-	description = "Writes run/options.txt with onboardAccessibility:false if it does not exist yet."
+	description = "Forces soundCategory_master:0.0, onboardAccessibility:false and pauseOnLostFocus:false in run/options.txt (creates it if missing)."
 	def options = runDir.file("options.txt").asFile
-	onlyIf { !options.exists() }
+	outputs.upToDateWhen { false }
 	doLast {
 		options.parentFile.mkdirs()
-		options.text = "onboardAccessibility:false\n"
+		def forced = ["soundCategory_master": "0.0", "onboardAccessibility": "false", "pauseOnLostFocus": "false"]
+		def lines = options.exists() ? options.readLines("UTF-8").findAll { line ->
+			!forced.keySet().any { line.startsWith(it + ":") }
+		} : []
+		forced.each { key, value -> lines.add(key + ":" + value) }
+		options.setText(lines.join("\n") + "\n", "UTF-8")
 	}
 }
 
+tasks.matching { it.name == "runClient" || it.name == "runClientWorld" || it.name == "runClientTour" }.configureEach {
+	dependsOn prepareDevOptions
+}
 tasks.matching { it.name == "runClientWorld" || it.name == "runClientTour" }.configureEach {
-	dependsOn prepareDevWorld, prepareDevOptions
+	dependsOn prepareDevWorld
 }

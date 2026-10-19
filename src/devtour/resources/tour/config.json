@@ -1,0 +1,78 @@
+{
+  "description": "EMI config screen with the module groups: module switches (toggled and restored), module setting groups, jump buttons and icons, Plugins button, small window, GUI scale 3.",
+  "warmupTicks": 60,
+  "settleTicks": 10,
+  "steps": [
+    { "type": "resize", "w": 1280, "h": 720 },
+    { "type": "set_gui_scale", "n": 2 },
+    { "type": "open_emi_config" },
+    { "type": "hover", "x": 630, "y": 5 },
+    { "type": "screenshot", "name": "config-top" },
+    { "type": "screen_info" },
+
+    { "type": "hover", "x": 10, "y": 250 },
+    { "type": "screenshot", "name": "jump-hover-modules" },
+    { "type": "hover", "x": 630, "y": 5 },
+
+    { "type": "emi_config_jump", "group": "modules" },
+    { "type": "screenshot", "name": "group-modules" },
+
+    { "type": "click", "text": "Modules" },
+    { "type": "click", "text": "Loot", "optional": true },
+    { "type": "screenshot", "name": "group-loot" },
+    { "type": "click", "text": "Ores", "optional": true },
+    { "type": "screenshot", "name": "group-ores" },
+    { "type": "click", "text": "Effects", "optional": true },
+    { "type": "screenshot", "name": "group-effects" },
+    { "type": "click", "text": "Enchanting", "optional": true },
+    { "type": "screenshot", "name": "group-enchanting" },
+    { "type": "click", "text": "Professions", "optional": true },
+    { "type": "screenshot", "name": "group-professions" },
+    { "type": "click", "text": "Let's Do", "optional": true },
+    { "type": "screenshot", "name": "group-letsdo" },
+    { "type": "click", "text": "Distraction-Free", "optional": true },
+    { "type": "screenshot", "name": "group-distraction-free" },
+
+    { "type": "scroll", "amount": -10, "x": 320, "y": 180 },
+    { "type": "screenshot", "name": "scrolled-end" },
+    { "type": "scroll", "amount": 3, "x": 320, "y": 180 },
+    { "type": "screenshot", "name": "scrolled-back-3" },
+
+    { "type": "click_row", "text": "Distraction-Free Recipes" },
+    { "type": "screenshot", "name": "switch-distraction-free-off" },
+    { "type": "click_row", "text": "Let's Do" },
+    { "type": "screenshot", "name": "switch-letsdo-off" },
+    { "type": "hover", "x": 480, "y": 150 },
+    { "type": "screenshot", "name": "switch-tooltip" },
+    { "type": "hover", "x": 630, "y": 5 },
+    { "type": "screen_close" },
+    { "type": "emi_wait_loaded" },
+
+    { "type": "open_emi_config" },
+    { "type": "emi_config_jump", "group": "modules" },
+    { "type": "screenshot", "name": "reopened-after-switch-off" },
+    { "type": "click_row", "text": "Distraction-Free Recipes" },
+    { "type": "click_row", "text": "Let's Do" },
+    { "type": "screenshot", "name": "switches-restored" },
+    { "type": "screen_close" },
+    { "type": "emi_wait_loaded" },
+
+    { "type": "open_emi_config" },
+    { "type": "emi_config_jump", "group": "general" },
+    { "type": "click", "text": "Modules" },
+    { "type": "screenshot", "name": "jump-modules-button" },
+
+    { "type": "resize", "w": 854, "h": 480 },
+    { "type": "wait", "ticks": 10 },
+    { "type": "screenshot", "name": "small-window" },
+    { "type": "emi_config_jump", "group": "general" },
+    { "type": "screenshot", "name": "small-window-top" },
+
+    { "type": "resize", "w": 1280, "h": 720 },
+    { "type": "set_gui_scale", "n": 3 },
+    { "type": "wait", "ticks": 10 },
+    { "type": "screenshot", "name": "scale-3" },
+    { "type": "set_gui_scale", "n": 2 },
+    { "type": "screen_close" }
+  ]
+}

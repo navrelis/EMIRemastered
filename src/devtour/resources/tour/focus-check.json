@@ -1,0 +1,14 @@
+{
+  "description": "Checks that the dev client neither takes the OS focus nor locks the cursor, and that screenshots render unfocused.",
+  "warmupTicks": 40,
+  "steps": [
+    { "type": "window_info" },
+    { "type": "open_inventory" },
+    { "type": "window_info" },
+    { "type": "screenshot", "name": "inventory-unfocused" },
+    { "type": "close_screen" },
+    { "type": "wait", "ticks": 20 },
+    { "type": "window_info" },
+    { "type": "screenshot", "name": "world-unfocused" }
+  ]
+}
