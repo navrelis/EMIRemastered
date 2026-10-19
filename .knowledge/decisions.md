@@ -12,3 +12,4 @@
 - D11 Parallel code agents get a worktree the lead creates from `remastered` (Agent isolation worktrees start from `main`).
 - D12 Game sound always off: every client launch with `soundCategory_master:0.0` (owner request); prepareDevOptions enforces it (Q1b).
 - D13 Dev clients never take the owner's mouse: no computer-use/OS input by agents; dev-only no-grab/no-focus mixin in the devtour mod on every client run config; client checks batched into tour runs (owner request).
+- D14 Enchanted books above the listed range (> max+5 or > 10) do not open the enchantment page: a level-ignoring lookup would need an EMI core comparison change for all enchanted books (side effects); accepted limitation.

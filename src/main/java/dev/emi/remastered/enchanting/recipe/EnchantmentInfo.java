@@ -22,6 +22,8 @@ import net.minecraft.util.Identifier;
  * including the changes of mods that mix into it)
  * @param levelCap highest level an item stack can store at all, see {@link dev.emi.remastered.enchanting.logic.LevelCap}
  * @param books enchanted books listed for this enchantment, the recipe outputs
+ * @param aboveMaxBooks books of levels above the maximum level (up to the level cap, see {@link dev.emi.remastered.enchanting.logic.LevelCap#aboveMaxTop}), also recipe
+ * outputs but not part of {@link #books} and {@link #bookIngredient}, so they are not cycled in the slots; empty when the setting is off
  * @param bookIngredient {@link #books} as one ingredient
  * @param validItems items the enchantment can be applied to, spread over {@link #ITEM_COLUMNS} lists
  * @param exclusions enchantments that cannot be combined with this one
@@ -29,6 +31,7 @@ import net.minecraft.util.Identifier;
  * @param tradeRebalance whether the world uses the rebalanced villager trades
  */
 public record EnchantmentInfo(RegistryEntry<Enchantment> entry, Identifier id, int maxLevel, int levelCap, List<EmiStack> books,
+	List<EmiStack> aboveMaxBooks,
 	EmiIngredient bookIngredient, List<List<EmiStack>> validItems, List<Exclusion> exclusions,
 	Set<EnchantmentSources.Source> sources, boolean tradeRebalance) {
 	public static final int ITEM_COLUMNS = 8;

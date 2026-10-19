@@ -47,8 +47,7 @@ public class EffectInfoRecipe implements EmiRecipe {
 	EffectInfoRecipe(EffectEmiStack stack, EffectSources sources) {
 		this.stack = stack;
 		this.effect = stack.getEffect();
-		Identifier effectId = stack.getId();
-		this.id = Identifier.of("emiffect", "/effects/" + effectId.getNamespace() + "/" + effectId.getPath());
+		this.id = recipeId(stack.getId());
 		this.sections = EffectSectionBuilder.build(effect, sources, EffectsSettings.showAttributeModifiers,
 			EffectsSettings.showPotionVariants);
 		List<EmiIngredient> list = new ArrayList<>();
@@ -62,6 +61,16 @@ public class EffectInfoRecipe implements EmiRecipe {
 			}
 		}
 		this.inputs = List.copyOf(list);
+	}
+
+	/** Recipe id of the page of the effect with this registry id. */
+	static Identifier recipeId(Identifier effectId) {
+		return Identifier.of("emiffect", "/effects/" + effectId.getNamespace() + "/" + effectId.getPath());
+	}
+
+	/** The blocks of the page (attributes, sources, cures), shared with the Item Info provider. */
+	List<EffectSection> sections() {
+		return sections;
 	}
 
 	@Override

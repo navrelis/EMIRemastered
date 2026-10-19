@@ -6,10 +6,12 @@ import java.util.List;
 import dev.emi.emi.api.EmiRegistry;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.runtime.EmiLog;
+import dev.emi.remastered.info.api.ItemInfoRegistry;
 import dev.emi.remastered.professions.trade.TradeCollector;
 import dev.emi.remastered.professions.trade.TradeEntry;
 import dev.emi.remastered.professions.trade.TradeRecipe;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientWorldEvents;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.item.Items;
@@ -29,9 +31,12 @@ public class ProfessionsContent {
 
 	public static void initClient() {
 		ClientWorldEvents.AFTER_CLIENT_WORLD_CHANGE.register((client, world) -> VillagerPreview.clear());
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> TradeInfoProvider.clear());
 	}
 
 	public static void register(EmiRegistry registry) {
+		// replaces the instance of the previous reload; the index is rebuilt when the first page is opened
+		ItemInfoRegistry.register(new TradeInfoProvider());
 		registry.addCategory(ProfessionsCategories.PROFESSION);
 		registry.addWorkstation(ProfessionsCategories.PROFESSION, EmiStack.of(Items.EMERALD));
 		registry.addWorkstation(ProfessionsCategories.PROFESSION, EmiStack.of(Items.VILLAGER_SPAWN_EGG));

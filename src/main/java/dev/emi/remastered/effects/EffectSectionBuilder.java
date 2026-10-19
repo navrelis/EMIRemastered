@@ -46,7 +46,7 @@ final class EffectSectionBuilder {
 		add(sections, beacon(sources));
 		add(sections, table(sources, false, shown, Text.translatable("info.emiffect.section.other")));
 		if (sections.size() == sourceStart) {
-			sections.add(EffectSection.lines(Text.translatable("info.emiffect.section.sources"),
+			sections.add(EffectSection.lines(EffectSection.Kind.NOTE, Text.translatable("info.emiffect.section.sources"),
 				List.of(Text.translatable("info.emiffect.no_sources"))));
 		}
 		add(sections, table(sources, true, shown, Text.translatable("info.emiffect.section.cures")));
@@ -75,7 +75,7 @@ final class EffectSectionBuilder {
 				lines.add(Text.translatable("attribute.modifier.take." + operation, number, name).formatted(Formatting.DARK_RED));
 			}
 		});
-		return lines.isEmpty() ? null : EffectSection.lines(Text.translatable("info.emiffect.section.attributes"), lines);
+		return lines.isEmpty() ? null : EffectSection.lines(EffectSection.Kind.ATTRIBUTES, Text.translatable("info.emiffect.section.attributes"), lines);
 	}
 
 	private static EffectSection potions(StatusEffect effect, EffectSources sources, boolean variants) {
@@ -170,7 +170,7 @@ final class EffectSectionBuilder {
 			}
 			groups.add(new EffectSection.Group(tableLabel(first), cells));
 		}
-		return groups.isEmpty() ? null : new EffectSection(title, groups, List.of());
+		return groups.isEmpty() ? null : new EffectSection(cure ? EffectSection.Kind.CURES : EffectSection.Kind.SOURCE, title, groups, List.of());
 	}
 
 	private static String labelKey(EffectSources.TableSource source) {

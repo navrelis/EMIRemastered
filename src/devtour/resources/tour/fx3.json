@@ -1,0 +1,57 @@
+{
+  "description": "FX3: loot copy_name tooltip (shulker box), enchanting pages for books above the maximum level, U on a book opens its own page first.",
+  "warmupTicks": 60,
+  "settleTicks": 15,
+  "stepTimeoutSeconds": 30,
+  "worldJoinTimeoutSeconds": 120,
+  "timeoutSeconds": 300,
+  "steps": [
+    { "type": "resize", "w": 1280, "h": 720 },
+    { "type": "set_gui_scale", "n": 2 },
+
+    { "type": "open_inventory" },
+    { "type": "emi_recipes", "item": "minecraft:white_banner" },
+    { "type": "emi_category", "id": "emi_loot:block_drops" },
+    { "type": "screenshot", "name": "banner-block-drops" },
+    { "type": "hover", "x": 303, "y": 101 },
+    { "type": "screenshot", "name": "banner-output-tooltip" },
+    { "type": "hover", "x": 285, "y": 106 },
+    { "type": "screenshot", "name": "banner-icon-tooltip-low" },
+    { "type": "hover", "x": 285, "y": 100 },
+    { "type": "screenshot", "name": "banner-icon-tooltip" },
+    { "type": "close_screen" },
+
+    { "type": "command", "text": "/give @p minecraft:enchanted_book[stored_enchantments={levels:{\"minecraft:smite\":3}}]", "waitTicks": 5 },
+    { "type": "command", "text": "/give @p minecraft:enchanted_book[stored_enchantments={levels:{\"minecraft:sharpness\":7}}]", "waitTicks": 5 },
+    { "type": "command", "text": "/give @p minecraft:enchanted_book[stored_enchantments={levels:{\"minecraft:sharpness\":12}}]", "waitTicks": 5 },
+
+    { "type": "open_inventory" },
+    { "type": "hover", "x": 248, "y": 247 },
+    { "type": "screenshot", "name": "hover-smite" },
+    { "type": "key", "key": "U" },
+    { "type": "screenshot", "name": "smite-uses-first-tab" },
+    { "type": "emi_category", "id": "emi_enchanting:enchantments" },
+    { "type": "screenshot", "name": "smite-uses-enchantments" },
+    { "type": "close_screen" },
+
+    { "type": "open_inventory" },
+    { "type": "hover", "x": 266, "y": 247 },
+    { "type": "key", "key": "R" },
+    { "type": "screenshot", "name": "sharpness7-recipes" },
+    { "type": "close_screen" },
+
+    { "type": "open_inventory" },
+    { "type": "hover", "x": 266, "y": 247 },
+    { "type": "key", "key": "U" },
+    { "type": "screenshot", "name": "sharpness7-uses-first-tab" },
+    { "type": "emi_category", "id": "emi_enchanting:enchantments" },
+    { "type": "screenshot", "name": "sharpness7-uses-enchantments" },
+    { "type": "close_screen" },
+
+    { "type": "open_inventory" },
+    { "type": "hover", "x": 284, "y": 247 },
+    { "type": "key", "key": "R" },
+    { "type": "screenshot", "name": "sharpness12-recipes" },
+    { "type": "close_screen" }
+  ]
+}
