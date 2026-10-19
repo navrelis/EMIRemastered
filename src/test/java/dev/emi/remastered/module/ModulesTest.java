@@ -35,7 +35,7 @@ import dev.emi.remastered.professions.ProfessionsEmiPlugin;
 
 /** Guards the module contract (docs/MODULES.md) for the real modules. */
 class ModulesTest {
-	private static final List<String> IDS = List.of("loot", "ores", "effects", "enchanting", "professions", "letsdo", "distraction_free", "info", "tools");
+	private static final List<String> IDS = List.of("loot", "ores", "effects", "enchanting", "professions", "letsdo", "distraction_free", "info", "mobs", "tools");
 
 	private static JsonObject json(String path) throws IOException {
 		try (InputStream in = ModulesTest.class.getClassLoader().getResourceAsStream(path)) {
