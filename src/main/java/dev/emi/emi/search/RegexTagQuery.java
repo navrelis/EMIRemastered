@@ -7,7 +7,9 @@ import java.util.stream.Stream;
 
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.stack.EmiStack;
+import dev.emi.emi.registry.EmiTags;
 import dev.emi.emi.runtime.EmiTagKey;
+import net.minecraft.item.BlockItem;
 
 public class RegexTagQuery extends Query {
 	private final Set<Object> valid;
@@ -23,7 +25,7 @@ public class RegexTagQuery extends Query {
 		} else {
 			final Pattern pat = p;
 			valid = Stream.<EmiTagKey<?>>concat(
-				EmiTagKey.fromRegistry(EmiPort.getItemRegistry()),
+				EmiTags.TAGS.stream(), // EMI Remastered: all registries, upstream 4c22e3b0 (KB6)
 				EmiTagKey.fromRegistry(EmiPort.getBlockRegistry())
 			).filter(t -> {
 				if (t.hasTranslation()) {
@@ -41,6 +43,10 @@ public class RegexTagQuery extends Query {
 
 	@Override
 	public boolean matches(EmiStack stack) {
+		// EMI Remastered: block tags also match block items, upstream 4c22e3b0 (KB6)
+		if (stack.getKey() instanceof BlockItem bi && valid.contains(bi.getBlock())) {
+			return true;
+		}
 		return valid.contains(stack.getKey());
 	}
 }

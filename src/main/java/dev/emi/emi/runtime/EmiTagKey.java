@@ -9,8 +9,6 @@ import java.util.stream.Stream;
 
 import org.jetbrains.annotations.Nullable;
 
-import com.google.common.collect.Maps;
-
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.registry.EmiTags;
@@ -27,7 +25,8 @@ import net.minecraft.util.Identifier;
 
 // Wrapper around TagKeys
 public class EmiTagKey<T> {
-	public static final Map<TagKey<?>, EmiTagKey<?>> CACHE = Maps.newHashMap();
+	// EMI Remastered: concurrent, tag searches (search thread) and reloads create keys at the same time (CME in computeIfAbsent)
+	public static final Map<TagKey<?>, EmiTagKey<?>> CACHE = new java.util.concurrent.ConcurrentHashMap<>();
 	private final TagKey<T> raw;
 	private List<T> cached;
 	

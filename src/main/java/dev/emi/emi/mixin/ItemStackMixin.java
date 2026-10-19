@@ -25,7 +25,7 @@ public class ItemStackMixin {
 	@Inject(at = @At("RETURN"), method = "getTooltip")
 	private void getTooltip(Item.TooltipContext context, @Nullable PlayerEntity player, TooltipType type, CallbackInfoReturnable<List<Text>> info) {
 		List<Text> text = info.getReturnValue();
-		if (EmiConfig.appendItemModId && EmiConfig.appendModId && Thread.currentThread() != EmiSearch.searchThread && text != null && !text.isEmpty()) {
+		if (EmiConfig.appendItemModId && EmiConfig.appendModId && Thread.currentThread() != EmiSearch.searchThread && !EmiSearch.BAKING.get() && text != null && !text.isEmpty()) {
 			String namespace = EmiPort.getItemRegistry().getId(((ItemStack) (Object) this).getItem()).getNamespace();
 			String mod = EmiUtil.getModName(namespace);
 			text.add(EmiPort.literal(mod, Formatting.BLUE, Formatting.ITALIC));

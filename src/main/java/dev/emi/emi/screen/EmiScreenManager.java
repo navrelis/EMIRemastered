@@ -1177,7 +1177,10 @@ public class EmiScreenManager {
 			if (e instanceof TextFieldWidget tfw && tfw.isActive() && tfw.visible) {
 				return true;
 			} else if (e instanceof ParentElement p) {
-				return hasFocusedTextField(p, depthBail - 1);
+				// EMI Remastered: check every container instead of returning after the first one
+				if (hasFocusedTextField(p, depthBail - 1)) {
+					return true;
+				}
 			}
 		}
 		return false;
