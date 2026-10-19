@@ -809,5 +809,7 @@
   "config.emi.modules.distraction_free": "Distraction-Free Recipes",
   "config.emi.tooltip.modules.distraction_free": "Hides EMI's index until you search for something.",
   "config.emi.modules.info": "Item Info",
-  "config.emi.tooltip.modules.info": "A key (default I) on any stack opens an overview: how to get it, what it is used for and its details."
+  "config.emi.tooltip.modules.info": "A key (default I) on any stack opens an overview: how to get it, what it is used for and its details.",
+  "config.emi.modules.stats": "Stats",
+  "config.emi.tooltip.modules.stats": "Shows food, tool, weapon and armour stats: a Food category and details on the Item Info page."
 }

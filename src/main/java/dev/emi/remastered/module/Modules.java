@@ -13,6 +13,7 @@ import dev.emi.remastered.letsdo.LetsDoModule;
 import dev.emi.remastered.loot.LootModule;
 import dev.emi.remastered.ores.OresModule;
 import dev.emi.remastered.professions.ProfessionsModule;
+import dev.emi.remastered.stats.StatsModule;
 
 /**
  * Registry of all EMI Remastered modules. The order here is the order of the module switches and module config
@@ -32,6 +33,7 @@ public final class Modules {
 	public static final LetsDoModule LETSDO = register(new LetsDoModule());
 	public static final DistractionFreeModule DISTRACTION_FREE = register(new DistractionFreeModule());
 	public static final InfoModule INFO = register(new InfoModule());
+	public static final StatsModule STATS = register(new StatsModule());
 
 	private Modules() {
 	}

@@ -47,7 +47,8 @@
       "dev.emi.remastered.effects.EffectsEmiPlugin",
       "dev.emi.remastered.enchanting.EnchantingEmiPlugin",
       "dev.emi.remastered.professions.ProfessionsEmiPlugin",
-      "dev.emi.remastered.letsdo.LetsDoEmiPlugin"
+      "dev.emi.remastered.letsdo.LetsDoEmiPlugin",
+      "dev.emi.remastered.stats.StatsEmiPlugin"
     ],
     "modmenu": [
       "dev.emi.emi.compat.EmiModMenu"
@@ -71,7 +72,8 @@
     "emi_remastered_professions.mixins.json",
     "emi_remastered_letsdo.mixins.json",
     "emi_remastered_distraction_free.mixins.json",
-    "emi_remastered_info.mixins.json"
+    "emi_remastered_info.mixins.json",
+    "emi_remastered_stats.mixins.json"
   ],
   "accessWidener": "emi.accesswidener",
   "provides": [
