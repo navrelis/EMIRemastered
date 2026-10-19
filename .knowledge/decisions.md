@@ -1,0 +1,11 @@
+# Decisions
+- D1 Mod id stays `emi` (27 plugins, 16 mods using internals, 5 mixing in). Name "EMI Remastered", version `2.0.0+1.21.1` (must stay >= 1.1.24 for `emi` version ranges), jar `EMIRemastered-1.21.1-2.0.0-Fabric.jar`. fabric.mod.json `provides` the 7 add-on ids so a leftover add-on jar fails loudly.
+- D2 One plain Fabric Loom project, Yarn mappings, Java 21; xplat+fabric sources merged into `src/main`; neoforge/forge dropped. `EmiAgnosFabric` and all `dev.emi.emi` names/members kept (Sporran mixin, internal users).
+- D3 Add-ons become modules under `dev.emi.remastered.<module>`; each keeps its resource namespace (emi_loot, emiffect, ...) so resource packs and data still apply. Distraction Free Recipes is built into EMI core (no mixins into own classes).
+- D4 One config: every module setting lives in EMI's own config system/screen; fzzy_config, txnilib, Architectury, ForgeConfigAPIPort dropped as dependencies.
+- D5 Mojang-mapped add-ons are converted to Yarn with Loom `migrateMappings` before integration.
+- D6 Porting agents never edit the access widener (single file); they use mixin accessors/invokers. EMI Loot's port owns the AW merge.
+- D7 Parallel code agents run in separate git worktrees; the lead merges.
+- D8 Duplicates: own modules stay on; plugin manager lets the player switch off any EMI plugin by mod id; Let's Do module skips categories the native plugin already registers.
+- D9 Tests: JUnit 5 (test scope only) for pure logic; dev-client screenshot tour; final pack run under the game lock.
+- D10 Translations: en_us + de_de for all new strings.
