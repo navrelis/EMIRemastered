@@ -807,5 +807,7 @@
   "config.emi.modules.letsdo": "Let's Do (Let's Do EMI Compat)",
   "config.emi.tooltip.modules.letsdo": "Shows recipes of the Let's Do mods (Vinery, Meadow, Bakery, ...).",
   "config.emi.modules.distraction_free": "Distraction-Free Recipes",
-  "config.emi.tooltip.modules.distraction_free": "Hides EMI's index until you search for something."
+  "config.emi.tooltip.modules.distraction_free": "Hides EMI's index until you search for something.",
+  "config.emi.modules.tools": "Tools (Tag Browser, Copy Recipe)",
+  "config.emi.tooltip.modules.tools": "Tools for pack developers: a browser for all tags and a key that copies the hovered recipe as text or JSON."
 }
