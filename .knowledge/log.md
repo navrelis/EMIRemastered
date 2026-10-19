@@ -49,3 +49,11 @@
 2026-10-19 | X1 review (lead) | accepted: /emiexport client command, render-thread slices (10 ms/tick), compute() bypasses page cache, abort on reload/leave, async write; merged, build green, pushed. Client run pending (tour export.json via call step)
 2026-10-19 | B5 review (lead) | correction: listener replay calls setListener(null) and would drop other mods listeners -> use accessor on progress map
 2026-10-19 | A8 review (lead) | correction: structure prefetch on server thread at start -> background build with join/timeout, skip when setting off
+2026-10-19 | A9 review (lead) | protocol start/batch/complete + OresSyncState accepted; correction: OresSelfCheck dev-only, cache sync plan per data generation
+2026-10-19 | A2 review (lead) | accepted: measured level cap, incompatibility matrix (either direction), tag sources page, info provider; merged, build green
+2026-10-19 | Q2 review (lead) | accepted: docs/KNOWN_BUGS.md (42 rows, 22 affect us, top 10); merged
+2026-10-19 | B5, A8, A9 corrections | accepted (accessor instead of listener; async structure build; dev-only self check + cached plan); merged, build green
+2026-10-19 | A5+B1 review (lead) | accepted: stats module (food category, tool/weapon/armour sections), order info-mobs-tools-stats; merged, build green
+2026-10-19 | Q1b review (lead) | accepted: mixins cancel lockCursor/unlockCursor/setCursorParameters/raw mouse/fullscreen, no-focus hints, never pause on lost focus; devtour on all client runs, not in release jar (0 entries); 4 tour launches clean; merged, pushed. Client ban lifted (D13 fix in place)
+2026-10-19 | Q3 code review (lead) | accepted: tag index (skips only tags with no shared value), RecipeBuckets (identity adjacency when allDistinct), repair fix; benchmark + KB2/KB12 sent
+2026-10-19 | wave 5 delegated: T1 tours+icons (Sonnet long), FX1 reload/persistence (Opus long), FX2 core small fixes (Sonnet), FX3 module fixes (Sonnet), P8 trades/effects providers (Sonnet), B2 world module (Sonnet long); client launches allowed (one per agent)
