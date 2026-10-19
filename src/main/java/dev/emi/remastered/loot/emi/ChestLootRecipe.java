@@ -12,12 +12,17 @@ import dev.emi.emi.api.widget.SlotWidget;
 import dev.emi.emi.api.widget.WidgetHolder;
 import dev.emi.remastered.loot.EMILoot;
 import dev.emi.remastered.loot.client.ClientChestLootTable;
+import dev.emi.remastered.loot.util.StructureText;
 import dev.emi.remastered.loot.util.stack.ChestLootEmiStack;
 import dev.emi.remastered.loot.util.InteractableTextWidget;
 import dev.emi.remastered.loot.util.ClientText;
 import dev.emi.remastered.loot.util.LText;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
+import net.minecraft.text.OrderedText;
+import net.minecraft.text.StringVisitable;
+import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
@@ -54,7 +59,10 @@ public class ChestLootRecipe implements EmiRecipe {
         }
         this.outputs = list;
         inputStack = new ChestLootEmiStack(loot.id);
+        this.info = Suppliers.memoize(this::buildInfo);
     }
+
+    private final Supplier<Info> info;
 
     private final ClientChestLootTable loot;
     private final Supplier<ArrayListMultimap<Float, EmiStack>> lootStacksSorted;
@@ -96,9 +104,28 @@ public class ChestLootRecipe implements EmiRecipe {
         return 144;
     }
 
+    /** The extra lines below the title: where the chest is found, and the Lootr note. */
+    private record Info(ClientText.Wrapped structure, Text structureText, ClientText.Wrapped lootr) {
+        int lineCount() {
+            return structure.lines().size() + lootr.lines().size();
+        }
+    }
+
+    private static final int INFO_WIDTH = 144;
+    private static final int INFO_LINE_HEIGHT = 9;
+    private static final int INFO_COLOR = 0x555555;
+
+    private Info buildInfo() {
+        ClientText.Wrapped none = new ClientText.Wrapped(List.of(), false);
+        Text found = LootSettings.showStructures ? StructureText.foundIn(loot.structures) : null;
+        ClientText.Wrapped structure = found == null ? none : ClientText.wrap(found, INFO_WIDTH, 2);
+        ClientText.Wrapped lootr = LootSettings.lootrNote && EMILoot.isModLoaded("lootr") ? ClientText.wrap(LText.translatable("emi_loot.lootr_note"), INFO_WIDTH, 2) : none;
+        return new Info(structure, found, lootr);
+    }
+
     @Override
     public int getDisplayHeight() {
-        int titleHeight = 11;
+        int titleHeight = 11 + info.get().lineCount() * INFO_LINE_HEIGHT;
         int boxesHeight = ((int) Math.ceil(lootStacksSortedSize/ columns) * (EMILoot.Type.CHEST.isCompact() ? 18 : 19)) - 1;
         return titleHeight + boxesHeight;
     }
@@ -107,11 +134,13 @@ public class ChestLootRecipe implements EmiRecipe {
     public void addWidgets(WidgetHolder widgets) {
         final int titleSpace;
         final int finalRowHeight;
+        Info extra = info.get();
+        int infoHeight = extra.lineCount() * INFO_LINE_HEIGHT;
         if (widgets.getHeight() < getDisplayHeight()) {
-            titleSpace = 9;
+            titleSpace = 9 + infoHeight;
             finalRowHeight = (widgets.getHeight() - titleSpace) / ((int) Math.ceil(lootStacksSortedSize / 8.0));
         } else {
-            titleSpace = 11;
+            titleSpace = 11 + infoHeight;
             finalRowHeight =  18;
         }
         widgets.add(new InteractableTextWidget(inputStack, 1, 0, 0x404040, false).recipeContext(this));
@@ -119,6 +148,18 @@ public class ChestLootRecipe implements EmiRecipe {
             widgets.addTooltip(ClientText.components(inputStack.getName(), loot.id.getNamespace()), 0, 0, 144, 10);
         } else {
             widgets.addTooltipText(List.of(inputStack.getName()), 0, 0, 144, 10);
+        }
+        int infoY = 11;
+        for (OrderedText line : extra.structure().lines()) {
+            widgets.addText(line, 1, infoY, INFO_COLOR, false);
+            infoY += INFO_LINE_HEIGHT;
+        }
+        if (extra.structure().truncated()) {
+            widgets.addTooltipText(List.of(extra.structureText()), 0, 11, INFO_WIDTH, extra.structure().lines().size() * INFO_LINE_HEIGHT);
+        }
+        for (OrderedText line : extra.lootr().lines()) {
+            widgets.addText(line, 1, infoY, INFO_COLOR, false);
+            infoY += INFO_LINE_HEIGHT;
         }
         AtomicInteger index = new AtomicInteger(lootStacksSortedSize);
         for (var entry : lootStacksSorted.get().asMap().entrySet()) {

@@ -1,5 +1,6 @@
 package dev.emi.remastered.loot.emi;
 
+import dev.emi.remastered.loot.util.ConditionIcons;
 import dev.emi.remastered.loot.util.LText;
 import dev.emi.remastered.loot.LootSettings;
 import dev.emi.emi.api.recipe.EmiRecipe;
@@ -138,7 +139,9 @@ public class BlockLootRecipe implements EmiRecipe {
                 widget.appendTooltip(LText.translatable("emi_loot.rolls", rounded).formatted(Formatting.GRAY));
                 if (LootSettings.showConditionsInTooltip()) {
                     for (Pair<Integer, Text> pair : stack.conditions()) {
-                        widget.appendTooltip(pair.getRight());
+                        for (Text line : ConditionIcons.tooltipLines(pair)) {
+                            widget.appendTooltip(line);
+                        }
                     }
                 }
                 ++i;

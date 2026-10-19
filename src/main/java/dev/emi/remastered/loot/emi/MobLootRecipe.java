@@ -208,7 +208,9 @@ public class MobLootRecipe implements EmiRecipe {
                 widget.appendTooltip(LText.translatable("emi_loot.rolls", rounded).formatted(Formatting.GRAY));
                 if (LootSettings.showConditionsInTooltip()) {
                     for (Pair<Integer, Text> pair : stack.conditions()) {
-                        widget.appendTooltip(pair.getRight());
+                        for (Text line : ConditionIcons.tooltipLines(pair)) {
+                            widget.appendTooltip(line);
+                        }
                     }
                 }
                 ++i;

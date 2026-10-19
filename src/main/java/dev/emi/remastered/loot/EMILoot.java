@@ -3,6 +3,7 @@ package dev.emi.remastered.loot;
 import com.google.gson.JsonElement;
 import dev.emi.remastered.loot.parser.LootTableParser;
 import dev.emi.remastered.loot.server.ServerResourceData;
+import dev.emi.remastered.loot.structure.StructureLookup;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.loot.LootTable;
@@ -69,6 +70,7 @@ public class EMILoot {
 
     public static void parseTables(ResourceManager resourceManager, Registry<LootTable> lootManager, RegistryOps<JsonElement> ops) {
         LootTableParser.registryOps = ops;
+        StructureLookup.invalidate();
         ServerResourceData.loadDirectTables(resourceManager, ops);
         LootTableParser.parseLootTables(lootManager);
     }

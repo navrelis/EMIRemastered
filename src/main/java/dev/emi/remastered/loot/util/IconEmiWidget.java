@@ -9,17 +9,23 @@ import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
 public class IconEmiWidget extends Widget {
 
     public IconEmiWidget(int x, int y, int keyIndex, Text text) {
-        this.tex = TextKey.getSpriteId(keyIndex);
+        ConditionKind kind = ConditionIcons.kindOf(text);
+        this.tex = kind != null ? ConditionIcons.texture(kind) : TextKey.getSpriteId(keyIndex);
         this.x = x;
         this.y = y;
         this.bounds = new Bounds(x, y, 12, 12);
-        this.tooltipText = Collections.singletonList(TooltipComponent.of(text.asOrderedText()));
+        List<TooltipComponent> tooltip = new ArrayList<>(2);
+        tooltip.add(TooltipComponent.of(text.asOrderedText()));
+        if (kind != null) {
+            tooltip.add(TooltipComponent.of(ConditionIcons.hint(kind).asOrderedText()));
+        }
+        this.tooltipText = tooltip;
     }
 
     static final Identifier FRAME_ID = Identifier.of(EMILoot.MOD_ID, "textures/gui/icon_frame.png");

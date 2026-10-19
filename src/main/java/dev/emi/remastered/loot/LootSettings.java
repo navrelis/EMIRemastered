@@ -65,6 +65,10 @@ public class LootSettings {
 	@ConfigValue("loot.direct-drops-archaeology")
 	public static boolean directDropsArchaeology = true;
 
+	@Comment("Whether chest loot is sent together with the structures it is found in (and their dimensions).")
+	@ConfigValue("loot.chest-structures")
+	public static boolean chestStructures = true;
+
 	@ConfigGroupEnd
 	@Comment("Comma separated condition keys that are not shown because they say nothing useful. "
 		+ "Remove a key to show it. 'emi_loot.no_conditions' only matters in the tooltip and plain condition styles.")
@@ -109,6 +113,18 @@ public class LootSettings {
 	@Comment("Group gameplay drops that share chance and conditions into one slot (tooltip condition style only).")
 	@ConfigValue("loot.compact-gameplay")
 	public static boolean compactGameplay = true;
+
+	@Comment("Show where a chest is found (structures and dimensions) on chest loot pages.")
+	@ConfigValue("loot.show-structures")
+	public static boolean showStructures = true;
+
+	@Comment("Show special icons and a level scaling hint for drops that depend on Looting, Fortune, Silk Touch, fire or a player kill.")
+	@ConfigValue("loot.condition-hints")
+	public static boolean conditionHints = true;
+
+	@Comment("Show a note on chest loot pages when Lootr is installed, because every player gets their own loot there.")
+	@ConfigValue("loot.lootr-note")
+	public static boolean lootrNote = true;
 
 	@ConfigGroupEnd
 	@Comment("Tighter rows for archaeology loot.")
