@@ -390,9 +390,6 @@ public final class Steps {
 			}
 			return waitTicks(2);
 		});
-
-		// EMI reload benchmark steps: bench_record, emi_reload, emi_dump, jfr_start, jfr_stop (see BenchSteps)
-		BenchSteps.register();
 	}
 
 	private static RecipeScreen requireRecipeScreen(TourContext ctx) {

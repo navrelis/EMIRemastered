@@ -1,6 +1,5 @@
 package dev.emi.emi.registry;
 
-import java.util.BitSet;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
@@ -102,36 +101,13 @@ public class EmiTags {
 			keys = Lists.newArrayList();
 			Set<T> original = new HashSet<>(map.keySet());
 			List<EmiTagKey<T>> tags = getTags(registry);
-			// EMI Remastered: only a tag sharing a value with the stacks can pass containsAll, so test just those (in
-			// the same order) instead of every tag of the registry; falls back to the full scan if the index is stale
+			// EMI Remastered: only a tag sharing a value with the stacks can be taken, so test just those (same order,
+			// same tags taken) instead of every tag of the registry; the full scan if the index does not match
 			EmiTagIndex index = TAG_INDEX.get(registry.getKey().getValue());
 			if (index != null && index.isFor(tags, EmiTagKey.getListVersion())) {
-				BitSet candidates = index.candidates(original);
-				for (int i = candidates.nextSetBit(0); i >= 0; i = candidates.nextSetBit(i + 1)) {
-					EmiTagKey<T> key = tags.get(i);
-					List<T> values = key.getList();
-					if (map.keySet().containsAll(values)) {
-						values.forEach(map::remove);
-						keys.add(key);
-					}
-					if (map.isEmpty()) {
-						break;
-					}
-				}
+				index.scan(tags, EmiTagKey::getList, map, original, keys);
 			} else {
-				for (EmiTagKey<T> key : tags) {
-					List<T> values = key.getList();
-					if (values.size() < 2) {
-						continue;
-					}
-					if (map.keySet().containsAll(values)) {
-						values.forEach(map::remove);
-						keys.add(key);
-					}
-					if (map.isEmpty()) {
-						break;
-					}
-				}
+				EmiTagIndex.scanAll(tags, EmiTagKey::getList, map, keys);
 			}
 			CACHED_TAGS.put((Set) original, (List) keys);
 		}

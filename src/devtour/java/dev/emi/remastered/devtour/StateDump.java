@@ -34,7 +34,10 @@ import dev.emi.emi.bom.BoM;
 import dev.emi.emi.registry.EmiRecipes;
 import dev.emi.emi.registry.EmiStackList;
 import dev.emi.emi.registry.EmiTags;
+import dev.emi.emi.runtime.EmiFavorites;
 import dev.emi.emi.runtime.EmiHidden;
+import dev.emi.emi.runtime.EmiPersistentData;
+import dev.emi.emi.runtime.EmiSidebars;
 import dev.emi.emi.runtime.EmiTagKey;
 import dev.emi.emi.search.EmiSearch;
 import net.minecraft.client.MinecraftClient;
@@ -188,6 +191,14 @@ public final class StateDump {
 			}
 		}
 		section("search", search);
+
+		// what EmiPersistentData.save() would write to emi.json (built in memory, the file is not touched)
+		JsonObject persistent = new JsonObject();
+		persistent.add("favorites", EmiFavorites.save());
+		EmiSidebars.save(persistent);
+		persistent.add("recipe_defaults", BoM.saveAdded());
+		persistent.add("hidden_stacks", EmiHidden.save());
+		section("persistent_data", List.of(EmiPersistentData.GSON.toJson(persistent).split("\\R")));
 
 		List<String> summary = new ArrayList<>();
 		hashes.forEach((k, v) -> summary.add(k + " " + v));

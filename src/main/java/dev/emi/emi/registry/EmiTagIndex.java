@@ -5,13 +5,15 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 
 /**
  * EMI Remastered: inverted index over one registry's tag list (in {@link EmiTags#getTags} order): for every value,
- * the positions of the tags with at least two values that contain it. {@link EmiTags#getIngredient} only needs to
- * test tags that share a value with the stacks it collapses; every other tag fails its {@code containsAll} check.
+ * the positions of the tags with at least two values that contain it. {@link EmiTags#getIngredient} collapses stacks
+ * into tags by testing every tag of the registry in order; only a tag sharing a value with the stacks can pass that
+ * test, so {@link #scan} tests just those, in the same order, and picks exactly the same tags as {@link #scanAll}.
  * Pure Java on purpose (unit tested without Minecraft).
  */
 final class EmiTagIndex {
@@ -69,5 +71,45 @@ final class EmiTagIndex {
 			}
 		}
 		return set;
+	}
+
+	/**
+	 * Upstream's loop: every tag (with at least two values) whose values are all keys of {@code map} is added to
+	 * {@code out} and its values are removed from {@code map}, in tag order, until {@code map} is empty.
+	 */
+	static <K, T> void scanAll(List<K> tags, Function<K, List<T>> valuesOf, Map<T, ?> map, List<K> out) {
+		for (K key : tags) {
+			List<T> values = valuesOf.apply(key);
+			if (values.size() < 2) {
+				continue;
+			}
+			if (map.keySet().containsAll(values)) {
+				values.forEach(map::remove);
+				out.add(key);
+			}
+			if (map.isEmpty()) {
+				break;
+			}
+		}
+	}
+
+	/**
+	 * Same result as {@link #scanAll} for the {@code tags} this index was built for; {@code original} are the keys of
+	 * {@code map} before the call. A skipped tag has at least two values and none of them in {@code map}, so it fails
+	 * {@code containsAll} in {@link #scanAll}, and {@code map} only changes when a tag is taken.
+	 */
+	<K, T> void scan(List<K> tags, Function<K, List<T>> valuesOf, Map<T, ?> map, Collection<?> original, List<K> out) {
+		BitSet candidates = candidates(original);
+		for (int i = candidates.nextSetBit(0); i >= 0; i = candidates.nextSetBit(i + 1)) {
+			K key = tags.get(i);
+			List<T> values = valuesOf.apply(key);
+			if (map.keySet().containsAll(values)) {
+				values.forEach(map::remove);
+				out.add(key);
+			}
+			if (map.isEmpty()) {
+				break;
+			}
+		}
 	}
 }

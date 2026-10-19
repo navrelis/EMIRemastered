@@ -24,7 +24,6 @@ public final class TourMod implements ClientModInitializer {
 			return;
 		}
 		LogCapture logs = LogCapture.install();
-		PhaseTimer.install();
 		TourRunner runner = new TourRunner(MinecraftClient.getInstance(), logs, tour.trim(), FabricLoader.getInstance().getGameDir());
 		ClientTickEvents.END_CLIENT_TICK.register(runner::onTick);
 		// frame counter, used so screenshots are taken only after the GUI was drawn a few times

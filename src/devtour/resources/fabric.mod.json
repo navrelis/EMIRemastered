@@ -11,7 +11,7 @@
   "environment": "client",
   "entrypoints": {
     "main": [
-      "dev.emi.remastered.devtour.BenchItems"
+      "dev.emi.remastered.devtour.BenchMod"
     ],
     "client": [
       "dev.emi.remastered.devtour.TourMod"

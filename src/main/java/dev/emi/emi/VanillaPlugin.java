@@ -496,7 +496,7 @@ public class VanillaPlugin implements EmiPlugin {
 				if (i.getComponents().getOrDefault(DataComponentTypes.MAX_DAMAGE, 0) > 0) {
 					if (i instanceof ArmorItem ai && ai.getMaterial() != null && ai.getMaterial().value().repairIngredient().get() != null
 							&& !ai.getMaterial().value().repairIngredient().get().isEmpty()) {
-						// EMI Remastered: an ingredient with entries can still match nothing (empty tag); skip it instead of throwing
+						// EMI Remastered: an ingredient with entries can match no stack (empty repair tag): no material repair recipe
 						ItemStack[] matching = ai.getMaterial().value().repairIngredient().get().getMatchingStacks();
 						if (matching.length > 0) {
 							Identifier id = synthetic("anvil/repairing/material", EmiUtil.subId(i) + "/" + EmiUtil.subId(matching[0].getItem()));
@@ -504,7 +504,7 @@ public class VanillaPlugin implements EmiPlugin {
 						}
 					} else if (i instanceof ToolItem ti && ti.getMaterial().getRepairIngredient() != null
 							&& !ti.getMaterial().getRepairIngredient().isEmpty()) {
-						// EMI Remastered: see above (this threw ArrayIndexOutOfBoundsException for tools with an empty repair tag)
+						// EMI Remastered: same; [0] threw ArrayIndexOutOfBoundsException and lost the item's other repair recipes
 						ItemStack[] matching = ti.getMaterial().getRepairIngredient().getMatchingStacks();
 						if (matching.length > 0) {
 							Identifier id = synthetic("anvil/repairing/material", EmiUtil.subId(i) + "/" + EmiUtil.subId(matching[0].getItem()));

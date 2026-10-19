@@ -1,11 +1,16 @@
 package dev.emi.emi.registry;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -166,10 +171,13 @@ public class EmiRecipes {
 			Set<Identifier> incorrectIds = new ObjectArraySet<>();
 			// EMI Remastered: dev mode checked recipeIds.containsValue (a linear scan) for every recipe
 			Set<Identifier> knownIds = EmiConfig.devMode ? new HashSet<>(recipeIds.values()) : Set.of();
+			// EMI Remastered: identity lookup first (List.contains per recipe is a linear scan), the list only if absent
+			Set<EmiRecipeCategory> registeredCategories = Collections.newSetFromMap(new IdentityHashMap<>());
+			registeredCategories.addAll(categories);
 			for (EmiRecipe recipe : recipes) {
 				Identifier id = recipe.getId();
 				EmiRecipeCategory category = recipe.getCategory();
-				if (!categories.contains(category)) {
+				if (!registeredCategories.contains(category) && !categories.contains(category)) {
 					EmiReloadLog.warn("Recipe " + id + " loaded with unregistered category: " + category.getId());
 				}
 				if (EmiConfig.logNonTagIngredients && recipe.supportsRecipeTree()) {
@@ -204,8 +212,13 @@ public class EmiRecipes {
 				}
 			}
 	
-			Map<EmiStack, Set<EmiRecipe>> byInput = new Object2ObjectOpenCustomHashMap<>(new EmiStackList.ComparisonHashStrategy());
-			Map<EmiStack, Set<EmiRecipe>> byOutput = new Object2ObjectOpenCustomHashMap<>(new EmiStackList.ComparisonHashStrategy());
+			// EMI Remastered: a LinkedHashSet per stack was the most expensive part of the bake. A recipe is added to a
+			// stack's bucket only while that recipe is indexed, so if no two recipes are equal its repeats are adjacent,
+			// and a list skipping a repeat of its last element holds what the set held, in the same order
+			boolean distinct = RecipeBuckets.allDistinct(this.recipes);
+			Function<EmiStack, Collection<EmiRecipe>> bucket = distinct ? b -> new ArrayList<>(4) : b -> Sets.newLinkedHashSet();
+			Map<EmiStack, Collection<EmiRecipe>> byInput = new Object2ObjectOpenCustomHashMap<>(new EmiStackList.ComparisonHashStrategy());
+			Map<EmiStack, Collection<EmiRecipe>> byOutput = new Object2ObjectOpenCustomHashMap<>(new EmiStackList.ComparisonHashStrategy());
 
 			for (EmiRecipeCategory category : byCategory.keySet()) {
 				String key = EmiUtil.translateId("emi.category.", category.getId());
@@ -223,21 +236,21 @@ public class EmiRecipes {
 				for (EmiRecipe recipe : cRecipes) {
 					for (EmiIngredient ingredient : recipe.getInputs()) {
 						for (EmiStack i : ingredient.getEmiStacks()) {
-							byInput.computeIfAbsent(i.copy(), b -> Sets.newLinkedHashSet()).add(recipe);
+							RecipeBuckets.add(byInput.computeIfAbsent(i.copy(), bucket), recipe, distinct);
 						}
 					}
 					for (EmiIngredient ingredient : recipe.getCatalysts()) {
 						for (EmiStack i : ingredient.getEmiStacks()) {
-							byInput.computeIfAbsent(i.copy(), b -> Sets.newLinkedHashSet()).add(recipe);
+							RecipeBuckets.add(byInput.computeIfAbsent(i.copy(), bucket), recipe, distinct);
 						}
 					}
 					for (EmiStack i : recipe.getOutputs()) {
-						byOutput.computeIfAbsent(i.copy(), b -> Sets.newLinkedHashSet()).add(recipe);
+						RecipeBuckets.add(byOutput.computeIfAbsent(i.copy(), bucket), recipe, distinct);
 					}
 				}
 			}
 			for (EmiStack key : byInput.keySet()) {
-				Set<EmiRecipe> r = byInput.getOrDefault(key, null);
+				Collection<EmiRecipe> r = byInput.getOrDefault(key, null);
 				if (r != null) {
 					this.byInput.put(key, r.stream().toList());
 				} else {
@@ -245,7 +258,7 @@ public class EmiRecipes {
 				}
 			}
 			for (EmiStack key : byOutput.keySet()) {
-				Set<EmiRecipe> r = byOutput.getOrDefault(key, null);
+				Collection<EmiRecipe> r = byOutput.getOrDefault(key, null);
 				if (r != null) {
 					this.byOutput.put(key, r.stream().toList());
 				} else {

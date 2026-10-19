@@ -12,50 +12,35 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.function.Function;
 
 import org.junit.jupiter.api.Test;
 
 /**
  * EmiTags.getIngredient collapses stacks into tags greedily: it walks the tags in order and takes every tag whose
- * values are all still present. With the index it only walks the candidate tags. Both must pick the same tags in
- * the same order and leave the same stacks.
+ * values are all still present ({@link EmiTagIndex#scanAll}, upstream's loop). With the index it walks only the
+ * candidate tags ({@link EmiTagIndex#scan}). Both must take the same tags in the same order and leave the same stacks.
  */
 class EmiTagIndexTest {
+	private static final Function<List<Integer>, List<Integer>> VALUES = Function.identity();
 
-	/** Upstream's loop (EmiTags.getIngredient before the index). */
-	private static List<Integer> fullScan(Map<Integer, String> map, List<List<Integer>> tags) {
-		List<Integer> picked = new ArrayList<>();
-		for (int i = 0; i < tags.size(); i++) {
-			List<Integer> values = tags.get(i);
+	/** Upstream's loop verbatim (EmiTags.getIngredient in EMI 1.1.24), as an independent reference. */
+	private static List<List<Integer>> upstream(Map<Integer, String> map, List<List<Integer>> tags) {
+		List<List<Integer>> keys = new ArrayList<>();
+		for (List<Integer> key : tags) {
+			List<Integer> values = key;
 			if (values.size() < 2) {
 				continue;
 			}
 			if (map.keySet().containsAll(values)) {
 				values.forEach(map::remove);
-				picked.add(i);
+				keys.add(key);
 			}
 			if (map.isEmpty()) {
 				break;
 			}
 		}
-		return picked;
-	}
-
-	/** The indexed loop (EmiTags.getIngredient now). */
-	private static List<Integer> indexedScan(Map<Integer, String> map, List<List<Integer>> tags, EmiTagIndex index) {
-		List<Integer> picked = new ArrayList<>();
-		BitSet candidates = index.candidates(new HashSet<>(map.keySet()));
-		for (int i = candidates.nextSetBit(0); i >= 0; i = candidates.nextSetBit(i + 1)) {
-			List<Integer> values = tags.get(i);
-			if (map.keySet().containsAll(values)) {
-				values.forEach(map::remove);
-				picked.add(i);
-			}
-			if (map.isEmpty()) {
-				break;
-			}
-		}
-		return picked;
+		return keys;
 	}
 
 	private static Map<Integer, String> stacks(Set<Integer> values) {
@@ -66,10 +51,30 @@ class EmiTagIndexTest {
 		return map;
 	}
 
+	private static void check(List<List<Integer>> tags, EmiTagIndex index, Set<Integer> ingredient, String what) {
+		Map<Integer, String> reference = stacks(ingredient);
+		Map<Integer, String> full = stacks(ingredient);
+		Map<Integer, String> indexed = stacks(ingredient);
+		List<List<Integer>> expected = upstream(reference, tags);
+		List<List<Integer>> fullOut = new ArrayList<>();
+		EmiTagIndex.scanAll(tags, VALUES, full, fullOut);
+		List<List<Integer>> indexedOut = new ArrayList<>();
+		index.scan(tags, VALUES, indexed, new HashSet<>(indexed.keySet()), indexedOut);
+		assertEquals(expected.size(), fullOut.size(), what);
+		assertEquals(expected.size(), indexedOut.size(), what);
+		for (int i = 0; i < expected.size(); i++) {
+			// same tag objects, same order (identity, not just equal values)
+			assertTrue(expected.get(i) == fullOut.get(i), what);
+			assertTrue(expected.get(i) == indexedOut.get(i), what);
+		}
+		assertEquals(reference, full, what);
+		assertEquals(reference, indexed, what);
+	}
+
 	@Test
-	void indexedScanPicksTheSameTagsAsTheFullScan() {
+	void indexedScanTakesTheSameTagsAsTheFullScan() {
 		Random random = new Random(42);
-		for (int round = 0; round < 200; round++) {
+		for (int round = 0; round < 300; round++) {
 			int universe = 10 + random.nextInt(80);
 			List<List<Integer>> tags = new ArrayList<>();
 			int tagCount = random.nextInt(300);
@@ -80,6 +85,9 @@ class EmiTagIndexTest {
 					values.add(random.nextInt(universe)); // duplicates on purpose
 				}
 				tags.add(values);
+				if (t > 0 && random.nextInt(20) == 0) {
+					tags.add(new ArrayList<>(tags.get(random.nextInt(tags.size())))); // equal value lists
+				}
 			}
 			// like EmiTags' size order: biggest first (stable)
 			tags.sort((a, b) -> Integer.compare(b.size(), a.size()));
@@ -95,14 +103,25 @@ class EmiTagIndexTest {
 				}
 				int noise = random.nextInt(6);
 				for (int n = 0; n < noise; n++) {
-					ingredient.add(random.nextInt(universe));
+					ingredient.add(random.nextInt(universe + 5)); // also values in no tag
 				}
-				Map<Integer, String> a = stacks(ingredient);
-				Map<Integer, String> b = stacks(ingredient);
-				assertEquals(fullScan(a, tags), indexedScan(b, tags, index), "round " + round + " query " + q);
-				assertEquals(a, b);
+				check(tags, index, ingredient, "round " + round + " query " + q);
 			}
 		}
+	}
+
+	@Test
+	void edgeCases() {
+		List<List<Integer>> tags = List.of(List.of(1, 2, 3), List.of(1, 2), List.of(3, 4), List.of(5), List.of(),
+			List.of(6, 6), List.of(4, 7));
+		EmiTagIndex index = EmiTagIndex.build(tags, tags, 0);
+		check(tags, index, Set.of(), "empty ingredient");
+		check(tags, index, Set.of(1, 2, 3), "exactly one tag, stops when empty");
+		check(tags, index, Set.of(1, 2, 3, 4), "overlapping tags: the first one wins");
+		check(tags, index, Set.of(1, 2, 4, 7), "two tags");
+		check(tags, index, Set.of(5), "single value tags are never taken");
+		check(tags, index, Set.of(6), "a tag of one value listed twice");
+		check(tags, index, Set.of(8, 9), "values in no tag");
 	}
 
 	@Test
