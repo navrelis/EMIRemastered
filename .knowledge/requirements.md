@@ -56,3 +56,4 @@ Owner statement (2026-10-19): he asked the authors for permission to use and cha
 - Subagents implement; lead writes only `.knowledge/`, runs builds/tests/git. Subagents never commit.
 - Never force-push; no secrets.
 - Owner (2026-10-19): never start Minecraft with sound.
+- Owner (2026-10-19, session 5): Phase 4 = once the owner has closed the game, lead backs up the 8 jars to mods_backup/ and installs the new jar; the OWNER launches the pack; lead then reads latest.log and reload times.

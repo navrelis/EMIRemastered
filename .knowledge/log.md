@@ -87,3 +87,11 @@
 2026-10-19 | CFG1 client review (lead) | tour ok 111/111, globe + T1-25 accepted; correction sent: partial jumps must keep 'Modules' first then its module jumps (720p shot read as dev sub-entries)
 2026-10-19 | FX-TOOLS client review (lead) | accepted: tour 89/89 ok twice, iron pickaxe/flint and steel data-pack JSON checked, notice drawn via EmiScreenManager hook, husk shot: selection cleared; KB44 not reproducible (426 = 426); merged, build green
 2026-10-19 | CFG1 correction review (lead) | accepted: Modules first then trimmed module jumps (lead viewed 720p shot); merged, build green
+2026-10-19 | KB7 delegated (Sonnet long): port fork fix for synthetic favourite remainders, worktree kb7
+2026-10-19 | FX-WD client review (lead) | accepted: 4 tours ok, lead viewed bat portrait + diamond ore info; silverfish fit fixed by horizontal reach; merged, build green
+2026-10-19 | T2 delegated (Sonnet long): server smoke + all tours regression on merged remastered
+2026-10-19 | KB7 review (lead) | accepted: invs apart from remainders, usedRemainder per node (accumulated over tag stacks), countRecipes adds it; activator rail before 2/2 after 3/3; merged, build green; credit aMelonRind/emi (MIT) in DOC3
+2026-10-19 | DOC3 delegated (Sonnet short): TOUR_REPORT/KNOWN_BUGS statuses, CREDITS (aMelonRind), CHANGELOG session 5, DEVTOUR kb7
+2026-10-19 | DOC3 review (lead) | accepted: Status column in TOUR_REPORT, KB7/KB43 fixed, KB44 closed not reproducible, counts recomputed, CREDITS + CHANGELOG; merged
+2026-10-19 | owner decision Phase 4: swap after owner closes the game, owner launches, lead checks the log
+2026-10-19 | auto-handoff: T2 stopped after its tour runs (report not written); see F:\Coding\EMI_Remastered\handoff-2026-10-19-2db405d6.md

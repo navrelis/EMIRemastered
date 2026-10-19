@@ -19,11 +19,13 @@ much as needed.
 | Module `ores`: EMI Ores 1.3 | Abbie | https://github.com/Abbie5/emi-ores | tag `v1.3+1.21.1` (41c3537) | Code: LGPL-3.0-only. Biome icons: CC BY-NC-SA 3.0 (see below) |
 | Module `letsdo`: Let's Do EMI Compat 2.0.3 | Pandaismyname1 | https://github.com/Pandaismyname1/Let-s-Do-EMI-Compat | branch `1.21.1`, commit 5c8dad1 | MIT, Copyright 2024 Pandaismyname1 |
 | Module `loot`: EMI Loot 0.7.9 | fzzyhmstrs; art lxly9; ports unilock | https://github.com/fzzyhmstrs/EMI_loot | branch `architectury/1.21`, commit 6ba879f | MIT (README badge and `fabric.mod.json` "MIT License"; the repository has no LICENSE file) |
+| EMI core: favourite remainder counts (`TreeCost`, `MaterialNode`, `EmiFavorites`) | aMelonRind | https://github.com/aMelonRind/emi | commits 2508321 and e7fd7d9 | MIT |
 
 Notes per project:
 
 - **EMI** is the base of this mod. The `dev.emi.emi` packages, class names and members are kept so that other mods that
   use EMI's internals keep working. The fork history starts at EMI's tag `1.1.24+1.21.1`.
+- **aMelonRind/emi** is a fork of EMI. Only its two commits 2508321 and e7fd7d9 are used, for the "favourite remainder counts" fix: the amounts that recipe remainders already serve are counted in the remaining amount of synthetic favourites (upstream issues 1113, 895, 766). The ported code is marked with `EMI Remastered: KB7` comments.
 - **Distraction Free Recipes**: the jar metadata of 1.2.2 says "Tonis MMC License", the repository ships an MIT
   `LICENSE.md` (Copyright (c) 2024 Toni). Its behaviour is built into EMI's screen code instead of mixins.
 - **EMIffect**: the build metadata names Flamarine as the author, the repository belongs to Prismwork and the licence file
