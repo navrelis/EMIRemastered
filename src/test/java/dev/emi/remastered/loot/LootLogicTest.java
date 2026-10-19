@@ -27,6 +27,17 @@ class LootLogicTest {
 		assertEquals("12.34", FloatTrimmer.trimFloatString(12.3456f, 2));
 		assertEquals("12", FloatTrimmer.trimFloatString(12.3456f, 0));
 		assertEquals("5.0", FloatTrimmer.trimFloatString(5f));
+		assertEquals("0.0", FloatTrimmer.trimFloatString(0f, 1));
+		assertEquals("0.05", FloatTrimmer.trimFloatString(0.0512f, 2));
+	}
+
+	@Test
+	void tinyChancesAreNotShownAsZeroOrInScientificNotation() {
+		assertEquals("<0.1", FloatTrimmer.trimFloatString(0.0083f, 1));
+		// Float.toString(9.09E-4f) is "9.09E-4", which used to be cut to a wrong "9.0"
+		assertEquals("<0.1", FloatTrimmer.trimFloatString(0.000909f, 1));
+		assertEquals("<1", FloatTrimmer.trimFloatString(0.5f, 0));
+		assertEquals("<0.01", FloatTrimmer.trimFloatString(0.000909f, 2));
 	}
 
 	@Test

@@ -16,8 +16,10 @@
     "ExplorationMapLootFunctionAccessor",
     "FilteredLootFunctionAccessor",
     "ItemEntryAccessor",
+    "JigsawStructureAccessor",
     "LeafEntryAccessor",
     "LimitCountLootFunctionAccessor",
+    "ListPoolElementAccessor",
     "LootContextTypesAccessor",
     "LootPoolAccessor",
     "LootPoolEntryAccessor",
@@ -42,6 +44,7 @@
     "SetOminousBottleAmplifierLootFunctionAccessor",
     "SetPotionLootFunctionAccessor",
     "SetStewEffectLootFunctionAccessor",
+    "SinglePoolElementAccessor",
     "TagEntryAccessor",
     "VariantPredicateAccessor"
   ],
