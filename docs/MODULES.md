@@ -16,6 +16,7 @@ EMI Remastered is EMI (mod id `emi`) plus seven built-in modules. Each former ad
 | `mobs` | `dev.emi.remastered.mobs` | `Mobs` | `emi_mobs` | yes (mob pages with attributes, spawn biomes and drops; has a server part) |
 | `tools` | `dev.emi.remastered.tools` | `Tools` | `emi_remastered_tools` | no (pack-developer tools: tag browser, copy recipe) |
 | `stats` | `dev.emi.remastered.stats` | `Stats` | `emi_stats` | yes (Food category; Food/Tool/Weapon/Armour sections on the Item Info page via the provider API; client only) |
+| `world` | `dev.emi.remastered.world` | `World` | `emi_world` | yes (Biome and Structure categories: climate, tags, dimensions, mobs, ores, structures, spacing, chest loot links; has a server part, payload `emi_world:structures`) |
 
 ## Files of a module
 

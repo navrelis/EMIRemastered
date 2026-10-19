@@ -815,5 +815,7 @@
   "config.emi.modules.tools": "Tools (Tag Browser, Copy Recipe)",
   "config.emi.tooltip.modules.tools": "Tools for pack developers: a browser for all tags and a key that copies the hovered recipe as text or JSON.",
   "config.emi.modules.stats": "Stats",
-  "config.emi.tooltip.modules.stats": "Shows food, tool, weapon and armour stats: a Food category and details on the Item Info page."
+  "config.emi.tooltip.modules.stats": "Shows food, tool, weapon and armour stats: a Food category and details on the Item Info page.",
+  "config.emi.modules.world": "World (Biomes, Structures)",
+  "config.emi.tooltip.modules.world": "Shows a page for every biome and every structure: climate, dimensions, mobs, ores, structures and chest loot."
 }

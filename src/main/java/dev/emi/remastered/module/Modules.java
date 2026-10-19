@@ -16,6 +16,7 @@ import dev.emi.remastered.ores.OresModule;
 import dev.emi.remastered.professions.ProfessionsModule;
 import dev.emi.remastered.stats.StatsModule;
 import dev.emi.remastered.tools.ToolsModule;
+import dev.emi.remastered.world.WorldModule;
 
 /**
  * Registry of all EMI Remastered modules. The order here is the order of the module switches and module config
@@ -38,6 +39,7 @@ public final class Modules {
 	public static final MobsModule MOBS = register(new MobsModule());
 	public static final ToolsModule TOOLS = register(new ToolsModule());
 	public static final StatsModule STATS = register(new StatsModule());
+	public static final WorldModule WORLD = register(new WorldModule());
 
 	private Modules() {
 	}
