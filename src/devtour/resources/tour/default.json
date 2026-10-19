@@ -1,0 +1,37 @@
+{
+  "description": "Default EMI tour: main UI (sidebar, search, recipes, uses, fuel, config).",
+  "warmupTicks": 60,
+  "settleTicks": 10,
+  "stepTimeoutSeconds": 30,
+  "worldJoinTimeoutSeconds": 120,
+  "timeoutSeconds": 300,
+  "steps": [
+    { "type": "resize", "w": 1280, "h": 720 },
+    { "type": "set_gui_scale", "n": 2 },
+
+    { "type": "open_inventory" },
+    { "type": "screenshot", "name": "inventory" },
+
+    { "type": "emi_search", "text": "iron" },
+    { "type": "screenshot", "name": "search-iron" },
+    { "type": "emi_search", "text": "" },
+
+    { "type": "emi_recipes", "item": "minecraft:iron_pickaxe" },
+    { "type": "screenshot", "name": "recipes-iron-pickaxe" },
+
+    { "type": "emi_uses", "item": "minecraft:iron_ingot" },
+    { "type": "screenshot", "name": "uses-iron-ingot" },
+
+    { "type": "emi_recipes", "item": "minecraft:furnace" },
+    { "type": "screenshot", "name": "recipes-furnace" },
+
+    { "type": "emi_uses", "item": "minecraft:coal" },
+    { "type": "emi_category", "id": "emi:fuel" },
+    { "type": "screenshot", "name": "uses-coal-fuel" },
+
+    { "type": "open_emi_config" },
+    { "type": "screenshot", "name": "emi-config" },
+
+    { "type": "close_screen" }
+  ]
+}

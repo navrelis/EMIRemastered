@@ -56,6 +56,17 @@ repositories {
 	mavenCentral()
 }
 
+// ---------------------------------------------------------------------------
+// Dev tour source set (src/devtour): compiled against main + the full main classpath and run
+// ONLY by the clientTour run config. The release jar / sources jar only package sourceSets.main.
+// ---------------------------------------------------------------------------
+sourceSets {
+	devtour {
+		compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
+		runtimeClasspath += sourceSets.main.output + sourceSets.main.runtimeClasspath
+	}
+}
+
 loom {
 	accessWidenerPath = file("src/main/resources/emi.accesswidener")
 
@@ -66,6 +77,10 @@ loom {
 	mods {
 		emi {
 			sourceSet sourceSets.main
+		}
+		// dev-only screenshot tour (src/devtour); never part of the release jar
+		emi_devtour {
+			sourceSet sourceSets.devtour
 		}
 	}
 
@@ -83,6 +98,16 @@ loom {
 			name = "Minecraft Client (devworld)"
 			runDir "run"
 			programArgs "--quickPlaySingleplayer", "devworld"
+		}
+		// Dev-only screenshot tour: clientWorld + the emi_devtour mod (src/devtour) on the classpath.
+		// Run via `gradlew runClientTour [-Ptour=<name>]`, see docs/DEVTOUR.md.
+		clientTour {
+			client()
+			name = "Minecraft Client (screenshot tour)"
+			runDir "run"
+			source sourceSets.devtour
+			programArgs "--quickPlaySingleplayer", "devworld"
+			vmArg "-Demi.tour=${project.findProperty('tour') ?: 'default'}"
 		}
 	}
 }
@@ -132,6 +157,15 @@ processResources {
 	}
 }
 
+tasks.named("processDevtourResources") {
+	def modVersion = project.version.toString()
+	inputs.property "version", modVersion
+
+	filesMatching("fabric.mod.json") {
+		expand "version": modVersion
+	}
+}
+
 tasks.withType(JavaCompile).configureEach {
 	options.encoding = "UTF-8"
 	options.release = 21
@@ -145,6 +179,11 @@ java {
 
 test {
 	useJUnitPlatform()
+}
+
+// keep the dev tour compiling as part of `gradlew build` (it is not packaged)
+tasks.named("check") {
+	dependsOn "devtourClasses"
 }
 
 // ---------------------------------------------------------------------------
@@ -253,6 +292,6 @@ def prepareDevOptions = tasks.register("prepareDevOptions") {
 	}
 }
 
-tasks.matching { it.name == "runClientWorld" }.configureEach {
+tasks.matching { it.name == "runClientWorld" || it.name == "runClientTour" }.configureEach {
 	dependsOn prepareDevWorld, prepareDevOptions
 }
