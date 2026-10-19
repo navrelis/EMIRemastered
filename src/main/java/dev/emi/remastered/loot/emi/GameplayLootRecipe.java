@@ -75,6 +75,15 @@ public class GameplayLootRecipe implements EmiRecipe {
 
     }
 
+    /** Every pool the recipe shows, for the Item Info sections. */
+    public List<ClientBuiltPool> getPools() {
+        List<ClientBuiltPool> pools = new ArrayList<>();
+        for (WidgetRowBuilder builder : rowBuilderList) {
+            pools.addAll(builder.getPoolList());
+        }
+        return pools;
+    }
+
     @Override
     public EmiRecipeCategory getCategory() {
         return LootEmiRegistration.GAMEPLAY_CATEGORY;

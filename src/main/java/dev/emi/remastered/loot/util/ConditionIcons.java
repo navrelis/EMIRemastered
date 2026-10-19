@@ -1,5 +1,6 @@
 package dev.emi.remastered.loot.util;
 
+import dev.emi.emi.api.render.EmiRenderable;
 import dev.emi.remastered.loot.EMILoot;
 import dev.emi.remastered.loot.LootSettings;
 import net.minecraft.text.MutableText;
@@ -24,11 +25,15 @@ public final class ConditionIcons {
 	private ConditionIcons() {
 	}
 
+	/** The kind of the condition text if condition hints are switched on. */
 	@Nullable
 	public static ConditionKind kindOf(Text text) {
-		if (!LootSettings.conditionHints) {
-			return null;
-		}
+		return LootSettings.conditionHints ? classify(text) : null;
+	}
+
+	/** The kind of the condition text whatever the setting says. */
+	@Nullable
+	public static ConditionKind classify(Text text) {
 		String root = text.getContent() instanceof TranslatableTextContent content ? content.getKey() : null;
 		if (root == null) {
 			return null;
@@ -40,6 +45,12 @@ public final class ConditionIcons {
 
 	public static Identifier texture(ConditionKind kind) {
 		return Identifier.of(EMILoot.MOD_ID, "textures/gui/" + kind.texture() + ".png");
+	}
+
+	/** The icon as a 16x16 renderable (the 8x8 sprite drawn twice as large), for the Item Info screen. */
+	public static EmiRenderable renderable(ConditionKind kind) {
+		Identifier texture = texture(kind);
+		return (draw, x, y, delta) -> draw.drawTexture(texture, x, y, 16, 16, 0, 0, 8, 8, 8, 8);
 	}
 
 	public static MutableText hint(ConditionKind kind) {

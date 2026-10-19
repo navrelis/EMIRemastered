@@ -39,6 +39,11 @@ public enum ConditionKind {
 		return hintKey;
 	}
 
+	/** Lang key of the short name, for example Silk Touch. */
+	public String labelKey() {
+		return "emi_loot.kind." + name().toLowerCase(java.util.Locale.ROOT);
+	}
+
 	/**
 	 * @param rootKey the translation key of the outermost condition text, i.e. the {@code emi_loot.*} key of the condition
 	 * @param allKeys every translation key in the condition text, including the root and the nested arguments

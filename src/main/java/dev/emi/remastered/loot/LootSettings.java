@@ -126,6 +126,10 @@ public class LootSettings {
 	@ConfigValue("loot.lootr-note")
 	public static boolean lootrNote = true;
 
+	@Comment("Add the structures a chest is found in and the drop conditions (Looting, Fortune, Silk Touch, fire, player kill) to the Item Info screen.")
+	@ConfigValue("loot.item-info")
+	public static boolean itemInfo = true;
+
 	@ConfigGroupEnd
 	@Comment("Tighter rows for archaeology loot.")
 	@ConfigValue("loot.compact-archaeology")

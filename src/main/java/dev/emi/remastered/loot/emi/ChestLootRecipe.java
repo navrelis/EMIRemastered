@@ -12,6 +12,7 @@ import dev.emi.emi.api.widget.SlotWidget;
 import dev.emi.emi.api.widget.WidgetHolder;
 import dev.emi.remastered.loot.EMILoot;
 import dev.emi.remastered.loot.client.ClientChestLootTable;
+import dev.emi.remastered.loot.structure.StructureRef;
 import dev.emi.remastered.loot.util.StructureText;
 import dev.emi.remastered.loot.util.stack.ChestLootEmiStack;
 import dev.emi.remastered.loot.util.InteractableTextWidget;
@@ -73,6 +74,14 @@ public class ChestLootRecipe implements EmiRecipe {
     private final float columns = 8f;
 
 
+
+    public List<StructureRef> getStructures() {
+        return loot.structures;
+    }
+
+    public Text getTitle() {
+        return inputStack.getName();
+    }
 
     @Override
     public EmiRecipeCategory getCategory() {
