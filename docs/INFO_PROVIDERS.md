@@ -8,7 +8,7 @@ slot, or a slot in the Item Info screen itself) and press the "Open Item Info" k
   recipe screen on that tab), plus whatever providers add (loot, world generation, trades...). If nothing counts as a
   source, the page shows **No Known Source** (setting `info.show-no-source`).
 - **Used For**: recipes using the stack, grouped the same way, and the categories it is a workstation for.
-- **Details**: fuel burn time, composting chance, EMI info pages, item tags, and whatever providers add.
+- **Details**: fuel burn time, composting chance, advancements with the item as icon, EMI info pages, item tags, and whatever providers add.
 
 Everything on the page comes from **providers**. The built-in ones read EMI's recipe index; other modules (loot, ores,
 effects, enchanting, stats, ...) and EMI plugins of other mods add their own sections through the API in
@@ -115,6 +115,7 @@ public void register(EmiRegistry registry) {
 | `emi_info:recipes` | 0 | `emi_info:produced_by` (OBTAIN), `emi_info:used_in`, `emi_info:workstation` (USE), `emi_info:information`, `emi_info:tags` (DETAILS) |
 | `emi_info:fuel` | 990 | `emi_info:fuel` (DETAILS): burn time from Fabric's `FuelRegistry` |
 | `emi_info:composting` | 1000 | `emi_info:composting` (DETAILS): `ComposterBlock.ITEM_TO_LEVEL_INCREASE_CHANCE` |
+| `emi_info:advancements` | 1500 | `emi_info:advancements` (DETAILS): advancements the client knows whose display icon is the item (components ignored; criteria are not synced), with done/open marker, frame and description; hidden ones only once done; a click opens the advancement screen on their tab. Setting `info.show-advancements` |
 | `emi_info:no_source` | last | `emi_info:no_source` (OBTAIN, not a source) when `hasSource()` is false |
 
 "Produced by" skips EMI's tag, ingredient, resolution and fuel pseudo categories; recipes that need the stack itself as
