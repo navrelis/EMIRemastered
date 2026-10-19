@@ -1,6 +1,6 @@
 # Plan
 
-Usage tally (work units: short = 1, long = 2): Opus 6 (F1, F2, Q3) / Sonnet 16 (research x3, Y0, Q1, P7, P4, P3, P5) -> Opus 27 %
+Usage tally (work units: short = 1, long = 2): Opus 8 (F1, F2, Q3, A1) / Sonnet 21 -> Opus 28 %
 
 Status: open / in progress / in review / done. `||` = can run in parallel.
 
@@ -14,9 +14,9 @@ Status: open / in progress / in review / done. `||` = can run in parallel.
 ## Phase 1 Ports (parallel, worktrees) — each: module under `dev.emi.remastered.<m>`, Yarn, own config group, no dependency on the old mod
 | ID | Task | Model | Status |
 |---|---|---|---|
-| P1 | Distraction Free Recipes into EMI core | Sonnet short | open |
-| P2 | EMIffect -> `effects` | Sonnet short | open |
-| P3 | EMI Professions -> `professions` | Sonnet short | in progress (wip/p3-professions) |
+| P1 | Distraction Free Recipes into EMI core | Sonnet short | in progress (wip/p1-distraction-free, + A10) |
+| P2 | EMIffect -> `effects` | Sonnet short | in progress (wip/p2-effects, + A3) |
+| P3 | EMI Professions -> `professions` | Sonnet short | done |
 | P4 | EMI Enchanting -> `enchanting` | Sonnet short | in progress (wip/p4-enchanting) |
 | P5 | EMI Ores -> `ores` (LGPL headers kept) | Sonnet long | in progress (wip/p5-ores) |
 | P6 | Let's Do compat -> `letsdo` (Vinery/Meadow fixes, no Architectury, dedupe native) | Sonnet long | open |
@@ -29,8 +29,26 @@ Status: open / in progress / in review / done. `||` = can run in parallel.
 | Q2 | Known bugs (EMI repair AIOOBE, upstream issues of each module) | Sonnet | open |
 | Q3 | A12 reload performance, before/after numbers | Opus long | in progress (wip/q3-perf) |
 
-## Phase 3 Features (after ports) — details written when phase starts
-A1 source index core (Opus) + page (Sonnet); A2-A11, tier B, extras (Sonnet unless noted).
+## Phase 3 Features (after the module each builds on is merged)
+| ID | Task | Builds on | Model | Status |
+|---|---|---|---|---|
+| A1 | Item Info screen + provider API ("How to get": recipes by output grouped, loot, mob drops, ores, trades, brewing; "no known source" marker); key bind on hovered stack | F2 | Opus long | in progress (wip/a1-info) |
+| A2 | Enchanting: real max level (cap mods), incompatibilities via canBeCombined, sources (table/loot/librarian), info provider | P4, A1 | Sonnet | open |
+| A3 | Effects sources (in P2) | P2 | Sonnet | in P2 |
+| A4 | Villager trades per profession/level (client dummy villager, wandering trader, Fabric TradeOfferHelper trades; Villager-API plans if reachable) | P3 | Sonnet long | open |
+| A5+B1 | `stats` module: food page, tool/weapon/armour stats pages, fuel/compost in info screen (A6) | F2, A1 | Sonnet long | open |
+| A7 | `mobs` module: mob pages (health, armour, attack, speed, spawn biomes via server sync, drops link) | P7 | Sonnet long | open |
+| A8 | Loot: structure/dimension filters, condition icons, Lootr per-player note | P7 | Sonnet | open |
+| A9 | Ores: modded dimensions, compact biome list, Y-range highlight | P5 | Sonnet | open |
+| A10 | Distraction-free extras (in P1) | P1 | Sonnet | in P1 |
+| A11 | Unified config + plugin manager (in F2) | F2 | Opus | done |
+| A12 | Reload performance (Q3) | - | Opus | in progress |
+| B2 | `world` module: biome pages (climate, tags, spawns, ores) + structure pages (server sync) | P5, A7 | Sonnet long | open |
+| B3 | Tag browser screen (all tags, search, members) | F2 | Sonnet | open |
+| B4 | Copy recipe as text/JSON bind | F2 | Sonnet short | open |
+| B5 | Advancement links in item info (icon/display) | A1 | Sonnet short | open |
+| X1 | Pack-dev export command `/emi export` (recipes, loot, sources to JSON/CSV) | A1 | Sonnet | open |
+| X2 | Let's Do port fixes + dedupe (P6) | Y0 | Sonnet long | open |
 
 ## Phase 4 Acceptance
 Pack install under game lock, end-to-end check, report, push.

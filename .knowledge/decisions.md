@@ -10,3 +10,4 @@
 - D9 Tests: JUnit 5 (test scope only) for pure logic; dev-client screenshot tour; final pack run under the game lock.
 - D10 Translations: en_us + de_de for all new strings.
 - D11 Parallel code agents get a worktree the lead creates from `remastered` (Agent isolation worktrees start from `main`).
+- D12 Game sound always off: every client launch with `soundCategory_master:0.0` (owner request); prepareDevOptions enforces it (Q1b).

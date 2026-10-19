@@ -17,3 +17,8 @@
 2026-10-19 | P3 EMI Professions port (Sonnet, short) | delegated, worktree wip/p3-professions
 2026-10-19 | P5 EMI Ores port (Sonnet, long) | delegated, worktree wip/p5-ores
 2026-10-19 | F2 review (lead) | accepted: EMI diffs small + marked, build ok, 26 tests green; committed 13f59cf; Q1 merged 7c49e57; tour 19/19 ok, config screen shows Plugins button + module jumps, 0 EMI warnings
+2026-10-19 | P1 DFR into core + A10 (Sonnet, long) | delegated, wip/p1-distraction-free (from F2)
+2026-10-19 | P2 EMIffect port + perf + A3 sources (Sonnet, long) | delegated, wip/p2-effects (from F2)
+2026-10-19 | Q1b tour steps click/scroll/config jump/plugin manager + config visual review (Sonnet, short) | delegated, wip/q1b-tour-steps
+2026-10-19 | A1 Item Info screen + provider API (Opus, long) | delegated, wip/a1-info
+2026-10-19 | P3 review (lead) | accepted: 6 classes, no mixins, server-safe; merged (add/add on stubs -> porter versions), build+tests green
