@@ -1,0 +1,50 @@
+{
+  "description": "Distraction-free mode: hidden index, search shows it, pin, recipe screen keeps sidebars.",
+  "warmupTicks": 60,
+  "settleTicks": 10,
+  "stepTimeoutSeconds": 30,
+  "worldJoinTimeoutSeconds": 120,
+  "timeoutSeconds": 300,
+  "steps": [
+    { "type": "resize", "w": 1280, "h": 720 },
+    { "type": "set_gui_scale", "n": 2 },
+
+    { "type": "note", "text": "1) inventory: index hidden, hint and show button visible" },
+    { "type": "open_inventory" },
+    { "type": "wait", "ticks": 20 },
+    { "type": "call", "class": "dev.emi.remastered.distractionfree.DistractionFree", "method": "status" },
+    { "type": "screenshot", "name": "inventory-hidden" },
+
+    { "type": "note", "text": "2) typing a search shows the index" },
+    { "type": "emi_search", "text": "iron" },
+    { "type": "wait", "ticks": 20 },
+    { "type": "screenshot", "name": "search-visible" },
+
+    { "type": "note", "text": "3) clearing the search hides it again" },
+    { "type": "emi_search", "text": "" },
+    { "type": "wait", "ticks": 20 },
+    { "type": "screenshot", "name": "search-cleared-hidden" },
+
+    { "type": "note", "text": "4) pin: the pin bind has no default key, so the tour calls the same toggle the bind and the buttons use" },
+    { "type": "call", "class": "dev.emi.remastered.distractionfree.DistractionFree", "method": "togglePinned" },
+    { "type": "wait", "ticks": 20 },
+    { "type": "screenshot", "name": "pinned" },
+
+    { "type": "note", "text": "5) recipe screen keeps its sidebars" },
+    { "type": "emi_recipes", "item": "minecraft:iron_pickaxe" },
+    { "type": "wait", "ticks": 10 },
+    { "type": "screenshot", "name": "recipe-screen-pinned" },
+
+    { "type": "call", "class": "dev.emi.remastered.distractionfree.DistractionFree", "method": "togglePinned" },
+    { "type": "wait", "ticks": 10 },
+    { "type": "call", "class": "dev.emi.remastered.distractionfree.DistractionFree", "method": "status" },
+    { "type": "screenshot", "name": "recipe-screen-unpinned" },
+
+    { "type": "close_screen" },
+    { "type": "open_inventory" },
+    { "type": "wait", "ticks": 20 },
+    { "type": "call", "class": "dev.emi.remastered.distractionfree.DistractionFree", "method": "status" },
+    { "type": "screenshot", "name": "inventory-unpinned-hidden" },
+    { "type": "close_screen" }
+  ]
+}
