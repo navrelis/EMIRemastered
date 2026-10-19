@@ -1,6 +1,6 @@
 # Plan
 
-Usage tally (work units: short = 1, long = 2): Opus 12 (F1, F2, Q3 x2, A1 x2) / Sonnet 40 -> Opus 23 %
+Usage tally (work units: short = 1, long = 2): Opus 12 (F1, F2, Q3 x2, A1 x2) / Sonnet 45 -> Opus 21 %
 
 Status: open / in progress / in review / done. `||` = can run in parallel.
 
@@ -14,7 +14,7 @@ Status: open / in progress / in review / done. `||` = can run in parallel.
 ## Phase 1 Ports (parallel, worktrees) — each: module under `dev.emi.remastered.<m>`, Yarn, own config group, no dependency on the old mod
 | ID | Task | Model | Status |
 |---|---|---|---|
-| P1 | Distraction Free Recipes into EMI core | Sonnet short | in progress (wave 1, continued in its worktree) |
+| P1 | Distraction Free Recipes into EMI core | Sonnet short | done (incl. A10) |
 | P2 | EMIffect -> `effects` | Sonnet short | in progress (wave 1, continued in its worktree) |
 | P3 | EMI Professions -> `professions` | Sonnet short | done |
 | P4 | EMI Enchanting -> `enchanting` | Sonnet short | in progress (wave 1, continued in its worktree) |
@@ -37,10 +37,10 @@ Status: open / in progress / in review / done. `||` = can run in parallel.
 | A3 | Effects sources (in P2) | P2 | Sonnet | in P2 |
 | A4 | Villager trades per profession/level (client dummy villager, wandering trader, Fabric TradeOfferHelper trades; Villager-API plans if reachable) | P3 | Sonnet long | in progress (wave 1, continued in its worktree) |
 | A5+B1 | `stats` module: food page, tool/weapon/armour stats pages, fuel/compost in info screen (A6) | F2, A1 | Sonnet long | open |
-| A7 | `mobs` module: mob pages (health, armour, attack, speed, spawn biomes via server sync, drops link) | P7 | Sonnet long | open |
-| A8 | Loot: structure/dimension filters, condition icons, Lootr per-player note | P7 | Sonnet | open |
-| A9 | Ores: modded dimensions, compact biome list, Y-range highlight | P5 | Sonnet | open |
-| A10 | Distraction-free extras (in P1) | P1 | Sonnet | in P1 |
+| A7 | `mobs` module: mob pages (health, armour, attack, speed, spawn biomes via server sync, drops link) | P7 | Sonnet long | in progress (wip/a7-mobs) |
+| A8 | Loot: structure/dimension filters, condition icons, Lootr per-player note | P7 | Sonnet | in progress (wip/a8-loot-extras) |
+| A9 | Ores: modded dimensions, compact biome list, Y-range highlight | P5 | Sonnet | in progress (wip/a9-ores-extras) |
+| A10 | Distraction-free extras (in P1) | P1 | Sonnet | done (P1) |
 | A11 | Unified config + plugin manager (in F2) | F2 | Opus | done |
 | A12 | Reload performance (Q3) | - | Opus | in progress (Q3) |
 | B2 | `world` module: biome pages (climate, tags, spawns, ores) + structure pages (server sync) | P5, A7 | Sonnet long | open |

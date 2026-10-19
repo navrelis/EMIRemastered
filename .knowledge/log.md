@@ -29,3 +29,5 @@
 2026-10-19 | B3+B4 new module tools (Sonnet, long) | delegated, wip/b-tools (no jump icon: lead adds later)
 2026-10-19 | P5 review (lead) | accepted: faithful port, LGPL headers, OresEmiPlugin initialize forwarding (needed for biome serializer), canSend guard; merged a123b92, build+tests green. Follow-up for A9: batch-complete marker so a reload mid-sync can't see partial features
 2026-10-19 | P7 review (lead) | accepted: faithful port, 11 AW class lines (no EMI lines removed), 6 S2C payloads canSend-guarded, settings restored to upstream set; merged 5e68fda, build+tests green. Note: lootify condition/function types registered like upstream
+2026-10-19 | A8 loot extras (Sonnet), A9 ores extras + sync marker (Sonnet), A7 mobs module (Sonnet, long) | delegated, own worktrees from c7cf633
+2026-10-19 | P1+A10 review (lead) | accepted: upstream behaviour, no mixins, marked edits in EmiScreenManager (isVisible delegates to new isBaseVisible + DF hiding, same as upstream mixin; no signature changes) and EmiSearchWidget; module off = stock; merged, build+tests green. Manual: real clicks on Show/Hide buttons, crafting-table scope
