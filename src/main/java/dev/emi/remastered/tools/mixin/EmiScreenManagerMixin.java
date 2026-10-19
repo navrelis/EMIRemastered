@@ -5,12 +5,15 @@ import java.util.function.Function;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.stack.EmiStackInteraction;
 import dev.emi.emi.input.EmiBind;
+import dev.emi.emi.runtime.EmiDrawContext;
 import dev.emi.emi.screen.EmiScreenManager;
+import dev.emi.remastered.tools.client.CopyNotice;
 import dev.emi.remastered.tools.client.ToolsClient;
 
 /**
@@ -42,5 +45,11 @@ public abstract class EmiScreenManagerMixin {
 		if (ToolsClient.onGenericInteraction(function)) {
 			cir.setReturnValue(true);
 		}
+	}
+
+	/** Draws the "recipe copied" notice, which replaces the toast EMI hides on its screens (see CopyNotice). */
+	@Inject(method = "render(Ldev/emi/emi/runtime/EmiDrawContext;IIF)V", at = @At("RETURN"), remap = false)
+	private static void emiRemastered$toolsNotice(EmiDrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+		CopyNotice.render(context);
 	}
 }
