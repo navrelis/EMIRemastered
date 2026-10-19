@@ -109,3 +109,4 @@
 2026-10-19 | LOGO correction (lead) | owner: gem not centred -> gem centred in inner area (margins 1/1, 2/2 on 32 grid), lead viewed render; merged, build green
 2026-10-19 | owner: 'no you do all' -> PACK-REAL delegated (Opus long, precision: owner's real instance); newest jar installed in pack first
 2026-10-19 | PACK-REAL review (lead) | accepted: real pack ok (see plan); instance traces of the test identity restored by lead via instance git (last_world.fmdata, usercache.json, jade usernamecache, crash_assistant username.info, fabricDefaultResourcePacks.dat); F1/F2 -> LOOT-ASYNC (Opus long, concurrency)
+2026-10-19 | LOOT-ASYNC review (lead) | accepted: Build/whenReady with generation + stopped-server guard, LateDelivery per generation, ChestStructuresPayload + StructureLootPayload canSend-guarded, client in-place update (volatile structures, Info rebuilt by source identity, provider re-register by id), fingerprint ignores loot tables; merged, build green

@@ -77,7 +77,7 @@ Status: open / in progress / in review / done. `||` = can run in parallel.
 | BRAND | docs/DESCRIPTION.md (summary EN/DE, tagline, CurseForge/Modrinth description), fabric.mod.json description | Sonnet short | done (merged; summary 187 chars, DE 181, tagline 55; one correction: product names untranslated, 'author') |
 | LOGO | Pixel-art logo, banner, mod icon from a deterministic Pillow generator | Opus long | done (merged; slot + gem + magnifier + sparkle, 32 px grid x16, banner 192x48 x8, byte-identical regeneration; lead viewed icon dark/light + banner) |
 | PACK-REAL | Owner-authorised launch of the real pack (copied world, offline, muted, options/emi.json backed up and restored), log check | Opus long | done (640 mods, world reached, clean exit; 5 third-party EMI mixins applied; 38 plugins, 0 errors, Let's Do + repair fixed; join reload 30.0 s cold (emi 3441 ms, emiffect 133 vs 1077 ms); emi.json byte-identical; F1 join blocked ~24 s by chest structure wait, F2 world loot links lost after 25 s -> LOOT-ASYNC) |
-| LOOT-ASYNC | Structure lookup never blocks the server thread; late results pushed to players; no 25 s cut of world loot links; honest log lines | Opus long | in progress (worktree loot-async, port 25674) |
+| LOOT-ASYNC | Structure lookup never blocks the server thread; late results pushed to players; no 25 s cut of world loot links; honest log lines | Opus long | done (merged; join and lookup decoupled (login->joined same second with 20 s delay), late payloads update chest pages, Item Info and structure pages without EMI reload, 9 new tests; needs re-check in real pack) |
 | -- | Later: KB13 (Sodium vertex path, needs pack measurement), T1-29 core string | - | open |
 
 ## Phase 4 Acceptance
