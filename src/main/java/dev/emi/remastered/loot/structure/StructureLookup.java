@@ -57,10 +57,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 /**
- * Finds the structures a chest loot table is found in. Only data is used: for every jigsaw structure the structure
- * templates reachable from its start pool are read, and their chests, vaults and other containers say which loot
- * tables they use. Structures that are generated in code (their loot tables are not part of any data file) cannot be
- * resolved and simply show no structure for their tables.
+ * Finds the structures a chest loot table is found in. For every jigsaw structure the structure templates reachable
+ * from its start pool are read, and their chests, vaults and other containers say which loot tables they use. Chests
+ * that vanilla places in code (desert pyramid, stronghold, nether fortress, ...) come from a built-in list by structure
+ * type ({@link CodePlacedLoot}), so every structure of such a type gets them. Structures of mods with their own
+ * structure type that place their chests in code remain unknown and show no structure for their tables.
  * The result per structure also lists the dimensions whose biome source can produce the structure's biomes.
  * <p>
  * Reading every template of every structure can take seconds in a large pack, so the lookup is built on a daemon
@@ -224,6 +225,11 @@ public final class StructureLookup {
 			Identifier id = entry.getKey().getValue();
 			Structure structure = entry.getValue();
 			structureDimensions.put(id, dimensionsOf(structure, context.biomes()));
+			for (RegistryKey<LootTable> table : CodePlacedLoot.forType(structure.getType())) {
+				if (context.chestTables().contains(table.getValue())) {
+					structuresByTable.computeIfAbsent(table.getValue(), t -> new LinkedHashSet<>()).add(id);
+				}
+			}
 			if (structure instanceof JigsawStructure jigsaw) {
 				try {
 					for (Identifier table : lootTablesOf(jigsaw, context.pools(), context.resources(), templates)) {

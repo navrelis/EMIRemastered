@@ -1,0 +1,32 @@
+{
+  "description": "Chests placed in code (desert pyramid, nether fortress, ...) show their structure: 'Found in' on the chest loot page and 'Chests in Structures' in Item Info.",
+  "warmupTicks": 60,
+  "settleTicks": 20,
+  "steps": [
+    { "type": "resize", "w": 1280, "h": 720 },
+    { "type": "set_gui_scale", "n": 2 },
+    { "type": "open_inventory" },
+
+    { "type": "note", "text": "Desert pyramid chest (placed in code): dune armor trim template is only in this chest" },
+    { "type": "emi_recipes", "item": "minecraft:dune_armor_trim_smithing_template" },
+    { "type": "emi_category", "id": "emi_loot:chest_loot" },
+    { "type": "screenshot", "name": "dune-template-chest-structures" },
+    { "type": "close_screen" },
+
+    { "type": "note", "text": "Nether fortress chest: nether wart" },
+    { "type": "emi_recipes", "item": "minecraft:nether_wart" },
+    { "type": "emi_category", "id": "emi_loot:chest_loot" },
+    { "type": "screenshot", "name": "nether-wart-chest-structures" },
+    { "type": "close_screen" },
+
+    { "type": "note", "text": "Item Info: 'Chests in Structures'" },
+    { "type": "open_inventory" },
+    { "type": "emi_stack_key", "item": "minecraft:nether_wart", "key": "I" },
+    { "type": "screenshot", "name": "nether-wart-item-info" },
+    { "type": "close_screen" },
+    { "type": "open_inventory" },
+    { "type": "emi_stack_key", "item": "minecraft:dune_armor_trim_smithing_template", "key": "I" },
+    { "type": "screenshot", "name": "dune-template-item-info" },
+    { "type": "close_screen" }
+  ]
+}
