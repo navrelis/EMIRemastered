@@ -55,9 +55,9 @@ Status: open / in progress / in review / done. `||` = can run in parallel.
 | ID | Task | Model | Status |
 |---|---|---|---|
 | T1 | Batched client tours of all merged features + jump icons mobs/stats -> docs/TOUR_REPORT.md | Sonnet long | in progress (session 4) |
-| FX1 | KB1, KB3, KB14, KB15, KB38: reload lifecycle (world gone, disconnect, daemon threads), keep unparsable emi.json entries, debounced hide save | Opus long | in progress (session 4) |
+| FX1 | KB1, KB3, KB14, KB15, KB38: reload lifecycle (world gone, disconnect, daemon threads), keep unparsable emi.json entries, debounced hide save | Opus long | in review (correction: gate interrupt to WAITING/TIMED_WAITING, verify stop flush) |
 | FX2 | KB5, KB6, KB8, KB9, KB10, KB11 + hasFocusedTextField (EMI core, small) | Sonnet long | done (merged 714005d; manual: regex tag search #/pickax/ showed empty in tour, I with anvil field focused) |
-| FX3 | KB17, KB18, KB22, KB23, KB28, KB29 (loot, ores, enchanting) | Sonnet | in progress (session 4) |
+| FX3 | KB17, KB18, KB22, KB23, KB28, KB29 (loot, ores, enchanting) | Sonnet | done (merged; limits: R/U on books only up to listed level (max+5, <=10), Grinding tab before Enchantments on U) |
 | P8 | Info providers: villager trades (professions), effects | Sonnet long | in progress (session 4) |
 | KBdoc | Update docs/KNOWN_BUGS.md rows from FX1-FX3/Q3 reports (agents do not edit it, avoids conflicts) | Sonnet short | open (after FX1-FX3, Q3) |
 | -- | Later: KB7, KB13; world icon slot 12; README/CREDITS | - | open |
