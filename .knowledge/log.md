@@ -73,3 +73,12 @@
 2026-10-19 | DOC2 delegated (Sonnet short): README, CREDITS, CHANGELOG, licences in jar
 2026-10-19 | DOC1 review (lead) | accepted: 30 rows fixed, KB43-45 added; merged
 2026-10-19 | DOC2 review (lead) | accepted: README, CREDITS from upstream metadata, CHANGELOG 2.0.0, jar root licences; merged, build green, jar checked
+2026-10-19 | T1 review (lead) | accepted: icons 9/11, 17 tours ok, TOUR_REPORT 29 findings (T1-2 tainted already fixed by FX2/KB11); merged, build green
+2026-10-19 | wave 6 delegated: FOCUS1 (Opus long, owner focus rule), FX-STATS, FX-TOOLS, FX-WD (Sonnet long), CFG1 (Sonnet short); ports 25650-25654
+2026-10-19 | auto-handoff: wave 6 agents stopped before writing anything; see F:\Coding\EMI_Remastered\handoff-2026-10-19-35c58cff.md
+2026-10-19 | session 5: handoff matches repo (remastered=origin=66aa62d9, wave 6 worktrees clean); status board committed; agent rules copied + client launch gate (no client until FOCUS1 merged)
+2026-10-19 | wave 6 re-delegated: FOCUS1 (Opus long), FX-STATS, FX-TOOLS, FX-WD (Sonnet long), CFG1 (Sonnet short); ports 25660-25664
+2026-10-19 | CFG1 code review (lead) | accepted pending client check: JumpFit (partial module jumps, Modules last), globe icon slot 12 (0 px diff outside), tag names translated/readable + #id tooltip, one 'Show all N tags' link
+2026-10-19 | FX-STATS code review (lead) | accepted pending client check: modifiers via ItemStack#applyAttributeModifiers (armour defaults), game-language locale numbers (+6 tests), honey use time/bottle, wider food page, weapon rule (no Weapon on pickaxe/shovel/hoe, no Tool on mace), friendly tag names
+2026-10-19 | FX-TOOLS code review (lead) | accepted pending client check: shaped/shapeless data-pack JSON rebuilt (pure CraftingRecipeJson + tests, tag reconstruction heuristic), CopyNotice where EMI hides toasts, locale numbers, selection reset, RowLayout, friendly tag/biome names; KB44 not reproducible from code (tour logs counts)
+2026-10-19 | FOCUS1 review (lead) | accepted: GLFW_VISIBLE false + no monitor at create + re-hide tick, window_info asserts, foreground-check.ps1 (read-only user32); 3 runs foreground never the game; merged, build green, jar 0 devtour. Client gate lifted
