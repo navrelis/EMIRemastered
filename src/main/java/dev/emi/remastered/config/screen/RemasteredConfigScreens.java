@@ -131,7 +131,7 @@ public final class RemasteredConfigScreens {
 
 	/**
 	 * Shortens the module jumps to what fits next to EMI's own {@code emiJumps} entries within {@code space} pixels:
-	 * the first module groups in registry order, followed by {@code modules} as the last entry when not all fit.
+	 * {@code modules} stays first (as when everything fits), followed by the first module groups in registry order.
 	 */
 	static void trimJumpTargets(List<String> jumps, int emiJumps, int space) {
 		int keep = JumpFit.fittingModuleJumps(space, emiJumps, jumps.size(), JumpFit.ICON_SIZE);
@@ -142,8 +142,8 @@ public final class RemasteredConfigScreens {
 		while (jumps.size() > Math.max(0, keep - 1)) {
 			jumps.remove(jumps.size() - 1);
 		}
-		if (modules || keep > 0) {
-			jumps.add(ModuleConfigs.MODULES_GROUP);
+		if (modules) {
+			jumps.add(0, ModuleConfigs.MODULES_GROUP);
 		}
 	}
 

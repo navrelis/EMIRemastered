@@ -10,7 +10,7 @@
     { "type": "screenshot", "name": "config-top" },
     { "type": "screen_info" },
 
-    { "type": "note", "text": "1280x720 scale 2: only some module jumps fit, 'Modules' is the last jump button" },
+    { "type": "note", "text": "1280x720 scale 2: only some module jumps fit, 'Modules' stays the first of the module jump buttons, followed by the first module groups" },
     { "type": "screenshot", "name": "scale-2-720p-partial-jumps" },
     { "type": "click", "text": "Modules" },
     { "type": "screenshot", "name": "scale-2-720p-partial-jumps-modules-click" },
@@ -119,10 +119,12 @@
     { "type": "open_inventory" },
     { "type": "emi_stack_key", "item": "minecraft:diamond_sword", "key": "I" },
     { "type": "screenshot", "name": "sword-info-top" },
-    { "type": "screen_scroll", "amount": -10 },
+    { "type": "screen_scroll", "amount": -100 },
+    { "type": "screen_scroll", "amount": 18 },
     { "type": "screenshot", "name": "sword-info-tags-collapsed" },
-    { "type": "screen_info" },
-    { "type": "click", "text": "Show all", "optional": true },
+    { "type": "hover", "x": 190, "y": 166 },
+    { "type": "screenshot", "name": "sword-info-tags-tooltip" },
+    { "type": "click", "x": 190, "y": 250, "optional": true },
     { "type": "screenshot", "name": "sword-info-tags-show-all" },
     { "type": "close_screen" }
   ]
