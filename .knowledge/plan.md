@@ -59,7 +59,7 @@ Status: open / in progress / in review / done. `||` = can run in parallel.
 | FX2 | KB5, KB6, KB8, KB9, KB10, KB11 + hasFocusedTextField (EMI core, small) | Sonnet long | done (merged 714005d; manual: regex tag search #/pickax/ showed empty in tour, I with anvil field focused) |
 | FX3 | KB17, KB18, KB22, KB23, KB28, KB29 (loot, ores, enchanting) | Sonnet | done (merged; limits: R/U on books only up to listed level (max+5, <=10), Grinding tab before Enchantments on U) |
 | P8 | Info providers: villager trades (professions), effects | Sonnet long | done (merged; coveredCategories(stack) API; item-info toggle not client-checked) |
-| DOC1 | KNOWN_BUGS.md rows from FX1-FX3/Q3 + DEVTOUR.md tour list (world, fx2, fx3, p8, WorldTour) | Sonnet short | in progress |
+| DOC1 | KNOWN_BUGS.md rows from FX1-FX3/Q3 + DEVTOUR.md tour list (world, fx2, fx3, p8, WorldTour) | Sonnet short | done (open: KB7, KB13, KB28 partly, KB43, KB44) |
 | ICON12 | world jump icon slot 12 (after T1) | Sonnet short | open |
 | DOC2 | README, CREDITS.md (authors, refs, licences), CHANGELOG 2.0.0, licence files in jar | Sonnet short | in progress |
 | -- | Later: KB7, KB13 | - | open |

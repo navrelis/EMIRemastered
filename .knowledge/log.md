@@ -71,3 +71,4 @@
 2026-10-19 | Q3 merged (lead) | EmiTagKey conflict resolved by agent (concurrent cache + listVersion, no recursive computeIfAbsent); repair check after FX2: 0 remainder errors; merged, build green (301 tests)
 2026-10-19 | DOC1 delegated (Sonnet short): KNOWN_BUGS rows + DEVTOUR tour list
 2026-10-19 | DOC2 delegated (Sonnet short): README, CREDITS, CHANGELOG, licences in jar
+2026-10-19 | DOC1 review (lead) | accepted: 30 rows fixed, KB43-45 added; merged
