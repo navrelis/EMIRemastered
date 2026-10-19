@@ -154,7 +154,7 @@
     { "type": "wait", "ticks": 4 },
     { "type": "key", "key": "I" },
     { "type": "wait", "ticks": 4 },
-    { "type": "click", "x": 300, "y": 308 },
+    { "type": "click", "x": 300, "y": 288 },
     { "type": "wait", "ticks": 5 },
     { "type": "screenshot", "name": "click-potion-effect-row-opens-effect" },
     { "type": "close_screen" }
