@@ -22,3 +22,5 @@
 2026-10-19 | Q1b tour steps click/scroll/config jump/plugin manager + config visual review (Sonnet, short) | delegated, wip/q1b-tour-steps
 2026-10-19 | A1 Item Info screen + provider API (Opus, long) | delegated, wip/a1-info
 2026-10-19 | P3 review (lead) | accepted: 6 classes, no mixins, server-safe; merged (add/add on stubs -> porter versions), build+tests green
+2026-10-19 | A4 villager trades in professions module (Sonnet, long) | delegated, wip/a4-trades
+2026-10-19 | auto-handoff: all agents stopped, partial work uncommitted in worktrees; see F:\Coding\EMI_Remastered\handoff-2026-10-19-5f3846e1.md

@@ -1,6 +1,6 @@
 # Plan
 
-Usage tally (work units: short = 1, long = 2): Opus 8 (F1, F2, Q3, A1) / Sonnet 21 -> Opus 28 %
+Usage tally (work units: short = 1, long = 2): Opus 8 (F1, F2, Q3, A1) / Sonnet 23 -> Opus 26 %
 
 Status: open / in progress / in review / done. `||` = can run in parallel.
 
@@ -14,28 +14,28 @@ Status: open / in progress / in review / done. `||` = can run in parallel.
 ## Phase 1 Ports (parallel, worktrees) — each: module under `dev.emi.remastered.<m>`, Yarn, own config group, no dependency on the old mod
 | ID | Task | Model | Status |
 |---|---|---|---|
-| P1 | Distraction Free Recipes into EMI core | Sonnet short | in progress (wip/p1-distraction-free, + A10) |
-| P2 | EMIffect -> `effects` | Sonnet short | in progress (wip/p2-effects, + A3) |
+| P1 | Distraction Free Recipes into EMI core | Sonnet short | open (interrupted, partial work in worktree wip/*, see handoff) |
+| P2 | EMIffect -> `effects` | Sonnet short | open (interrupted, partial work in worktree wip/*, see handoff) |
 | P3 | EMI Professions -> `professions` | Sonnet short | done |
-| P4 | EMI Enchanting -> `enchanting` | Sonnet short | in progress (wip/p4-enchanting) |
-| P5 | EMI Ores -> `ores` (LGPL headers kept) | Sonnet long | in progress (wip/p5-ores) |
+| P4 | EMI Enchanting -> `enchanting` | Sonnet short | open (interrupted, partial work in worktree wip/*, see handoff) |
+| P5 | EMI Ores -> `ores` (LGPL headers kept) | Sonnet long | open (interrupted, partial work in worktree wip/*, see handoff) |
 | P6 | Let's Do compat -> `letsdo` (Vinery/Meadow fixes, no Architectury, dedupe native) | Sonnet long | open |
-| P7 | EMI Loot -> `loot` (fzzy_config -> EMI config, Fabric networking, AW merge) | Sonnet long | in progress (wip/p7-loot) |
+| P7 | EMI Loot -> `loot` (fzzy_config -> EMI config, Fabric networking, AW merge) | Sonnet long | open (interrupted, partial work in worktree wip/*, see handoff) |
 
 ## Phase 2 Quality
 | ID | Task | Model | Status |
 |---|---|---|---|
 | Q1 | Dev-client screenshot tour + log check harness | Sonnet long | done |
 | Q2 | Known bugs (EMI repair AIOOBE, upstream issues of each module) | Sonnet | open |
-| Q3 | A12 reload performance, before/after numbers | Opus long | in progress (wip/q3-perf) |
+| Q3 | A12 reload performance, before/after numbers | Opus long | open (interrupted, partial work in worktree wip/*, see handoff) |
 
 ## Phase 3 Features (after the module each builds on is merged)
 | ID | Task | Builds on | Model | Status |
 |---|---|---|---|---|
-| A1 | Item Info screen + provider API ("How to get": recipes by output grouped, loot, mob drops, ores, trades, brewing; "no known source" marker); key bind on hovered stack | F2 | Opus long | in progress (wip/a1-info) |
+| A1 | Item Info screen + provider API ("How to get": recipes by output grouped, loot, mob drops, ores, trades, brewing; "no known source" marker); key bind on hovered stack | F2 | Opus long | open (interrupted, partial work in worktree wip/*, see handoff) |
 | A2 | Enchanting: real max level (cap mods), incompatibilities via canBeCombined, sources (table/loot/librarian), info provider | P4, A1 | Sonnet | open |
 | A3 | Effects sources (in P2) | P2 | Sonnet | in P2 |
-| A4 | Villager trades per profession/level (client dummy villager, wandering trader, Fabric TradeOfferHelper trades; Villager-API plans if reachable) | P3 | Sonnet long | open |
+| A4 | Villager trades per profession/level (client dummy villager, wandering trader, Fabric TradeOfferHelper trades; Villager-API plans if reachable) | P3 | Sonnet long | open (interrupted, partial work in worktree wip/*, see handoff) |
 | A5+B1 | `stats` module: food page, tool/weapon/armour stats pages, fuel/compost in info screen (A6) | F2, A1 | Sonnet long | open |
 | A7 | `mobs` module: mob pages (health, armour, attack, speed, spawn biomes via server sync, drops link) | P7 | Sonnet long | open |
 | A8 | Loot: structure/dimension filters, condition icons, Lootr per-player note | P7 | Sonnet | open |
