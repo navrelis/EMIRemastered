@@ -10,16 +10,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 
+import dev.emi.remastered.loot.structure.LateDelivery;
 import dev.emi.remastered.loot.structure.StructureLookup;
 import dev.emi.remastered.loot.structure.StructureRef;
 import dev.emi.remastered.world.World;
 import dev.emi.remastered.world.data.DimensionRow;
+import dev.emi.remastered.world.data.LootLinksWire;
 import dev.emi.remastered.world.data.StructureRow;
 import dev.emi.remastered.world.data.StructureRow.Placement;
 import dev.emi.remastered.world.data.WorldWire;
+import dev.emi.remastered.world.network.StructureLootPayload;
 import dev.emi.remastered.world.network.StructuresPayload;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -43,6 +46,7 @@ import net.minecraft.world.gen.chunk.placement.RandomSpreadStructurePlacement;
 import net.minecraft.world.gen.chunk.placement.SpreadType;
 import net.minecraft.world.gen.chunk.placement.StructurePlacement;
 import net.minecraft.world.gen.structure.Structure;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Server side of the world module: collects every structure (dimensions, valid biomes, generation step, placement
@@ -51,14 +55,15 @@ import net.minecraft.world.gen.structure.Structure;
  * synced to clients by vanilla. Safe to load on a dedicated server.
  * <p>
  * The data is built once per data generation and shared by all players: the registry-bound part runs on the server
- * thread (it is cheap), the loot table lookup and the encoding on a daemon thread, because the loot module reads
- * structure templates in the background and that can take seconds in a big pack. A player who joins before it is
- * done receives the data as soon as it is.
+ * thread (it is cheap), the encoding on a daemon thread. The chest loot tables come from the loot module's structure
+ * lookup, which reads structure templates in the background and can take many seconds in a big pack; nothing waits
+ * for it. When it is done before the data is collected the rows carry the tables; otherwise the data goes out
+ * without them and, once the lookup is done (server thread), every player who got the data gets a
+ * {@link StructureLootPayload} with the tables, players who join later get it right after the data.
  */
 public final class WorldServer {
-	/** Give up on the loot module's structure lookup after this long; the pages then show no loot links. */
-	private static final long LOOT_LOOKUP_SECONDS = 25;
 	private static final Object LOCK = new Object();
+	private static final LateDelivery<UUID> LOOT_WAITING = new LateDelivery<>();
 	private static Plan current;
 	private static int generation;
 
@@ -66,8 +71,24 @@ public final class WorldServer {
 	 * The encoded batches of one data generation. A new data pack reload gives the server new reloadable registries
 	 * (and with them new tags), so the plan is kept only for the same server, structure registry and reload.
 	 */
-	private record Plan(MinecraftServer server, Registry<Structure> registry, ReloadableRegistries.Lookup reloadable, int generation,
-			CompletableFuture<List<byte[]>> batches) {
+	private static final class Plan {
+		final MinecraftServer server;
+		final Registry<Structure> registry;
+		final ReloadableRegistries.Lookup reloadable;
+		final int generation;
+		final CompletableFuture<List<byte[]>> batches = new CompletableFuture<>();
+		/** Whether the batches have no chest loot tables because the lookup was not done; they follow. Server thread. */
+		boolean lootLater;
+		/** The follow-up with the chest loot tables once the lookup is done. Server thread. */
+		@Nullable List<byte[]> lootBatches;
+		List<Identifier> chestTables = List.of();
+
+		Plan(MinecraftServer server, Registry<Structure> registry, ReloadableRegistries.Lookup reloadable, int generation) {
+			this.server = server;
+			this.registry = registry;
+			this.reloadable = reloadable;
+			this.generation = generation;
+		}
 	}
 
 	/** What the server thread collects. */
@@ -83,6 +104,7 @@ public final class WorldServer {
 
 	public static void registerPayloads() {
 		PayloadTypeRegistry.playS2C().register(StructuresPayload.TYPE, StructuresPayload.CODEC);
+		PayloadTypeRegistry.playS2C().register(StructureLootPayload.TYPE, StructureLootPayload.CODEC);
 	}
 
 	/** {@code ServerLifecycleEvents.SYNC_DATA_PACK_CONTENTS}: on join and after a data pack reload. */
@@ -93,14 +115,14 @@ public final class WorldServer {
 		}
 		MinecraftServer server = player.server;
 		Plan plan = plan(server);
-		if (plan.batches().isDone()) {
-			send(player, plan.batches().join());
+		if (plan.batches.isDone()) {
+			send(player, plan, plan.batches.join());
 			return;
 		}
-		plan.batches().thenAcceptAsync(batches -> {
+		plan.batches.thenAcceptAsync(batches -> {
 			// the player may have left, or the data may have been reloaded (which syncs every player again)
 			if (server.getPlayerManager().getPlayerList().contains(player) && isCurrent(plan)) {
-				send(player, batches);
+				send(player, plan, batches);
 			}
 		}, server);
 	}
@@ -115,6 +137,7 @@ public final class WorldServer {
 		synchronized (LOCK) {
 			current = null;
 		}
+		LOOT_WAITING.clear();
 	}
 
 	private static boolean isCurrent(Plan plan) {
@@ -123,55 +146,81 @@ public final class WorldServer {
 		}
 	}
 
-	private static void send(ServerPlayerEntity player, List<byte[]> batches) {
+	/** Server thread: the world data, then the chest loot tables if they came later. */
+	private static void send(ServerPlayerEntity player, Plan plan, List<byte[]> batches) {
 		for (int i = 0; i < batches.size(); i++) {
 			ServerPlayNetworking.send(player, new StructuresPayload(i == 0, i == batches.size() - 1, batches.get(i)));
 		}
 		World.LOGGER.info("Sent the world data in {} payloads to {}", batches.size(), player.getGameProfile().getName());
+		if (!plan.lootLater || !ServerPlayNetworking.canSend(player, StructureLootPayload.TYPE)) {
+			return;
+		}
+		if (plan.lootBatches != null) {
+			sendLoot(player, plan.lootBatches);
+		} else {
+			LOOT_WAITING.add(plan.generation, player.getUuid());
+		}
+	}
+
+	private static void sendLoot(ServerPlayerEntity player, List<byte[]> batches) {
+		for (int i = 0; i < batches.size(); i++) {
+			ServerPlayNetworking.send(player, new StructureLootPayload(i == 0, batches.get(i)));
+		}
 	}
 
 	private static Plan plan(MinecraftServer server) {
 		Registry<Structure> registry = server.getRegistryManager().get(RegistryKeys.STRUCTURE);
 		ReloadableRegistries.Lookup reloadable = server.getReloadableRegistries();
+		Plan plan;
+		StructureLookup.Build lookup = null;
 		synchronized (LOCK) {
-			if (current != null && current.server() == server && current.registry() == registry && current.reloadable() == reloadable) {
+			if (current != null && current.server == server && current.registry == registry && current.reloadable == reloadable) {
 				return current;
 			}
-			int gen = ++generation;
-			CompletableFuture<List<byte[]>> future = new CompletableFuture<>();
-			Plan plan = new Plan(server, registry, reloadable, gen, future);
+			plan = new Plan(server, registry, reloadable, ++generation);
 			current = plan;
 			try {
 				long start = System.nanoTime();
 				Snapshot snapshot = collect(server);
 				World.LOGGER.info("Collected {} structures and {} dimensions in {}ms", snapshot.structures().size(), snapshot.dimensions().size(),
 					(System.nanoTime() - start) / 1_000_000);
-				// starts the loot module's template scan now, on this thread, so that the background thread only waits for it
-				prefetchLoot(server);
-				Thread thread = new Thread(() -> finish(server, snapshot, gen, future), "EMI World data");
+				plan.chestTables = snapshot.chestTables();
+				lookup = lootLookup(server);
+				StructureLookup ready = lookup == null ? null : lookup.now();
+				plan.lootLater = lookup != null && ready == null;
+				Plan started = plan;
+				Thread thread = new Thread(() -> finish(snapshot, ready, started), "EMI World data");
 				thread.setDaemon(true);
 				thread.start();
 			} catch (RuntimeException e) {
 				World.LOGGER.error("Could not collect the structures and biomes of the world, the world pages will have no server data", e);
-				future.complete(WorldWire.encode(List.of(), List.of(), WorldWire.MAX_BATCH_BYTES));
+				plan.lootLater = false;
+				plan.batches.complete(WorldWire.encode(List.of(), List.of(), WorldWire.MAX_BATCH_BYTES));
 			}
-			return plan;
 		}
+		if (plan.lootLater) {
+			Plan waiting = plan;
+			StructureLookup.Build build = lookup;
+			build.whenReady(ready -> lootReady(waiting, build, ready));
+		}
+		return plan;
 	}
 
-	private static void prefetchLoot(MinecraftServer server) {
+	/** The loot module's structure lookup (started now when it is not running), null when it is not available. */
+	private static StructureLookup.@Nullable Build lootLookup(MinecraftServer server) {
 		try {
-			StructureLookup.prefetch(server);
+			return StructureLookup.current(server);
 		} catch (Throwable e) {
 			World.LOGGER.warn("The loot module's structure lookup is not available: {}", e.toString());
+			return null;
 		}
 	}
 
-	/** Background part: chest loot tables per structure, then the encoding. */
-	private static void finish(MinecraftServer server, Snapshot snapshot, int gen, CompletableFuture<List<byte[]>> future) {
+	/** Background part: the chest loot tables if the lookup was already done, then the encoding. */
+	private static void finish(Snapshot snapshot, @Nullable StructureLookup lookup, Plan plan) {
 		List<StructureRow> structures = snapshot.structures();
 		try {
-			Map<String, List<String>> tables = lootTables(server, snapshot.chestTables());
+			Map<String, List<String>> tables = lookup == null ? Map.of() : lootTables(lookup, snapshot.chestTables());
 			if (!tables.isEmpty()) {
 				List<StructureRow> withLoot = new ArrayList<>(structures.size());
 				for (StructureRow row : structures) {
@@ -185,32 +234,46 @@ public final class WorldServer {
 					withTables++;
 				}
 			}
-			World.LOGGER.info("World data {}: {} structures ({} with chest loot tables), {} dimensions", gen, structures.size(), withTables,
-				snapshot.dimensions().size());
-			future.complete(WorldWire.encode(snapshot.dimensions(), structures, WorldWire.MAX_BATCH_BYTES));
+			World.LOGGER.info("World data {}: {} structures ({} with chest loot tables{}), {} dimensions", plan.generation, structures.size(), withTables,
+				plan.lootLater ? ", the tables follow when the structure lookup is done" : "", snapshot.dimensions().size());
+			plan.batches.complete(WorldWire.encode(snapshot.dimensions(), structures, WorldWire.MAX_BATCH_BYTES));
 		} catch (Throwable e) {
 			World.LOGGER.error("Could not build the world data", e);
-			future.complete(WorldWire.encode(snapshot.dimensions(), snapshot.structures(), WorldWire.MAX_BATCH_BYTES));
+			plan.batches.complete(WorldWire.encode(snapshot.dimensions(), snapshot.structures(), WorldWire.MAX_BATCH_BYTES));
 		}
 	}
 
-	/** Chest loot tables by structure id, from the structure lookup of the loot module (empty if it knows none). */
-	private static Map<String, List<String>> lootTables(MinecraftServer server, List<Identifier> chestTables) {
-		Map<String, List<String>> result = new TreeMap<>();
-		long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(LOOT_LOOKUP_SECONDS);
-		try {
-			for (Identifier table : chestTables) {
-				if (System.nanoTime() > deadline) {
-					World.LOGGER.warn("The chest loot tables of structures took more than {} seconds to look up, the structure pages will miss loot links until the next reload",
-						LOOT_LOOKUP_SECONDS);
-					break;
-				}
-				for (StructureRef ref : StructureLookup.forTable(server, table)) {
-					result.computeIfAbsent(ref.structure().toString(), k -> new ArrayList<>()).add(table.toString());
-				}
+	/** Server thread, once the structure lookup is done: the chest loot tables for everyone who got the data without. */
+	private static void lootReady(Plan plan, StructureLookup.Build build, StructureLookup lookup) {
+		if (!isCurrent(plan)) {
+			return;
+		}
+		Map<String, List<String>> tables = lootTables(lookup, plan.chestTables);
+		plan.lootBatches = LootLinksWire.encode(tables, WorldWire.MAX_BATCH_BYTES);
+		List<UUID> waiting = LOOT_WAITING.take(plan.generation);
+		if (waiting.isEmpty()) {
+			// nobody got the data yet: everyone gets the tables right after it
+			return;
+		}
+		int sent = 0;
+		for (UUID uuid : waiting) {
+			ServerPlayerEntity player = plan.server.getPlayerManager().getPlayer(uuid);
+			if (player != null && ServerPlayNetworking.canSend(player, StructureLootPayload.TYPE)) {
+				sendLoot(player, plan.lootBatches);
+				sent++;
 			}
-		} catch (Throwable e) {
-			World.LOGGER.warn("Could not look up the loot tables of structures: {}", e.toString());
+		}
+		World.LOGGER.info("The chest loot tables of {} structures were done {}ms after the structure lookup started, sent them to {} players",
+			tables.size(), build.elapsedMillis(), sent);
+	}
+
+	/** Chest loot tables by structure id, from the structure lookup of the loot module (empty if it knows none). */
+	private static Map<String, List<String>> lootTables(StructureLookup lookup, List<Identifier> chestTables) {
+		Map<String, List<String>> result = new TreeMap<>();
+		for (Identifier table : chestTables) {
+			for (StructureRef ref : lookup.structuresOf(table)) {
+				result.computeIfAbsent(ref.structure().toString(), k -> new ArrayList<>()).add(table.toString());
+			}
 		}
 		return result;
 	}

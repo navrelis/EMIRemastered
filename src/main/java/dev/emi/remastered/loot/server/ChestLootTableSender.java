@@ -9,6 +9,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -47,8 +48,18 @@ public class ChestLootTableSender implements LootSender<SimpleLootPoolBuilder> {
         return idToSend;
     }
 
+    /** The loot table id. */
+    public Identifier getTableId() {
+        return id;
+    }
+
     @Override
     public void send(ServerPlayerEntity player) {
+        send(player, LootSettings.chestStructures ? StructureLookup.ready(player.server) : null);
+    }
+
+    /** Sends the table with its structures from {@code structures}, or without them when it is null (not done yet). */
+    public void send(ServerPlayerEntity player, @Nullable StructureLookup structures) {
         if (!LootNetworking.canSend(player, ChestLootPayload.TYPE)) return;
         PacketByteBuf buf = LootNetworking.newBuffer();
         buf.writeString(idToSend);
@@ -57,9 +68,9 @@ public class ChestLootTableSender implements LootSender<SimpleLootPoolBuilder> {
             writeItemStack(buf, item, player.getServerWorld());
             buf.writeFloat(floatWeight);
         });
-        if (LootSettings.chestStructures) {
+        if (LootSettings.chestStructures && structures != null) {
             // trailing block, clients of older versions ignore it
-            StructureRef.write(buf, StructureLookup.forTable(player.server, id));
+            StructureRef.write(buf, structures.structuresOf(id));
         }
         LootNetworking.send(player, buf, ChestLootPayload::new, idToSend);
 

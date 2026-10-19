@@ -16,6 +16,7 @@ import dev.emi.remastered.module.Modules;
 import dev.emi.remastered.ores.emi.stack.BiomeEmiStack;
 import dev.emi.remastered.world.World;
 import dev.emi.remastered.world.WorldSettings;
+import dev.emi.remastered.world.client.ClientWorldData;
 import dev.emi.remastered.world.data.StructureRow;
 import dev.emi.remastered.world.data.StructureRow.Kind;
 import dev.emi.remastered.world.data.StructureRow.Placement;
@@ -35,7 +36,8 @@ import net.minecraft.world.biome.Biome;
 /**
  * The page of one structure: dimensions, generation step, placement (spacing and separation, or rings), the biomes it
  * generates in as clickable biome icons, and links to the chest loot tables found in it (needs the loot module). The
- * data is what the server sent when EMI registered the page.
+ * data is what the server sent when EMI registered the page; the loot links are read from the current client data,
+ * since the server may send them later.
  */
 public class StructureInfoRecipe implements EmiRecipe {
 	private static final int HEADER_HEIGHT = 22;
@@ -48,6 +50,7 @@ public class StructureInfoRecipe implements EmiRecipe {
 	private final EmiStack stack;
 	private final List<EmiStack> biomes;
 	private List<LootLink> loot;
+	private int lootVersion;
 
 	public StructureInfoRecipe(StructureRow row, Registry<Biome> registry) {
 		this.row = row;
@@ -100,12 +103,17 @@ public class StructureInfoRecipe implements EmiRecipe {
 	private record LootLink(String table, EmiRecipe recipe) {
 	}
 
-	/** The loot pages of the structure's chests that exist in this EMI session; empty when the loot module is off. */
+	/**
+	 * The loot pages of the structure's chests that exist in this EMI session; empty when the loot module is off. The
+	 * tables are read from {@link ClientWorldData} because they can arrive after the page was created.
+	 */
 	private synchronized List<LootLink> loot() {
-		if (loot == null) {
+		int version = ClientWorldData.lootVersion();
+		if (loot == null || lootVersion != version) {
+			lootVersion = version;
 			List<LootLink> links = new ArrayList<>();
 			if (WorldSettings.maxLootLinks() > 0 && Modules.LOOT.isEnabled()) {
-				for (String table : row.lootTables()) {
+				for (String table : ClientWorldData.lootTablesOf(row.id())) {
 					Identifier tableId = Identifier.tryParse(table);
 					if (tableId == null) {
 						continue;

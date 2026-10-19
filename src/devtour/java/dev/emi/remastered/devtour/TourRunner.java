@@ -64,6 +64,10 @@ public final class TourRunner {
 		this.gameDir = gameDir;
 		try {
 			plan = TourPlan.load(tourArg, gameDir);
+			plan.systemProperties.forEach((key, value) -> {
+				System.setProperty(key, value);
+				LOG.info("tour sets system property {}={}", key, value);
+			});
 			outDir = gameDir.resolve("tour-out").resolve(plan.name);
 			cleanDir(outDir);
 			ctx = new TourContext(client, plan, outDir);

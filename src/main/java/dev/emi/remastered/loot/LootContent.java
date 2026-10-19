@@ -7,6 +7,7 @@ import dev.emi.remastered.loot.client.ClientResourceData;
 import dev.emi.remastered.loot.emi.LootEmiRegistration;
 import dev.emi.remastered.loot.info.LootInfoProvider;
 import dev.emi.remastered.loot.networking.LootNetworking;
+import dev.emi.remastered.loot.server.ChestStructureSync;
 import dev.emi.remastered.loot.server.condition.BlownUpByCreeperLootCondition;
 import dev.emi.remastered.loot.server.condition.KilledByWitherLootCondition;
 import dev.emi.remastered.loot.server.condition.MobSpawnedWithLootCondition;
@@ -41,14 +42,17 @@ public class LootContent {
 				StructureLookup.prefetch(server);
 			}
 		});
-		ServerLifecycleEvents.SERVER_STOPPED.register(server -> StructureLookup.invalidate());
+		ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
+			StructureLookup.invalidate();
+			ChestStructureSync.clear();
+		});
 		ServerLifecycleEvents.SYNC_DATA_PACK_CONTENTS.register((player, joined) -> EMILoot.parser.registerServer(player));
 	}
 
 	/** Client only, called when the module is enabled. */
 	public static void initClient() {
 		ClientLootTablesReceiver.register();
-		ItemInfoRegistry.register(new LootInfoProvider());
+		ItemInfoRegistry.register(LootInfoProvider.INSTANCE);
 		ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(new ClientResourceData.EntityOffsetsReloadListener());
 	}
 

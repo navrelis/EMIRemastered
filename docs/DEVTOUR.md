@@ -50,6 +50,7 @@ Tours for single fixes and features (also in `src/devtour/resources/tour/`):
 * `world.json`: biome and structure pages (village, stronghold, trial chambers, nether portal; plains, desert, nether wastes, deep dark), also after a `/reload`. Biome and structure stacks are no items, and tour clicks do not reach index stacks, so the tour opens the pages with the dev-only helper `src/devtour/java/dev/emi/remastered/devtour/WorldTour.java` through `call` steps (it does what a click on the stack in the index does).
 * `kb7.json`: recipe tree remainder counts of synthetic favourites (KB7). The dev-only helper `src/devtour/java/dev/emi/remastered/devtour/Kb7Tour.java` (`call` steps `goalActivatorRail` and `report`) sets the activator rail as the recipe tree goal and notes per recipe the batches and the remaining amount with the old formula and with the fix. The stick recipe makes 4 per batch, so the stick of the redstone torch is served by the remainder: the stick favourite must show 3 with an empty inventory, 2 of 3 with one stick (`/give`) and be gone with three.
 * `loot-van.json`: chests that vanilla places in code get their structure from a built-in list by structure type (`CodePlacedLoot`): the chest loot page of the dune armor trim template (desert pyramid) and nether wart (nether fortress) with the "Found in" line, and the Item Info "Chests in Structures" section of both.
+* `loot-async.json`: the structure lookup finishes after the player joined (delayed by 20 s with `emi.devtour.lookupDelayMs` through `systemProperties`). The desert pyramid chest page ("Found in"), the dune armor trim template Item Info ("Chests in Structures") and the desert pyramid structure page (loot links) are shown before and after the delay, then the chest page and the structure page before and after the rebuilt lookup of a `/reload`. Nothing waits for the lookup and there is no EMI reload: the structures arrive in `emi_loot:chest_structures`, the structure loot links in `emi_world:structure_loot`.
 
 ## How it works
 
@@ -87,6 +88,16 @@ Tours are found in this order: a path, `run/tour/<name>.json`, built-in resource
 
 All settings are optional (defaults shown). `settleTicks` is how many ticks a screenshot waits before capturing.
 `worldJoinTimeoutSeconds` applies to joining the world and to EMI loading.
+`"systemProperties": {"key": "value"}` (optional) sets Java system properties when the tour is loaded, which is before
+the integrated server starts, for dev-only switches such as the ones below.
+
+## Dev-only system properties
+
+Read only in a development environment (`FabricLoader.isDevelopmentEnvironment()`), ignored in a release:
+
+| Property | Meaning |
+|---|---|
+| `emi.devtour.lookupDelayMs` | delays every build of the loot module's structure lookup (`StructureLookup`) by that many milliseconds on its background thread, to test what players see when the lookup finishes after they joined (`loot-async.json` sets 20000) |
 
 ## Step types
 

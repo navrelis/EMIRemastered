@@ -24,6 +24,7 @@ public class LootNetworking {
 		PayloadTypeRegistry.playS2C().register(MobLootPayload.TYPE, MobLootPayload.CODEC);
 		PayloadTypeRegistry.playS2C().register(GameplayLootPayload.TYPE, GameplayLootPayload.CODEC);
 		PayloadTypeRegistry.playS2C().register(ArchaeologyLootPayload.TYPE, ArchaeologyLootPayload.CODEC);
+		PayloadTypeRegistry.playS2C().register(ChestStructuresPayload.TYPE, ChestStructuresPayload.CODEC);
 	}
 
 	public static boolean canSend(ServerPlayerEntity player, CustomPayload.Id<?> type) {

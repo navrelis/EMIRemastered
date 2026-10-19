@@ -39,6 +39,8 @@ import net.minecraft.util.math.random.Random;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.structure.JigsawStructure;
 import net.minecraft.world.gen.structure.Structure;
+import net.fabricmc.loader.api.FabricLoader;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.InputStream;
 import java.util.ArrayDeque;
@@ -53,8 +55,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.util.function.Consumer;
 
 /**
  * Finds the structures a chest loot table is found in. For every jigsaw structure the structure templates reachable
@@ -64,21 +65,23 @@ import java.util.concurrent.TimeoutException;
  * structure type that place their chests in code remain unknown and show no structure for their tables.
  * The result per structure also lists the dimensions whose biome source can produce the structure's biomes.
  * <p>
- * Reading every template of every structure can take seconds in a large pack, so the lookup is built on a daemon
+ * Reading every template of every structure can take many seconds in a large pack, so the lookup is built on a daemon
  * background thread that starts when the server has started (and again, lazily, after a data pack reload). The
- * server thread only captures what the build reads. {@link #forTable} waits for a running build for at most
- * {@value #WAIT_SECONDS} seconds and shows no structures if it is not done by then.
+ * server thread only captures what the build reads and never waits for it: {@link #ready} and
+ * {@link #forTableIfReady} answer with what is there now, {@link Build#whenReady} runs code on the server thread once
+ * the build of the current data is done. Every build has a generation; a data pack reload or a server stop
+ * ({@link #invalidate}) makes it stale, and the results and callbacks of a stale build are dropped.
  */
 public final class StructureLookup {
 	private static final int MAX_POOLS_PER_STRUCTURE = 600;
 	private static final int MAX_TEMPLATES_PER_STRUCTURE = 4000;
 	private static final int MAX_TABLE_DEPTH = 8;
-	private static final long WAIT_SECONDS = 30;
+	/** Development environment only: delays every build by this many milliseconds, to test late results. */
+	private static final String DEV_DELAY_PROPERTY = "emi.devtour.lookupDelayMs";
+	private static final StructureLookup EMPTY = new StructureLookup();
 
 	private static int generation;
-	private static MinecraftServer currentServer;
-	private static CompletableFuture<StructureLookup> current;
-	private static boolean timeoutLogged;
+	private static Build current;
 
 	private final Map<Identifier, List<Identifier>> structureDimensions = new LinkedHashMap<>();
 	private final Map<Identifier, Set<Identifier>> structuresByTable = new HashMap<>();
@@ -89,6 +92,62 @@ public final class StructureLookup {
 		ReloadableRegistries.Lookup loot, Map<Identifier, Set<RegistryEntry<Biome>>> biomes, List<Identifier> chestTables) {
 	}
 
+	/** One build of the lookup for one server and one data generation. */
+	public static final class Build {
+		private final int generation;
+		private final MinecraftServer server;
+		private final CompletableFuture<StructureLookup> future;
+		private final long startNanos = System.nanoTime();
+
+		private Build(int generation, MinecraftServer server, CompletableFuture<StructureLookup> future) {
+			this.generation = generation;
+			this.server = server;
+			this.future = future;
+		}
+
+		public int generation() {
+			return generation;
+		}
+
+		/** The finished lookup, or null while the build is still running. Never blocks. */
+		public @Nullable StructureLookup now() {
+			return future.getNow(null);
+		}
+
+		/** Milliseconds since the build started. */
+		public long elapsedMillis() {
+			return (System.nanoTime() - startNanos) / 1_000_000;
+		}
+
+		/** Whether the data changed (reload, server stop) since this build started. */
+		public boolean isStale() {
+			return StructureLookup.isStale(generation);
+		}
+
+		/**
+		 * Runs {@code action} on the server thread once the build is done (right away when it is done and this is the
+		 * server thread). Dropped when the build became stale or the server stopped before.
+		 */
+		public void whenReady(Consumer<StructureLookup> action) {
+			future.thenAccept(lookup -> {
+				if (server.isStopped()) {
+					// MinecraftServer.execute would run the task right here, on this thread, once the server stopped
+					return;
+				}
+				server.execute(() -> {
+					if (!server.isRunning() || !server.isOnThread() || isStale()) {
+						return;
+					}
+					try {
+						action.accept(lookup);
+					} catch (Throwable e) {
+						EMILoot.LOGGER.error("Could not use the structures of chest loot tables", e);
+					}
+				});
+			});
+		}
+	}
+
 	/**
 	 * Call when the data packs reload or the server stops: a build that is still running is abandoned and never
 	 * published, the lookup is built again for the next player that needs it.
@@ -96,7 +155,6 @@ public final class StructureLookup {
 	public static synchronized void invalidate() {
 		generation++;
 		current = null;
-		currentServer = null;
 	}
 
 	private static synchronized boolean isStale(int gen) {
@@ -110,42 +168,24 @@ public final class StructureLookup {
 	 */
 	public static void prefetch(MinecraftServer server) {
 		if (LootSettings.chestStructures) {
-			start(server);
+			current(server);
 		}
 	}
 
-	/** The structures of a chest loot table (empty when unknown). Server thread; waits for a running build. */
-	public static List<StructureRef> forTable(MinecraftServer server, Identifier table) {
+	/**
+	 * The build for the current data of the server, started when there is none. While {@code loot.chest-structures}
+	 * is off it is an empty lookup that is done at once. Never blocks.
+	 */
+	public static synchronized Build current(MinecraftServer server) {
 		if (!LootSettings.chestStructures) {
-			return List.of();
+			return new Build(generation, server, CompletableFuture.completedFuture(EMPTY));
 		}
-		CompletableFuture<StructureLookup> future = start(server);
-		try {
-			return future.get(WAIT_SECONDS, TimeUnit.SECONDS).resolve(table);
-		} catch (TimeoutException e) {
-			logTimeoutOnce();
-		} catch (InterruptedException e) {
-			Thread.currentThread().interrupt();
-		} catch (Exception e) {
-			EMILoot.LOGGER.error("Could not look up the structures of chest loot table {}", table, e);
-		}
-		return List.of();
-	}
-
-	private static synchronized void logTimeoutOnce() {
-		if (!timeoutLogged) {
-			timeoutLogged = true;
-			EMILoot.LOGGER.warn("Looking up the structures of chest loot tables took more than {} seconds, chest pages will not show where a chest is found until the next reload", WAIT_SECONDS);
-		}
-	}
-
-	private static synchronized CompletableFuture<StructureLookup> start(MinecraftServer server) {
-		if (current != null && currentServer == server) {
+		if (current != null && current.server == server) {
 			return current;
 		}
 		int gen = ++generation;
-		timeoutLogged = false;
 		CompletableFuture<StructureLookup> future = new CompletableFuture<>();
+		Build build = new Build(gen, server, future);
 		try {
 			Context context = capture(server);
 			Thread thread = new Thread(() -> run(context, gen, future), "EMI Loot structure lookup");
@@ -153,11 +193,21 @@ public final class StructureLookup {
 			thread.start();
 		} catch (Throwable e) {
 			EMILoot.LOGGER.error("Could not look up the structures of chest loot tables, chest pages will not show where a chest is found", e);
-			future.complete(new StructureLookup());
+			future.complete(EMPTY);
 		}
-		current = future;
-		currentServer = server;
-		return future;
+		current = build;
+		return build;
+	}
+
+	/** The finished lookup of the current data, or null while it is built (the build is started if needed). */
+	public static @Nullable StructureLookup ready(MinecraftServer server) {
+		return current(server).now();
+	}
+
+	/** The structures of a chest loot table if the lookup is done, else (and when unknown) empty. Never blocks. */
+	public static List<StructureRef> forTableIfReady(MinecraftServer server, Identifier table) {
+		StructureLookup lookup = ready(server);
+		return lookup == null ? List.of() : lookup.structuresOf(table);
 	}
 
 	private static Context capture(MinecraftServer server) {
@@ -175,21 +225,24 @@ public final class StructureLookup {
 		StructureLookup lookup = new StructureLookup();
 		long start = System.currentTimeMillis();
 		try {
+			devDelay();
 			lookup.scan(context, gen);
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
 		} catch (Throwable e) {
 			EMILoot.LOGGER.error("Could not look up the structures of chest loot tables, chest pages will not show where a chest is found", e);
 		}
 		if (isStale(gen)) {
 			// the data changed while this build ran: never hand out its results
-			future.complete(new StructureLookup());
+			future.complete(EMPTY);
 			return;
 		}
-		future.complete(lookup);
 		EMILoot.LOGGER.info("Looked up {} structures and the loot tables of their pieces in {}ms", lookup.structureDimensions.size(), System.currentTimeMillis() - start);
+		future.complete(lookup);
 		boolean dev = LootSettings.isDevelopment();
 		int resolvedTables = 0;
 		for (Identifier table : context.chestTables()) {
-			List<StructureRef> refs = lookup.resolve(table);
+			List<StructureRef> refs = lookup.structuresOf(table);
 			if (!refs.isEmpty()) {
 				resolvedTables++;
 			}
@@ -200,7 +253,19 @@ public final class StructureLookup {
 		EMILoot.LOGGER.info("Chest loot tables with a known structure: {} of {}", resolvedTables, context.chestTables().size());
 	}
 
-	private synchronized List<StructureRef> resolve(Identifier table) {
+	private static void devDelay() throws InterruptedException {
+		if (!FabricLoader.getInstance().isDevelopmentEnvironment()) {
+			return;
+		}
+		long delay = Long.getLong(DEV_DELAY_PROPERTY, 0L);
+		if (delay > 0) {
+			EMILoot.LOGGER.info("Development: delaying the structure lookup by {}ms ({})", delay, DEV_DELAY_PROPERTY);
+			Thread.sleep(delay);
+		}
+	}
+
+	/** The structures of a chest loot table, sorted by id; empty when unknown. Any thread. */
+	public synchronized List<StructureRef> structuresOf(Identifier table) {
 		List<StructureRef> cached = resolved.get(table);
 		if (cached != null) {
 			return cached;
