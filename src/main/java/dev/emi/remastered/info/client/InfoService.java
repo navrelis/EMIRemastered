@@ -55,7 +55,7 @@ public final class InfoService {
 		return CACHE.get(generation, stack, InfoService::compute);
 	}
 
-	private static InfoPage compute(EmiStack stack) {
+	public static InfoPage compute(EmiStack stack) {
 		long start = System.nanoTime();
 		CollectorImpl collector = new CollectorImpl(stack);
 		for (ItemInfoProvider provider : ItemInfoRegistry.getProviders()) {

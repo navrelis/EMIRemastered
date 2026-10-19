@@ -9,6 +9,8 @@ import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.runtime.EmiReloadLog;
 import dev.emi.remastered.enchanting.EnchantingSettings;
+import dev.emi.remastered.enchanting.logic.IncompatibilityMatrix;
+import dev.emi.remastered.enchanting.logic.LevelCap;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentLevelEntry;
 import net.minecraft.item.EnchantedBookItem;
@@ -53,17 +55,29 @@ public final class EnchantmentCatalog {
 			}
 		}
 
+		List<RegistryEntry.Reference<Enchantment>> listed = entries.stream().filter(books::containsKey).toList();
+		boolean[] reported = {false};
+		IncompatibilityMatrix<RegistryEntry.Reference<Enchantment>> matrix = IncompatibilityMatrix.build(listed,
+			(a, b) -> Enchantment.canBeCombined(a, b), (entry, t) -> {
+				if (!reported[0]) {
+					reported[0] = true;
+					warn(entry, "test it against another enchantment", t);
+				}
+			});
+		int levelCap = listed.isEmpty() ? LevelCap.VANILLA : EnchantmentFacts.levelCap(listed.get(0));
+
 		List<EnchantmentInfo> infos = new ArrayList<>();
-		for (RegistryEntry.Reference<Enchantment> entry : entries) {
+		for (RegistryEntry.Reference<Enchantment> entry : listed) {
 			List<EmiStack> entryBooks = books.get(entry);
-			if (entryBooks == null) {
-				continue;
-			}
 			try {
 				List<List<EmiStack>> validItems = validItems(entry, items, itemStacks);
-				List<EnchantmentInfo.Exclusion> exclusions = exclusions(entry, entries, books);
-				infos.add(new EnchantmentInfo(entry, entry.registryKey().getValue(), entry.value().getMaxLevel(), entryBooks,
-					EmiIngredient.of(entryBooks), validItems, exclusions, tradeRebalance));
+				List<EnchantmentInfo.Exclusion> exclusions = new ArrayList<>();
+				for (RegistryEntry.Reference<Enchantment> other : matrix.incompatibleWith(entry)) {
+					exclusions.add(new EnchantmentInfo.Exclusion(other, EmiIngredient.of(books.get(other))));
+				}
+				infos.add(new EnchantmentInfo(entry, entry.registryKey().getValue(), entry.value().getMaxLevel(), levelCap,
+					entryBooks, EmiIngredient.of(entryBooks), validItems, exclusions,
+					EnchantmentFacts.sourcesOf(entry, tradeRebalance), tradeRebalance));
 			} catch (Throwable t) {
 				warn(entry, "build its info page", t);
 			}
@@ -109,29 +123,6 @@ public final class EnchantmentCatalog {
 			columns.get(counter++ % EnchantmentInfo.ITEM_COLUMNS).add(itemStacks[i]);
 		}
 		return columns;
-	}
-
-	private static List<EnchantmentInfo.Exclusion> exclusions(RegistryEntry<Enchantment> entry,
-			List<RegistryEntry.Reference<Enchantment>> entries, Map<RegistryEntry<Enchantment>, List<EmiStack>> books) {
-		List<EnchantmentInfo.Exclusion> exclusions = new ArrayList<>();
-		boolean reported = false;
-		for (RegistryEntry.Reference<Enchantment> other : entries) {
-			List<EmiStack> otherBooks = books.get(other);
-			if (other == entry || otherBooks == null) {
-				continue;
-			}
-			try {
-				if (!Enchantment.canBeCombined(entry, other)) {
-					exclusions.add(new EnchantmentInfo.Exclusion(other, EmiIngredient.of(otherBooks)));
-				}
-			} catch (Throwable t) {
-				if (!reported) {
-					reported = true;
-					warn(entry, "test it against " + other.registryKey().getValue(), t);
-				}
-			}
-		}
-		return exclusions;
 	}
 
 	private static void warn(RegistryEntry<Enchantment> entry, String action, Throwable t) {
