@@ -16,6 +16,7 @@ import dev.emi.remastered.loot.util.stack.GameplayLootEmiStack;
 import dev.emi.remastered.loot.util.IconGroupEmiWidget;
 import dev.emi.remastered.loot.util.InteractableTextWidget;
 import dev.emi.remastered.loot.util.ClientText;
+import dev.emi.remastered.loot.util.ConditionIcons;
 import dev.emi.remastered.loot.util.LText;
 import dev.emi.remastered.loot.util.WidgetRowBuilder;
 import net.minecraft.block.Blocks;
@@ -72,6 +73,15 @@ public class GameplayLootRecipe implements EmiRecipe {
         }
 
 
+    }
+
+    /** Every pool the recipe shows, for the Item Info sections. */
+    public List<ClientBuiltPool> getPools() {
+        List<ClientBuiltPool> pools = new ArrayList<>();
+        for (WidgetRowBuilder builder : rowBuilderList) {
+            pools.addAll(builder.getPoolList());
+        }
+        return pools;
     }
 
     @Override
@@ -156,7 +166,9 @@ public class GameplayLootRecipe implements EmiRecipe {
                 widget.appendTooltip(LText.translatable("emi_loot.rolls", rounded).formatted(Formatting.GRAY));
                 if (LootSettings.showConditionsInTooltip()) {
                     for (Pair<Integer, Text> pair : stack.conditions()) {
-                        widget.appendTooltip(pair.getRight());
+                        for (Text line : ConditionIcons.tooltipLines(pair)) {
+                            widget.appendTooltip(line);
+                        }
                     }
                 }
                 ++i;

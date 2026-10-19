@@ -1,7 +1,10 @@
 package dev.emi.remastered.loot.server;
 
+import dev.emi.remastered.loot.LootSettings;
 import dev.emi.remastered.loot.networking.ChestLootPayload;
 import dev.emi.remastered.loot.networking.LootNetworking;
+import dev.emi.remastered.loot.structure.StructureLookup;
+import dev.emi.remastered.loot.structure.StructureRef;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -15,9 +18,11 @@ import java.util.List;
 public class ChestLootTableSender implements LootSender<SimpleLootPoolBuilder> {
 
     public ChestLootTableSender(Identifier id) {
+        this.id = id;
         this.idToSend = LootSender.getIdToSend(id);
     }
 
+    private final Identifier id;
     private final String idToSend;
     final List<SimpleLootPoolBuilder> builderList = new LinkedList<>();
     HashMap<ItemStack, Float> floatMap = new HashMap<>();
@@ -52,6 +57,10 @@ public class ChestLootTableSender implements LootSender<SimpleLootPoolBuilder> {
             writeItemStack(buf, item, player.getServerWorld());
             buf.writeFloat(floatWeight);
         });
+        if (LootSettings.chestStructures) {
+            // trailing block, clients of older versions ignore it
+            StructureRef.write(buf, StructureLookup.forTable(player.server, id));
+        }
         LootNetworking.send(player, buf, ChestLootPayload::new, idToSend);
 
     }

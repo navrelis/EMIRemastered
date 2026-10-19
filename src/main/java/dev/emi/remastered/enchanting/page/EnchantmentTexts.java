@@ -2,6 +2,8 @@ package dev.emi.remastered.enchanting.page;
 
 import java.util.Optional;
 
+import dev.emi.remastered.enchanting.logic.EnchantmentSources;
+import dev.emi.remastered.enchanting.logic.LevelCap;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.text.MutableText;
@@ -35,5 +37,21 @@ public final class EnchantmentTexts {
 
 	public static boolean isObfuscated(Text text) {
 		return text.visit((style, string) -> style.isObfuscated() ? Optional.of(true) : Optional.empty(), Style.EMPTY).isPresent();
+	}
+
+	/** Name of a source with its colour for the grey recipe background: black, dark red for curses. */
+	public static MutableText source(EnchantmentSources.Source source) {
+		MutableText text = Text.translatable("emi_enchanting.source." + source.key());
+		return text.formatted(source == EnchantmentSources.Source.CURSE ? Formatting.DARK_RED : Formatting.BLACK);
+	}
+
+	public static MutableText noSource() {
+		return Text.translatable("emi_enchanting.source.none").formatted(Formatting.BLACK);
+	}
+
+	/** The level cap of item stacks, or "no limit". */
+	public static MutableText levelCap(int cap) {
+		return cap == LevelCap.UNLIMITED ? Text.translatable("emi_enchanting.level_cap.unlimited").formatted(Formatting.BLACK)
+			: Text.literal(String.valueOf(cap)).formatted(Formatting.BLACK);
 	}
 }
