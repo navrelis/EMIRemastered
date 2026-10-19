@@ -1,6 +1,7 @@
 package dev.emi.remastered.loot.util;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.math.RoundingMode;
 
 public class FloatTrimmer {
@@ -25,6 +26,27 @@ public class FloatTrimmer {
             return "<" + BigDecimal.ONE.movePointLeft(scale).toPlainString();
         }
         return cut.toPlainString();
+    }
+
+    /** True if the value is above zero but would be cut to zero with the given decimal places. */
+    public static boolean isBelowResolution(float value, int places) {
+        if (Float.isNaN(value) || Float.isInfinite(value) || value <= 0) {
+            return false;
+        }
+        return new BigDecimal(Float.toString(value)).setScale(Math.max(0, places), RoundingMode.DOWN).signum() == 0;
+    }
+
+    /**
+     * A fraction (1.0 = always) as a percent number with two significant digits, cut not rounded and without trailing
+     * zeros: 0.000909 gives "0.09", 0.0004 gives "0.04".
+     */
+    public static String trimPercent(float fraction) {
+        if (Float.isNaN(fraction) || Float.isInfinite(fraction)) {
+            return Float.toString(fraction);
+        }
+        BigDecimal percent = new BigDecimal(Float.toString(fraction)).movePointRight(2);
+        BigDecimal cut = percent.round(new MathContext(2, RoundingMode.DOWN));
+        return cut.signum() == 0 ? "0" : cut.stripTrailingZeros().toPlainString();
     }
 
 }

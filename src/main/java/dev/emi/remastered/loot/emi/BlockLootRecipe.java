@@ -1,7 +1,7 @@
 package dev.emi.remastered.loot.emi;
 
 import dev.emi.remastered.loot.util.ConditionIcons;
-import dev.emi.remastered.loot.util.LText;
+import dev.emi.remastered.loot.util.RollsText;
 import dev.emi.remastered.loot.LootSettings;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
@@ -14,10 +14,8 @@ import dev.emi.remastered.loot.EMILoot;
 import dev.emi.remastered.loot.client.ClientBlockLootTable;
 import dev.emi.remastered.loot.client.ClientBuiltPool;
 import dev.emi.remastered.loot.client.InitializedSupplier;
-import dev.emi.remastered.loot.util.stack.BlockLootEmiStack;
 import dev.emi.remastered.loot.util.stack.BlockStateEmiStack;
 import dev.emi.remastered.loot.util.ConditionalStack;
-import dev.emi.remastered.loot.util.FloatTrimmer;
 import dev.emi.remastered.loot.util.IconGroupEmiWidget;
 import dev.emi.remastered.loot.util.WidgetRowBuilder;
 import net.minecraft.block.Block;
@@ -44,12 +42,10 @@ public class BlockLootRecipe implements EmiRecipe {
         this.outputStacks = data.outputStacks;
         this.rowBuilderList = data.rowBuilderList;
         this.isSimple = data.guaranteed;
-        this.lootStack = new BlockLootEmiStack(data.id);
     }
 
     private final Identifier id;
     private final InitializedSupplier<EmiStack> inputStack;
-    private final BlockLootEmiStack lootStack;
     private final InitializedSupplier<List<EmiStack>> outputStacks;
     private final List<WidgetRowBuilder> rowBuilderList;
     private final boolean isSimple;
@@ -58,7 +54,7 @@ public class BlockLootRecipe implements EmiRecipe {
     public BlockLootRecipe init() {
         inputStack.init();
         outputStacks.init();
-        inputStacks = inputStack.get().getItemStack().isEmpty() ? List.of(lootStack) : List.of(inputStack.get(), lootStack);
+        inputStacks = inputStack.get().getItemStack().isEmpty() ? List.of() : List.of(inputStack.get());
         return this;
     }
 
@@ -144,8 +140,7 @@ public class BlockLootRecipe implements EmiRecipe {
             int j = 0;
             for (ConditionalStack stack: stacks) {
                 SlotWidget widget = widgets.addSlot(stack.getIngredient(), i * 18, 18 * j).recipeContext(this);
-                String rounded = FloatTrimmer.trimFloatString(Math.max(stack.weight() / 100f, 0.01f), LootSettings.chanceDecimalPlaces());
-                widget.appendTooltip(LText.translatable("emi_loot.rolls", rounded).formatted(Formatting.GRAY));
+                widget.appendTooltip(RollsText.of(stack.weight(), LootSettings.chanceDecimalPlaces()).formatted(Formatting.GRAY));
                 if (LootSettings.showConditionsInTooltip()) {
                     for (Pair<Integer, Text> pair : stack.conditions()) {
                         for (Text line : ConditionIcons.tooltipLines(pair)) {

@@ -14,6 +14,7 @@ import dev.emi.remastered.loot.util.stack.ArchaeologyLootEmiStack;
 import dev.emi.remastered.loot.util.InteractableTextWidget;
 import dev.emi.remastered.loot.util.ClientText;
 import dev.emi.remastered.loot.util.LText;
+import dev.emi.remastered.loot.util.RollsText;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.recipe.Ingredient;
@@ -135,9 +136,8 @@ public class ArchaeologyLootRecipe implements EmiRecipe {
 				int column = (int)((index.get() - 1) % columns);
 				index.getAndDecrement();
 				EmiIngredient ingredient = EmiIngredient.of(items.stream().toList());
-				String fTrim = trimFloatString(Math.max(weight / 100f, 0.01f), Math.max(LootSettings.chanceDecimalPlaces() + 1, 2));
 				SlotWidget slotWidget = new SlotWidget(ingredient, column * 18, titleSpace + row * finalRowHeight).recipeContext(this);
-				widgets.add(slotWidget.appendTooltip(LText.translatable("emi_loot.rolls", fTrim).formatted(Formatting.GRAY)));
+				widgets.add(slotWidget.appendTooltip(RollsText.of(weight, Math.max(LootSettings.chanceDecimalPlaces() + 1, 2)).formatted(Formatting.GRAY)));
 			}
 		}
 	}

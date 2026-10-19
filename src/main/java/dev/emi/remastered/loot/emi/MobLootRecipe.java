@@ -213,8 +213,7 @@ public class MobLootRecipe implements EmiRecipe {
             int j = 0;
             for (ConditionalStack stack: stacks) {
                 SlotWidget widget = widgets.addSlot(stack.getIngredient(), i * 18, 11 + (18 * j));
-                String rounded = FloatTrimmer.trimFloatString(Math.max(stack.weight() / 100f, 0.01f), LootSettings.chanceDecimalPlaces());
-                widget.appendTooltip(LText.translatable("emi_loot.rolls", rounded).formatted(Formatting.GRAY));
+                widget.appendTooltip(RollsText.of(stack.weight(), LootSettings.chanceDecimalPlaces()).formatted(Formatting.GRAY));
                 if (LootSettings.showConditionsInTooltip()) {
                     for (Pair<Integer, Text> pair : stack.conditions()) {
                         for (Text line : ConditionIcons.tooltipLines(pair)) {

@@ -1,5 +1,5 @@
 {
-  "description": "Ores module: ore generation pages (height graph, count, biomes, veins) and geode pages.",
+  "description": "Ores module: ore generation pages (height graph, count, biomes, veins, the barrier icon with its tooltip) and geode pages (no empty filling slot).",
   "warmupTicks": 100,
   "settleTicks": 15,
   "steps": [
@@ -11,6 +11,9 @@
     { "type": "emi_recipes", "item": "minecraft:diamond_ore" },
     { "type": "emi_category", "id": "emi_ores:oregen" },
     { "type": "screenshot", "name": "oregen-diamond" },
+    { "type": "hover", "x": 390, "y": 98 },
+    { "type": "screenshot", "name": "oregen-diamond-barrier-tooltip" },
+    { "type": "hover", "x": 630, "y": 5 },
     { "type": "close_screen" },
 
     { "type": "emi_recipes", "item": "minecraft:iron_ore" },

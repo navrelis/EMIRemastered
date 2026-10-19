@@ -55,8 +55,14 @@ public final class MobInfoProvider implements ItemInfoProvider {
 			.text(Text.translatable("emi_mobs.info.mob", type.getName()));
 		for (Stat stat : stats.visible()) {
 			if (SHOWN.contains(stat)) {
-				section.text(Text.translatable("emi_mobs.info.stat", Text.translatable("emi_mobs.stat." + stat.key()),
-					(stat == Stat.SPEED ? "≈" : "") + stats.value(stat, false)));
+				String value = (stat == Stat.SPEED ? "≈" : "") + stats.value(stat);
+				if (stat == Stat.HEALTH || stat == Stat.ATTACK) {
+					// the same points as the mob page, with the hearts they are on the screen
+					Text label = Text.translatable(stat == Stat.ATTACK ? "emi_mobs.info.attack" : "emi_mobs.stat." + stat.key());
+					section.text(Text.translatable("emi_mobs.info.stat_hearts", label, value, stats.tooltipArgs(stat)[1]));
+				} else {
+					section.text(Text.translatable("emi_mobs.info.stat", Text.translatable("emi_mobs.stat." + stat.key()), value));
+				}
 			}
 		}
 		section.link(Text.translatable("emi_mobs.info.open", type.getName()), InfoLink.recipe(page));
