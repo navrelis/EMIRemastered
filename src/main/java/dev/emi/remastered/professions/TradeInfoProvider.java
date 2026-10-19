@@ -14,7 +14,6 @@ import dev.emi.emi.api.render.EmiRenderable;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.remastered.info.api.InfoCollector;
-import dev.emi.remastered.info.api.InfoEntry;
 import dev.emi.remastered.info.api.InfoLink;
 import dev.emi.remastered.info.api.InfoSection;
 import dev.emi.remastered.info.api.ItemInfoProvider;
@@ -172,14 +171,16 @@ public final class TradeInfoProvider implements ItemInfoProvider {
 		if (TradeRows.detailed(trades.size())) {
 			for (TradeRecipe trade : trades) {
 				TradeEntry entry = trade.getEntry();
+				// the count column means "number of trades": the amount of the viewed item goes into the title, the
+				// stacks on the right carry their own amounts
 				long amount = (sold ? entry.output() : matching(entry, stack)).getAmount();
-				InfoEntry row = section.entry(icon(entry), Text.translatable("emiprofessions.trade.title", entry.owner(), entry.levelText()))
+				Text title = amount > 1
+					? Text.translatable("emiprofessions.trade.title_amount", entry.owner(), entry.levelText(), amount)
+					: Text.translatable("emiprofessions.trade.title", entry.owner(), entry.levelText());
+				section.entry(icon(entry), title)
 					.stacks(sold ? prices(entry, stack) : List.of(entry.output()))
 					.link(InfoLink.recipe(entry.id()))
 					.tooltip(tooltip(entry, stack, sold));
-				if (amount > 1) {
-					row.count(amount);
-				}
 			}
 			return;
 		}

@@ -3,6 +3,7 @@
   "emi.category.emiprofessions.villager_trades": "Dorfbewohner-Handel",
   "emi.category.emiprofessions.wandering_trader": "Fahrender Händler",
   "emiprofessions.trade.title": "%1$s - %2$s",
+  "emiprofessions.trade.title_amount": "%1$s - %2$s · %3$s×",
   "emiprofessions.trade.level": "Stufe %s",
   "emiprofessions.trade.pool": "Gruppe %1$s (%2$s Angebote)",
   "emiprofessions.trade.pool_plain": "Gruppe %s",
