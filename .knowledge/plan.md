@@ -64,7 +64,7 @@ Status: open / in progress / in review / done. `||` = can run in parallel.
 | FX-STATS | T1-20 armour section missing, T1-21 honey bottle, T1-22 locale numbers, T1-23 effect rows cut, T1-24 weapon/tool sections | Sonnet long | done (merged; stats tour 100/100 ok, lead viewed armour + food screenshots) |
 | FX-TOOLS | T1-5 crafting JSON copy, T1-6 toast, T1-8 locale, T1-9 stale selection, T1-10 truncation, T1-11 names, KB44 regex tag search | Sonnet long | done (merged; tools tour 89/89 ok; KB44 not reproducible: #/pickax/ = #pickax = 426) |
 | FX-WD | T1-12..19 loot placeholder slot, cost line, grammar, geode slot, ores info merge, graph label, bat portrait, mob units; KB43 | Sonnet long | in review (code accepted by lead; client check running) |
-| CFG1 | world jump icon slot 12, T1-3 module jumps at small windows, T1-25 info tag wording | Sonnet short | in review (code accepted by lead; client check running) |
+| CFG1 | world jump icon slot 12, T1-3 module jumps at small windows, T1-25 info tag wording | Sonnet short | done (merged; config tour 111/111 ok, one correction: Modules first) |
 | DOC2 | README, CREDITS.md (authors, refs, licences), CHANGELOG 2.0.0, licence files in jar | Sonnet short | done (merged; jar has CREDITS.md, LICENSE, LGPL text; 0 devtour entries) |
 | -- | Later: KB7, KB13 | - | open |
 
