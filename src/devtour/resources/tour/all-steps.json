@@ -1,0 +1,43 @@
+{
+  "description": "Smoke test of every step type; also an example for writing your own tour.",
+  "warmupTicks": 40,
+  "steps": [
+    { "type": "note", "text": "exercise every step type once" },
+    { "type": "resize", "w": 1280, "h": 720 },
+    { "type": "set_gui_scale", "n": 2 },
+    { "type": "command", "text": "/time set day" },
+    { "type": "wait", "ticks": 10 },
+    { "type": "screenshot", "name": "world-hud" },
+
+    { "type": "open_inventory" },
+    { "type": "emi_search", "text": "pickaxe" },
+    { "type": "screenshot", "name": "search-pickaxe" },
+    { "type": "emi_search", "text": "" },
+    { "type": "close_screen" },
+
+    { "type": "key", "key": "E" },
+    { "type": "wait", "ticks": 5 },
+    { "type": "screenshot", "name": "inventory-via-key" },
+
+    { "type": "emi_recipes", "item": "minecraft:iron_pickaxe" },
+    { "type": "emi_recipe_tab", "index": 1 },
+    { "type": "screenshot", "name": "second-tab" },
+    { "type": "emi_category", "id": "minecraft:crafting" },
+    { "type": "screenshot", "name": "crafting-tab" },
+    { "type": "emi_bom" },
+    { "type": "screenshot", "name": "bom" },
+    { "type": "close_screen" },
+
+    { "type": "emi_uses", "item": "minecraft:coal" },
+    { "type": "emi_category", "id": "emi:fuel" },
+    { "type": "screenshot", "name": "fuel" },
+    { "type": "close_screen" },
+
+    { "type": "open_emi_config" },
+    { "type": "screenshot", "name": "config" },
+    { "type": "close_screen" },
+
+    { "type": "emi_recipes", "item": "minecraft:bedrock" },
+    { "type": "note", "text": "the step above is expected to FAIL (bedrock has no recipes) to show failure reporting" }
+  ]
+}

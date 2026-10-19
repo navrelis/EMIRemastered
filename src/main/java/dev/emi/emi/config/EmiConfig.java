@@ -24,6 +24,7 @@ import dev.emi.emi.input.EmiBind;
 import dev.emi.emi.input.EmiInput;
 import dev.emi.emi.platform.EmiAgnos;
 import dev.emi.emi.runtime.EmiLog;
+import dev.emi.remastered.config.ModuleConfigs;
 import it.unimi.dsi.fastutil.ints.IntList;
 import joptsimple.internal.Strings;
 import net.minecraft.client.font.TextHandler;
@@ -562,6 +563,8 @@ public class EmiConfig {
 	public static void loadConfig(QDCSS css) {
 		try {
 			Set<String> consumed = Sets.newHashSet();
+			// EMI Remastered: module config classes (dev.emi.remastered.config.ModuleConfigs)
+			consumed.addAll(ModuleConfigs.load(css, EmiConfig::assignField));
 			for (Field field : EmiConfig.class.getFields()) {
 				ConfigValue annot = field.getAnnotation(ConfigValue.class);
 				if (annot != null) {
@@ -620,6 +623,8 @@ public class EmiConfig {
 				unparsed.computeIfAbsent(group, g -> Lists.newArrayList()).add(text);
 			}
 		}
+		// EMI Remastered: module groups after EMI's own, before keys nobody knows
+		ModuleConfigs.write(unparsed, EmiConfig::writeField);
 		for (Map.Entry<String, List<String>> entry : EmiConfig.unparsed.entrySet()) {
 			String[] parts = entry.getKey().split("\\.");
 			String group = parts[0];
@@ -818,6 +823,7 @@ public class EmiConfig {
 		} catch (Exception e) {
 			EmiLog.error("Error reflecting config", e);
 		}
+		FILTERS.putAll(ModuleConfigs.collectFilters()); // EMI Remastered
 		DEFAULT_CONFIG = getSavedConfig();
 	}
 	

@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "emi_devtour",
+  "version": "${version}",
+  "name": "EMI Dev Tour",
+  "description": "Dev-only automated screenshot tour for EMI Remastered. Only on the classpath of the clientTour run config, never shipped.",
+  "authors": [
+    "navrelis"
+  ],
+  "license": "MIT",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "dev.emi.remastered.devtour.TourMod"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.16.14",
+    "minecraft": "1.21.1",
+    "fabric-api": "*",
+    "emi": "*",
+    "java": ">=21"
+  }
+}

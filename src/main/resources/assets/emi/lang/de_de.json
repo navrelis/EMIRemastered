@@ -886,5 +886,20 @@
   "tag.item.fabric.shovels": "Schaufeln",
   "tag.item.fabric.hoes": "Hacken",
   "tag.item.fabric.swords": "Schwerter",
-  "tag.item.fabric.shears": "Scheren"
+  "tag.item.fabric.shears": "Scheren",
+  "config.emi.group.modules": "Module",
+  "config.emi.modules.loot": "Beute (EMI Loot)",
+  "config.emi.tooltip.modules.loot": "Zeigt Beute aus Truhen, von Blöcken, Mobs, Spielmechaniken und Archäologie.",
+  "config.emi.modules.ores": "Erze (EMI Ores)",
+  "config.emi.tooltip.modules.ores": "Zeigt, in welchen Biomen und auf welchen Höhen Erze und Geoden entstehen.",
+  "config.emi.modules.effects": "Effekte (EMIffect)",
+  "config.emi.tooltip.modules.effects": "Zeigt Statuseffekte mit Beschreibung und Quellen.",
+  "config.emi.modules.enchanting": "Verzauberungen (EMI Enchanting)",
+  "config.emi.tooltip.modules.enchanting": "Zeigt Verzauberungen mit maximaler Stufe, Unverträglichkeiten und passenden Gegenständen.",
+  "config.emi.modules.professions": "Berufe (EMI Professions)",
+  "config.emi.tooltip.modules.professions": "Zeigt Dorfbewohnerberufe mit ihren Arbeitsstationen und Handelsangeboten.",
+  "config.emi.modules.letsdo": "Let's Do (Let's Do EMI Compat)",
+  "config.emi.tooltip.modules.letsdo": "Zeigt Rezepte der Let's-Do-Mods (Vinery, Meadow, Bakery, ...).",
+  "config.emi.modules.distraction_free": "Ablenkungsfreie Rezepte",
+  "config.emi.tooltip.modules.distraction_free": "Blendet EMIs Index aus, bis du nach etwas suchst."
 }
