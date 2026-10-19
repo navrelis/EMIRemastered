@@ -905,5 +905,7 @@
   "config.emi.modules.info": "Gegenstandsinfo",
   "config.emi.tooltip.modules.info": "Eine Taste (Standard I) auf einem Stapel öffnet eine Übersicht: wie man ihn bekommt, wofür er verwendet wird und Details.",
   "config.emi.modules.mobs": "Mobs (EMI Mobs)",
-  "config.emi.tooltip.modules.mobs": "Zeigt für jeden Mob eine Seite mit Werten, Spawn-Biomen und einem Link zu seiner Beute."
+  "config.emi.tooltip.modules.mobs": "Zeigt für jeden Mob eine Seite mit Werten, Spawn-Biomen und einem Link zu seiner Beute.",
+  "config.emi.modules.tools": "Werkzeuge (Tag-Browser, Rezept kopieren)",
+  "config.emi.tooltip.modules.tools": "Werkzeuge für Pack-Entwickler: ein Browser für alle Tags und eine Taste, die das überfahrene Rezept als Text oder JSON kopiert."
 }
