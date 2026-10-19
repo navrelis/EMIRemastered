@@ -1,6 +1,6 @@
 # Plan
 
-Usage tally (work units: short = 1, long = 2): Opus 25 (F1, F2, Q3 x6, A1 x2, FX1 x4, FOCUS1 x4 = two delegations) / Sonnet 109 -> Opus 19 % (sessions 4+5 re-delegations counted again)
+Usage tally (work units: short = 1, long = 2): Opus 29 (F1, F2, Q3 x6, A1 x2, FX1 x4, FOCUS1 x4 = two delegations, PACK-CLI x2, LOGO x2) / Sonnet 113 -> Opus 20 % (sessions 4+5 re-delegations counted again)
 
 Status: open / in progress / in review / done. `||` = can run in parallel.
 
@@ -72,7 +72,12 @@ Status: open / in progress / in review / done. `||` = can run in parallel.
 | FX-SER | Unknown stack type (disabled plugin/removed mod) logs 1 WARN per type instead of ERROR+NPE per entry (EmiIngredientSerializers) | Sonnet short | done (merged; plugin-manager tour: 1 WARN per unknown type, 0 ERROR, emi.json entries kept byte-identical; 3 tests) |
 | LOOT-VAN | Code-placed vanilla chest tables mapped by structure type (desert pyramid, fortress, stronghold, ...) in StructureLookup | Sonnet short | done (merged; 53 of 56 chest tables now have a structure, loot-van tour 22/22, lead viewed nether wart Item Info) |
 | DOC3 | KNOWN_BUGS (KB7, KB43, KB44) + TOUR_REPORT statuses after wave 6, CREDITS for KB7 port | Sonnet short | done (merged; T2 findings may need a follow-up) |
+| PACK-CLI | Pack-mirror dev client (pack mods copied into run/mods, hidden, muted): mixins of other mods into EMI, EMI plugins, reload times, modded Item Info | Opus long | in progress (worktree pack-cli, port 25672) |
+| PACK-SRV | Production dedicated server (release jar + copied pack mods, local files only): loading, provides, server-side modules | Sonnet long | in progress (scratch dir, port 25673) |
+| BRAND | docs/DESCRIPTION.md (summary EN/DE, tagline, CurseForge/Modrinth description), fabric.mod.json description | Sonnet short | done (merged; summary 187 chars, DE 181, tagline 55; one correction: product names untranslated, 'author') |
+| LOGO | Pixel-art logo, banner, mod icon from a deterministic Pillow generator | Opus long | in progress (worktree logo) |
 | -- | Later: KB13 (Sodium vertex path, needs pack measurement), T1-29 core string | - | open |
 
 ## Phase 4 Acceptance
 Pack install under game lock, end-to-end check, report, push.
+- Jar swap: done 2026-10-19 21:1x (owner's client closed; 8 jars in mods_backup/, EMIRemastered jar in mods/, lock created and removed). Owner launch + log check: pending (owner offline).
