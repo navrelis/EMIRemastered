@@ -1,8 +1,10 @@
 package dev.emi.remastered.tools.client;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
@@ -19,10 +21,13 @@ import dev.emi.emi.runtime.EmiDrawContext;
 import dev.emi.emi.runtime.EmiHistory;
 import dev.emi.emi.runtime.EmiTagKey;
 import dev.emi.emi.screen.RecipeScreen;
+import dev.emi.remastered.tools.tags.NumberText;
+import dev.emi.remastered.tools.tags.RowLayout;
 import dev.emi.remastered.tools.tags.TagCatalog;
 import dev.emi.remastered.tools.tags.TagEntry;
 import dev.emi.remastered.tools.tags.TagFilter;
 import dev.emi.remastered.tools.tags.TagFilter.MemberRef;
+import dev.emi.remastered.tools.tags.TagNames;
 import dev.emi.remastered.tools.tags.TagSearch;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -48,7 +53,6 @@ import net.minecraft.util.math.MathHelper;
  */
 public class TagBrowserScreen extends Screen {
 	private static final String KEY = "emi_remastered_tools.tags.";
-	private static final DecimalFormat NUMBER = new DecimalFormat("#,###");
 	private static final int ROW = 12;
 	private static final int SLOT = 18;
 	private static final int TEXT_ROW = 10;
@@ -72,6 +76,8 @@ public class TagBrowserScreen extends Screen {
 
 	private final @Nullable Screen previous;
 	private final TagCatalog catalog;
+	private final Locale locale = NumberText.locale(MinecraftClient.getInstance().getLanguageManager().getLanguage());
+	private final Map<TagEntry, String> titles = new IdentityHashMap<>();
 	private TagFilter filter = TagFilter.ALL;
 	private List<TagEntry> results = List.of();
 	private @Nullable TagEntry selected;
@@ -121,6 +127,31 @@ public class TagBrowserScreen extends Screen {
 	private void refilter() {
 		results = TagSearch.filter(catalog.entries(), filter);
 		tagScroll.scroll = 0;
+		hoveredTag = -1;
+		hoveredMember = null;
+		// the right pane must not keep showing a tag the left list no longer has (the selection is cleared, not moved)
+		if (selected != null && !results.contains(selected)) {
+			select(null);
+		}
+	}
+
+	private String num(long number) {
+		return NumberText.format(number, locale);
+	}
+
+	/** The friendly name of a tag: its translation if there is one, else a name made of the last path segment. */
+	private String title(TagEntry tag) {
+		return titles.computeIfAbsent(tag, t -> {
+			String key = TagNames.tagKey(t.registry(), t.id());
+			if (I18n.hasTranslation(key)) {
+				return I18n.translate(key);
+			}
+			Text name = tagName(t);
+			if (!name.getString().equals("#" + t.id())) {
+				return name.getString();
+			}
+			return TagNames.readable(t.id());
+		});
 	}
 
 	private void select(@Nullable TagEntry tag) {
@@ -196,7 +227,7 @@ public class TagBrowserScreen extends Screen {
 		listH = Math.max(ROW * 2, bodyBottom - bodyTop);
 		detailX = listX + listW + PAD;
 		detailW = panelX + panelW - PAD - detailX;
-		gridY = bodyTop + 24;
+		gridY = bodyTop + 35;
 		gridH = Math.max(SLOT, bodyBottom - gridY);
 		footerY = bodyBottom + 4;
 		columns = Math.max(1, (detailW - BAR - 2) / SLOT);
@@ -211,7 +242,7 @@ public class TagBrowserScreen extends Screen {
 	}
 
 	private Text registryButtonText() {
-		return EmiPort.literal(registryLabel(filter.registry()).getString() + " (" + NUMBER.format(catalog.count(filter.registry())) + ")");
+		return EmiPort.literal(registryLabel(filter.registry()).getString() + " (" + num(catalog.count(filter.registry())) + ")");
 	}
 
 	private static Text registryLabel(@Nullable String registry) {
@@ -248,7 +279,7 @@ public class TagBrowserScreen extends Screen {
 		context.resetColor();
 		EmiRenderHelper.drawNinePatch(context, EmiRenderHelper.BACKGROUND, panelX, panelY, panelW, panelH, 0, 0, 4, 1);
 		context.drawText(title, panelX + PAD, panelY + 7, PANEL_TEXT);
-		Text count = EmiPort.translatable(KEY + "count", NUMBER.format(results.size()), NUMBER.format(catalog.count(filter.registry())));
+		Text count = EmiPort.translatable(KEY + "count", num(results.size()), num(catalog.count(filter.registry())));
 		context.drawText(count, panelX + panelW - PAD - textRenderer.getWidth(count), panelY + 7, PANEL_SUBTEXT);
 
 		super.render(raw, mouseX, mouseY, delta);
@@ -309,21 +340,25 @@ public class TagBrowserScreen extends Screen {
 			} else if (hovered) {
 				context.fill(listX + 1, y, viewW, ROW, 0xFF34495C);
 			}
-			String size = NUMBER.format(tag.size());
-			int right = listX + 1 + viewW - 3;
-			int sizeW = textRenderer.getWidth(size);
-			context.drawText(EmiPort.literal(size), right - sizeW, y + 2, 0xFF909090);
-			right -= sizeW + 6;
-			if (showRegistry) {
-				String registry = registryLabel(tag.registry()).getString();
-				int registryW = textRenderer.getWidth(registry);
-				if (registryW < viewW / 3) {
-					context.drawText(EmiPort.literal(registry), right - registryW, y + 2, 0xFF6F7F8F);
-					right -= registryW + 6;
-				}
+			// the id keeps its width; the registry label goes first, then the count (see RowLayout)
+			boolean empty = tag.size() == 0;
+			String size = num(tag.size());
+			String registry = showRegistry ? registryLabel(tag.registry()).getString() : "";
+			int idX = listX + 4;
+			int rowRight = listX + 1 + viewW - 3;
+			RowLayout layout = RowLayout.of(rowRight - idX, textRenderer.getWidth(tag.id()), textRenderer.getWidth(size),
+				showRegistry ? textRenderer.getWidth(registry) : 0, 6);
+			int right = rowRight;
+			if (layout.showSize()) {
+				int sizeW = textRenderer.getWidth(size);
+				context.drawText(EmiPort.literal(size), right - sizeW, y + 2, empty ? 0xFFA05050 : 0xFF909090);
+				right -= sizeW + 6;
 			}
-			String id = fit(tag.id(), Math.max(8, right - (listX + 4)));
-			context.drawText(EmiPort.literal(id), listX + 4, y + 2, tag == selected ? 0xFFFFFFFF : 0xFFD8D8D8);
+			if (layout.showRegistry()) {
+				context.drawText(EmiPort.literal(registry), right - textRenderer.getWidth(registry), y + 2, 0xFF6F7F8F);
+			}
+			int idColor = tag == selected ? 0xFFFFFFFF : empty ? 0xFF7C8288 : 0xFFD8D8D8;
+			context.drawText(EmiPort.literal(fit(tag.id(), layout.idWidth())), idX, y + 2, idColor);
 		}
 		raw.disableScissor();
 		if (results.isEmpty()) {
@@ -345,15 +380,10 @@ public class TagBrowserScreen extends Screen {
 			return;
 		}
 		TagEntry tag = selected;
-		Text name = tagName(tag);
-		boolean named = !name.getString().equals("#" + tag.id());
-		String head = named ? name.getString() + "  " : "";
-		context.drawText(EmiPort.literal(head), detailX, listY + 1, PANEL_TEXT);
-		int headW = textRenderer.getWidth(head);
-		context.drawText(EmiPort.literal(fit("#" + tag.id(), Math.max(8, detailW - headW))), detailX + headW, listY + 1,
-			named ? PANEL_SUBTEXT : PANEL_TEXT);
-		Text info = EmiPort.translatable(KEY + "info", registryLabel(tag.registry()), NUMBER.format(tag.size()));
-		context.drawText(EmiPort.literal(fit(info.getString(), detailW)), detailX, listY + 12, PANEL_SUBTEXT);
+		context.drawText(EmiPort.literal(fit(title(tag), detailW)), detailX, listY + 1, PANEL_TEXT);
+		context.drawText(EmiPort.literal(fit("#" + tag.id(), detailW)), detailX, listY + 12, PANEL_SUBTEXT);
+		Text info = EmiPort.translatable(KEY + "info", registryLabel(tag.registry()), num(tag.size()));
+		context.drawText(EmiPort.literal(fit(info.getString(), detailW)), detailX, listY + 23, PANEL_SUBTEXT);
 
 		int gridX = detailX;
 		memberScroll.update(contentHeightOfMembers(), gridH);
@@ -387,7 +417,13 @@ public class TagBrowserScreen extends Screen {
 				hoveredMember = member;
 				context.fill(gridX, y, detailW - BAR, TEXT_ROW, 0x55FFFFFF);
 			}
-			context.drawText(EmiPort.literal(fit(member.id(), detailW - BAR - 4)), gridX + 2, y + 1, PANEL_TEXT);
+			int textW = detailW - BAR - 4;
+			String label = fit(member.label(), textW);
+			context.drawText(EmiPort.literal(label), gridX + 2, y + 1, PANEL_TEXT);
+			int idX = textRenderer.getWidth(label) + 8;
+			if (!member.label().equals(member.id()) && idX + textRenderer.getWidth(member.id()) <= textW) {
+				context.drawText(EmiPort.literal(member.id()), gridX + 2 + idX, y + 1, PANEL_SUBTEXT);
+			}
 		}
 		raw.disableScissor();
 		if (stackMembers.isEmpty() && textMembers.isEmpty()) {
@@ -438,7 +474,10 @@ public class TagBrowserScreen extends Screen {
 			if (hoveredMember.stack() != null) {
 				tooltip.addAll(hoveredMember.stack().getTooltip());
 			} else {
-				tooltip.add(EmiTooltipComponents.of(EmiPort.literal(hoveredMember.id())));
+				tooltip.add(EmiTooltipComponents.of(EmiPort.literal(hoveredMember.label())));
+				if (!hoveredMember.label().equals(hoveredMember.id())) {
+					tooltip.add(EmiTooltipComponents.of(EmiPort.literal(hoveredMember.id(), Formatting.GRAY)));
+				}
 			}
 			List<TagEntry> tags = memberTags(hoveredMember);
 			tooltip.add(EmiTooltipComponents.of(tags.isEmpty()
@@ -454,9 +493,13 @@ public class TagBrowserScreen extends Screen {
 		} else if (hoveredTag >= 0 && hoveredTag < results.size()) {
 			TagEntry tag = results.get(hoveredTag);
 			List<TooltipComponent> tooltip = new ArrayList<>();
-			tooltip.add(EmiTooltipComponents.of(EmiPort.literal("#" + tag.id())));
+			tooltip.add(EmiTooltipComponents.of(EmiPort.literal(title(tag))));
+			tooltip.add(EmiTooltipComponents.of(EmiPort.literal("#" + tag.id(), Formatting.AQUA)));
 			tooltip.add(EmiTooltipComponents.of(EmiPort.translatable(KEY + "info", registryLabel(tag.registry()),
-				NUMBER.format(tag.size())).formatted(Formatting.GRAY)));
+				num(tag.size())).formatted(Formatting.GRAY)));
+			if (tag.size() == 0) {
+				tooltip.add(EmiTooltipComponents.of(EmiPort.translatable(KEY + "empty.tag").formatted(Formatting.RED)));
+			}
 			tooltip.add(EmiTooltipComponents.of(EmiPort.translatable(KEY + "tag.copy").formatted(Formatting.DARK_GRAY)));
 			EmiRenderHelper.drawTooltip(this, context, tooltip, mouseX, mouseY, Math.min(width / 2 - 16, 260));
 		} else if (overChipClear) {

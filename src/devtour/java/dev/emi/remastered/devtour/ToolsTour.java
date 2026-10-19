@@ -129,6 +129,47 @@ public final class ToolsTour {
 		return result;
 	}
 
+	/** Selects the item tag minecraft:logs, so a later filter that drops it shows whether the selection goes stale. */
+	public static String selectLogs() throws ReflectiveOperationException {
+		TagBrowserScreen screen = browser();
+		Method select = TagBrowserScreen.class.getDeclaredMethod("select", dev.emi.remastered.tools.tags.TagEntry.class);
+		select.setAccessible(true);
+		select.invoke(screen, TagIndex.get().find("minecraft:item", "minecraft:logs"));
+		return "selected " + field(screen, "selected");
+	}
+
+	/** What the right pane shows now (the selected tag), for the tour log. */
+	public static String selection() throws ReflectiveOperationException {
+		return "selected=" + field(browser(), "selected") + ", results=" + ((List<?>) field(browser(), "results")).size();
+	}
+
+	/** Scrolls the longest tag id of the list into view and hovers its row (the row tooltip shows the full id). */
+	public static String hoverLongestTag() throws ReflectiveOperationException {
+		TagBrowserScreen screen = browser();
+		List<?> results = (List<?>) field(screen, "results");
+		int longest = 0;
+		for (int i = 0; i < results.size(); i++) {
+			String id = ((dev.emi.remastered.tools.tags.TagEntry) results.get(i)).id();
+			if (id.length() > ((dev.emi.remastered.tools.tags.TagEntry) results.get(longest)).id().length()) {
+				longest = i;
+			}
+		}
+		Object scroll = field(screen, "tagScroll");
+		Field scrollY = scroll.getClass().getDeclaredField("scroll");
+		scrollY.setAccessible(true);
+		int row = 12;
+		int listX = (int) field(screen, "listX");
+		int listY = (int) field(screen, "listY");
+		scrollY.setInt(scroll, Math.max(0, longest * row - 2 * row));
+		int y = listY + 1 + longest * row - scrollY.getInt(scroll) + row / 2;
+		MinecraftClient client = client();
+		double scale = client.getWindow().getScaleFactor();
+		Method move = client.mouse.getClass().getDeclaredMethod("onCursorPos", long.class, double.class, double.class);
+		move.setAccessible(true);
+		move.invoke(client.mouse, client.getWindow().getHandle(), (listX + 20) * scale, y * scale);
+		return "hover row " + longest + " " + ((dev.emi.remastered.tools.tags.TagEntry) results.get(longest)).id();
+	}
+
 	public static String closeScreen() {
 		browser().close();
 		return screenName();
