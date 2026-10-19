@@ -1,5 +1,6 @@
 package dev.emi.remastered.ores;
 
+import dev.emi.emi.api.EmiInitRegistry;
 import dev.emi.emi.api.EmiRegistry;
 import dev.emi.remastered.module.ModuleEmiPlugin;
 import dev.emi.remastered.module.Modules;
@@ -13,6 +14,11 @@ public class OresEmiPlugin extends ModuleEmiPlugin {
 
 	public OresEmiPlugin() {
 		super(Modules.ORES, PLUGIN_ID);
+	}
+
+	@Override
+	protected void initializeContent(EmiInitRegistry registry) {
+		OresContent.initialize(registry);
 	}
 
 	@Override

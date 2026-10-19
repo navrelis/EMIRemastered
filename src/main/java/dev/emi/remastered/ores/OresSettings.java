@@ -8,7 +8,7 @@ import dev.emi.emi.config.EmiConfig.ConfigValue;
 
 public class OresSettings {
 
-	@Comment("Whether all biomes should be added to the EMI index.")
+	@Comment("Whether all biomes should be added to the EMI index (applies after an EMI reload).")
 	@ConfigValue("ores.add-biomes-to-index")
 	public static boolean addBiomesToIndex = true;
 
