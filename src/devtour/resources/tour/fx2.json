@@ -1,0 +1,47 @@
+{
+  "description": "FX2 core fixes: block tag search (KB6), index source creative (KB5), mod name tooltip around a reload (KB10).",
+  "warmupTicks": 60,
+  "settleTicks": 10,
+  "stepTimeoutSeconds": 60,
+  "worldJoinTimeoutSeconds": 180,
+  "timeoutSeconds": 400,
+  "steps": [
+    { "type": "resize", "w": 1280, "h": 720 },
+    { "type": "set_gui_scale", "n": 2 },
+    { "type": "command", "text": "/give @a minecraft:diamond 5", "waitTicks": 10 },
+    { "type": "open_inventory" },
+    { "type": "screenshot", "name": "inventory" },
+
+    { "type": "emi_search", "text": "#minecraft:mineable/pickaxe" },
+    { "type": "wait", "ticks": 30 },
+    { "type": "screenshot", "name": "tag-block-pickaxe" },
+    { "type": "emi_search", "text": "#minecraft:logs" },
+    { "type": "wait", "ticks": 30 },
+    { "type": "screenshot", "name": "tag-logs" },
+    { "type": "emi_search", "text": "#/pickax/" },
+    { "type": "wait", "ticks": 30 },
+    { "type": "screenshot", "name": "tag-regex-pickaxe" },
+    { "type": "emi_search", "text": "barrier" },
+    { "type": "wait", "ticks": 30 },
+    { "type": "screenshot", "name": "search-barrier" },
+    { "type": "emi_search", "text": "" },
+    { "type": "wait", "ticks": 30 },
+
+    { "type": "hover", "x": 248, "y": 247 },
+    { "type": "screenshot", "name": "tooltip-before-reload" },
+
+    { "type": "call", "class": "dev.emi.emi.runtime.EmiReloadManager", "method": "reload" },
+    { "type": "wait", "ticks": 3 },
+    { "type": "hover", "x": 248, "y": 247 },
+    { "type": "screenshot", "name": "tooltip-during-reload", "settleTicks": 2 },
+    { "type": "wait", "ticks": 200 },
+    { "type": "emi_wait_loaded" },
+    { "type": "hover", "x": 248, "y": 247 },
+    { "type": "screenshot", "name": "tooltip-after-reload" },
+
+    { "type": "hover", "x": 248, "y": 247 },
+    { "type": "key", "key": "I" },
+    { "type": "wait", "ticks": 10 },
+    { "type": "screenshot", "name": "info-key" }
+  ]
+}

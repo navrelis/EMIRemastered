@@ -1,7 +1,6 @@
 package dev.emi.emi.mixin;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executors;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -13,6 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import dev.emi.emi.platform.EmiClient;
 import dev.emi.emi.runtime.EmiLog;
+import dev.emi.emi.runtime.EmiPersistentData;
 import dev.emi.emi.runtime.EmiReloadManager;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.world.ClientWorld;
@@ -31,13 +31,16 @@ public class MinecraftClientMixin {
 				if (client.world != null && client.world.getRecipeManager() != null) {
 					EmiReloadManager.reload();
 				}
-			}, Executors.newFixedThreadPool(1));
+			}, (MinecraftClient) (Object) this); // EMI Remastered: was a new, never closed thread pool per reload (KB15)
 		}
 	}
 
-	@Inject(at = @At("HEAD"), method = "disconnect(Lnet/minecraft/client/gui/screen/Screen;)V")
+	// EMI Remastered: was disconnect(Screen); a kick or a lost connection calls disconnect(Screen, boolean) directly,
+	// so EMI was never cleared and its reload kept running without a world (KB1, KB38)
+	@Inject(at = @At("HEAD"), method = "disconnect(Lnet/minecraft/client/gui/screen/Screen;Z)V")
 	private void disconnect(CallbackInfo info) {
 		EmiLog.info("Disconnecting from server, EMI data cleared");
+		EmiPersistentData.flush(); // EMI Remastered: write a pending debounced save (KB14)
 		EmiReloadManager.clear();
 		EmiClient.onServer = false;
 	}
