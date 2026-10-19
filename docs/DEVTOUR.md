@@ -42,6 +42,13 @@ groups, jump buttons, module switches), `plugin-manager` (Plugin Manager: list, 
 `focus-check` (window focus / cursor lock check), `distraction-free`, `effects`, `enchanting`, `loot`, `ores` (one per
 module) and `all-steps` (touches every step type; its last step is meant to fail to show how failures are reported).
 
+Tours for single fixes and features (also in `src/devtour/resources/tour/`):
+
+* `fx2.json`: block tag search (`#minecraft:mineable/pickaxe`, `#minecraft:logs`, regex `#/pickax/`), creative index source (search `barrier`) and the mod name tooltip before, during and after an EMI reload (`call` step on `EmiReloadManager.reload`).
+* `fx3.json`: loot `copy_name` tooltip on the banner block drops, enchanted books above the maximum level (Sharpness 7 and 12), and `U` on a Smite book (own page first in the Enchantments tab).
+* `p8.json`: Item Info sections of the professions (trades sold/bought by villagers) and effects modules (potions, tipped arrows, stews, effect stacks) and clicking their rows.
+* `world.json`: biome and structure pages (village, stronghold, trial chambers, nether portal; plains, desert, nether wastes, deep dark), also after a `/reload`. Biome and structure stacks are no items, and tour clicks do not reach index stacks, so the tour opens the pages with the dev-only helper `src/devtour/java/dev/emi/remastered/devtour/WorldTour.java` through `call` steps (it does what a click on the stack in the index does).
+
 ## How it works
 
 1. `TourMod` (client entrypoint) reads the system property `emi.tour` (set by `clientTour` from `-Ptour`, default
