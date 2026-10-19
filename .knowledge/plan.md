@@ -61,7 +61,7 @@ Status: open / in progress / in review / done. `||` = can run in parallel.
 | P8 | Info providers: villager trades (professions), effects | Sonnet long | done (merged; coveredCategories(stack) API; item-info toggle not client-checked) |
 | DOC1 | KNOWN_BUGS.md rows from FX1-FX3/Q3 + DEVTOUR.md tour list (world, fx2, fx3, p8, WorldTour) | Sonnet short | done (open: KB7, KB13, KB28 partly, KB43, KB44) |
 | ICON12 | world jump icon slot 12 (after T1) | Sonnet short | open |
-| DOC2 | README, CREDITS.md (authors, refs, licences), CHANGELOG 2.0.0, licence files in jar | Sonnet short | in progress |
+| DOC2 | README, CREDITS.md (authors, refs, licences), CHANGELOG 2.0.0, licence files in jar | Sonnet short | done (merged; jar has CREDITS.md, LICENSE, LGPL text; 0 devtour entries) |
 | -- | Later: KB7, KB13 | - | open |
 
 ## Phase 4 Acceptance

@@ -72,3 +72,4 @@
 2026-10-19 | DOC1 delegated (Sonnet short): KNOWN_BUGS rows + DEVTOUR tour list
 2026-10-19 | DOC2 delegated (Sonnet short): README, CREDITS, CHANGELOG, licences in jar
 2026-10-19 | DOC1 review (lead) | accepted: 30 rows fixed, KB43-45 added; merged
+2026-10-19 | DOC2 review (lead) | accepted: README, CREDITS from upstream metadata, CHANGELOG 2.0.0, jar root licences; merged, build green, jar checked
