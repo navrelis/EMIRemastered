@@ -73,3 +73,5 @@
 2026-10-19 | DOC2 delegated (Sonnet short): README, CREDITS, CHANGELOG, licences in jar
 2026-10-19 | DOC1 review (lead) | accepted: 30 rows fixed, KB43-45 added; merged
 2026-10-19 | DOC2 review (lead) | accepted: README, CREDITS from upstream metadata, CHANGELOG 2.0.0, jar root licences; merged, build green, jar checked
+2026-10-19 | T1 review (lead) | accepted: icons 9/11, 17 tours ok, TOUR_REPORT 29 findings (T1-2 tainted already fixed by FX2/KB11); merged, build green
+2026-10-19 | wave 6 delegated: FOCUS1 (Opus long, owner focus rule), FX-STATS, FX-TOOLS, FX-WD (Sonnet long), CFG1 (Sonnet short); ports 25650-25654
