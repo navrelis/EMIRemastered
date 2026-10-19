@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -151,7 +152,7 @@ public class OresFeaturesSender {
 					placedFeatureHolder.getKey().ifPresent(placedFeatureResourceKey -> {
 						Identifier featureId = placedFeatureResourceKey.getValue();
 						if (featureMap.containsKey(featureId)) {
-							features2biomes.computeIfAbsent(featureId, k -> new LinkedHashSet<>()).add(biomeEntry.getKey().getValue());
+							features2biomes.computeIfAbsent(featureId, k -> new TreeSet<>()).add(biomeEntry.getKey().getValue());
 						}
 					});
 				});
@@ -201,13 +202,14 @@ public class OresFeaturesSender {
 				Ores.LOG.warn("Not sending the biomes of dimension {} to clients: {}", id, e.toString());
 			}
 		}
-		// overworld, nether and end first, in this order, then the rest as the server lists them (the sort is stable)
-		dimensions.sort(Comparator.comparingInt(d -> vanillaOrder(d.id())));
+		// overworld, nether and end first, in this order, then the rest by id (the registry is hash ordered)
+		dimensions.sort(Comparator.comparingInt((OresSyncPlan.DimensionSource d) -> vanillaOrder(d.id())).thenComparing(OresSyncPlan.DimensionSource::id));
 		return dimensions;
 	}
 
 	private static Collection<Identifier> biomesOf(ChunkGenerator generator) {
-		Collection<Identifier> biomes = new LinkedHashSet<>();
+		// a sorted set: the biome source gives its biomes in hash order
+		Collection<Identifier> biomes = new TreeSet<>();
 		for (RegistryEntry<Biome> biome : generator.getBiomeSource().getBiomes()) {
 			biome.getKey().ifPresent(key -> biomes.add(key.getValue()));
 		}

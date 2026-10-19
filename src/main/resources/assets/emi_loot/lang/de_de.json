@@ -107,6 +107,7 @@
   "emi_loot.percent_chance": "%s%% Chance",
   "emi_loot.percentage": "%s%%",
   "emi_loot.rolls": "%s Durchgänge",
+  "emi_loot.rolls_small": "%s %% eines Durchgangs",
   "emi_loot.rolls_visible": "%s D",
   "emi_loot.and": " & ",
   "emi_loot.color_name": "%1$s %2$s",

@@ -1,5 +1,5 @@
 {
-  "description": "Ores extras: height graph with highlighted peak and Y caption, dimension line, compact biome lists (all biomes, +N more), and the World Generation section on the Item Info page of an ore.",
+  "description": "Ores extras (FX-WD: emerald graph with the player marker on the label, merged World Generation rows and no biome tile in the ore Item Info): height graph with highlighted peak and Y caption, dimension line, compact biome lists (all biomes, +N more), and the World Generation section on the Item Info page of an ore.",
   "warmupTicks": 120,
   "settleTicks": 20,
   "steps": [
@@ -15,9 +15,16 @@
     { "type": "screenshot", "name": "oregen-diamond-peak-y" },
     { "type": "close_screen" },
 
+    { "type": "note", "text": "FX-WD: the player stands at Y 232, the peak of the emerald graph, so the orange marker runs through the middle label (it must leave the label free)" },
+    { "type": "command", "text": "/effect give @s minecraft:resistance 600 4 true" },
+    { "type": "command", "text": "/tp @s ~ 232 ~" },
+    { "type": "wait", "ticks": 3 },
     { "type": "emi_recipes", "item": "minecraft:emerald_ore" },
     { "type": "emi_category", "id": "emi_ores:oregen" },
     { "type": "screenshot", "name": "oregen-emerald-long-biome-list" },
+    { "type": "hover", "x": 320, "y": 98 },
+    { "type": "screenshot", "name": "oregen-emerald-graph-tooltip" },
+    { "type": "hover", "x": 630, "y": 5 },
     { "type": "close_screen" },
 
     { "type": "emi_recipes", "item": "minecraft:coal_ore" },

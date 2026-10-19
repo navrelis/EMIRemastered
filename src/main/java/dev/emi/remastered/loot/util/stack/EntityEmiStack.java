@@ -41,11 +41,16 @@ public class EntityEmiStack extends EmiStack {
         this(entity, 8.0);
     }
 
+    private EntityEmiStack(@Nullable Entity entity, EntityRenderContext ctx) {
+        this.entity = entity;
+        this.ctx = ctx;
+    }
+
     protected EntityEmiStack(@Nullable Entity entity, double scale) {
         this.entity = entity;
         if (entity != null) {
             boolean hasTransform = ClientResourceData.MOB_ROTATIONS.containsKey(entity.getType());
-            Vector3f transform = ClientResourceData.MOB_ROTATIONS.getOrDefault(entity.getType(), new Vector3f(0, 0, 0)).mul(0.017453292F);
+            Vector3f transform = new Vector3f(ClientResourceData.MOB_ROTATIONS.getOrDefault(entity.getType(), new Vector3f(0, 0, 0))).mul(0.017453292F);
             ctx = new EntityRenderContext(scale, hasTransform, transform);
         } else {
             ctx = new EntityRenderContext(scale, false, new Vector3f(0, 0, 0));
@@ -60,9 +65,18 @@ public class EntityEmiStack extends EmiStack {
         return new EntityEmiStack(entity, scale);
     }
 
+    /**
+     * A stack that renders the entity at the given scale (pixels per block) with its origin moved from the middle of the
+     * 16x16 stack area by the offsets (pixels), for example to centre a measured entity.
+     */
+    public static EntityEmiStack ofFitted(Entity entity, double scale, double offsetX, double offsetY) {
+        EntityEmiStack stack = new EntityEmiStack(entity, scale);
+        return new EntityEmiStack(entity, new EntityRenderContext(scale, stack.ctx.hasTransform, stack.ctx.transform, true, offsetX, offsetY));
+    }
+
     @Override
     public EmiStack copy() {
-        EntityEmiStack stack = new EntityEmiStack(entity);
+        EntityEmiStack stack = new EntityEmiStack(entity, ctx);
         stack.setRemainder(getRemainder().copy());
         stack.comparison = comparison;
         return stack;
@@ -77,7 +91,9 @@ public class EntityEmiStack extends EmiStack {
     public void render(DrawContext matrices, int x, int y, float delta, int flags) {
         try {
             if (entity != null) {
-                if (entity instanceof LivingEntity living)
+                if (entity instanceof LivingEntity living && ctx.centered)
+                    renderEntity(matrices.getMatrices(), (int) Math.round(x + 8 + ctx.offsetX), (int) Math.round(y + 8 + ctx.offsetY), ctx, living);
+                else if (entity instanceof LivingEntity living)
                     renderEntity(matrices.getMatrices(), x + 8, (int) (y + 8 + ctx.size), ctx, living);
                 else
                     renderEntity(matrices.getMatrices(), (int) (x + (2 * ctx.size / 2)), (int) (y + (2 * ctx.size)), ctx, entity);
@@ -246,7 +262,11 @@ public class EntityEmiStack extends EmiStack {
         DiffuseLighting.enableGuiDepthLighting();
     }
 
-    private record EntityRenderContext(double size, boolean hasTransform, Vector3f transform) {
+    private record EntityRenderContext(double size, boolean hasTransform, Vector3f transform, boolean centered, double offsetX, double offsetY) {
+        EntityRenderContext(double size, boolean hasTransform, Vector3f transform) {
+            this(size, hasTransform, transform, false, 0.0, 0.0);
+        }
+
         static EntityRenderContext EMPTY = new EntityRenderContext(8.0, false, new Vector3f(0, 0, 0));
     }
 }

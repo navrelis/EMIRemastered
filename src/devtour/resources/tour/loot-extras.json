@@ -1,5 +1,5 @@
 {
-  "description": "Loot extras (A8): structures on chest loot pages, condition icons on block and mob drops, fishing chances, and the loot sections of the Item Info screen. Needs a Lootr-free dev world; the Lootr note is checked in a pack with Lootr.",
+  "description": "Loot extras (A8, FX-WD): structures on chest loot pages, condition icons on block and mob drops, fishing chances, and the loot sections of the Item Info screen. Needs a Lootr-free dev world; the Lootr note is checked in a pack with Lootr.",
   "warmupTicks": 60,
   "settleTicks": 20,
   "steps": [
@@ -75,6 +75,16 @@
     { "type": "screenshot", "name": "diamond-item-info" },
     { "type": "screen_scroll", "amount": -3 },
     { "type": "screenshot", "name": "diamond-item-info-scrolled" },
+    { "type": "close_screen" },
+
+    { "type": "note", "text": "FX-WD: Item Info of an ore and of the crafting table has no empty placeholder slot in the Block Drops row" },
+    { "type": "open_inventory" },
+    { "type": "emi_stack_key", "item": "minecraft:diamond_ore", "key": "I" },
+    { "type": "screenshot", "name": "diamond-ore-item-info" },
+    { "type": "close_screen" },
+    { "type": "open_inventory" },
+    { "type": "emi_stack_key", "item": "minecraft:crafting_table", "key": "I" },
+    { "type": "screenshot", "name": "crafting-table-item-info" },
     { "type": "close_screen" },
 
     { "type": "open_emi_config" },

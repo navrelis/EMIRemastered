@@ -6,7 +6,7 @@ import dev.emi.emi.config.EmiConfig.ConfigValue;
 /** Settings of the mobs module, shown in the EMI config screen. The fields are read live by the mob pages. */
 public class MobsSettings {
 
-	@Comment("Show health, attack damage and armour as heart and armour icons instead of plain numbers.")
+	@Comment("Show a heart icon next to health and damage and an armour icon next to armour. The numbers are always points (2 points are one heart or armour icon).")
 	@ConfigValue("mobs.attributes-as-icons")
 	public static boolean attributesAsIcons = true;
 
