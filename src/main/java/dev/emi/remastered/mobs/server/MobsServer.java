@@ -42,7 +42,7 @@ public final class MobsServer {
 		for (int i = 0; i < batches.size(); i++) {
 			ServerPlayNetworking.send(player, new MobSpawnsPayload(i == 0, i == batches.size() - 1, batches.get(i)));
 		}
-		Mobs.LOGGER.debug("Sent {} spawn entries in {} payloads to {}", rows.size(), batches.size(), player.getGameProfile().getName());
+		Mobs.LOGGER.info("Sent {} spawn entries in {} payloads to {}", rows.size(), batches.size(), player.getGameProfile().getName());
 	}
 
 	/** Every spawn entry of every biome of the registry, in biome and spawn group order. */

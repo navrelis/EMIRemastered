@@ -1,6 +1,8 @@
 package dev.emi.remastered.mobs;
 
 import dev.emi.emi.api.EmiRegistry;
+import dev.emi.remastered.info.api.ItemInfoRegistry;
+import dev.emi.remastered.mobs.client.MobInfoProvider;
 import dev.emi.remastered.mobs.client.MobsClient;
 import dev.emi.remastered.mobs.emi.MobsEmiRegistration;
 import dev.emi.remastered.mobs.server.MobsServer;
@@ -20,6 +22,7 @@ public class MobsContent {
 	/** Client only, called when the module is enabled. */
 	public static void initClient() {
 		MobsClient.init();
+		ItemInfoRegistry.register(new MobInfoProvider());
 	}
 
 	public static void register(EmiRegistry registry) {

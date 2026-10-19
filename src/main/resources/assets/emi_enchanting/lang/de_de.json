@@ -1,3 +1,27 @@
 {
-  "config.emi.group.enchanting": "Verzauberungen"
+  "emi.category.emi_enchanting.enchantments": "Verzauberungsinfo",
+  "emi_enchanting.yes_good": "§0Ja",
+  "emi_enchanting.no_good": "§4Nein",
+  "emi_enchanting.yes_bad": "§4Ja",
+  "emi_enchanting.no_bad": "§0Nein",
+  "emi_enchanting.treasure": "Schatz: %s",
+  "emi_enchanting.curse": "Fluch: %s",
+  "emi_enchanting.tradeable": "Dorfbewohner handeln: %s",
+  "emi_enchanting.random": "Zufällig wählbar: %s",
+  "emi_enchanting.maxLvl": "Höchststufe: %s",
+  "emi_enchanting.valid_items": "Passende Gegenstände",
+  "emi_enchanting.description": "Beschreibung der Verzauberung",
+  "emi_enchanting.exclusions": "Nicht kombinierbar mit",
+  "emi_enchanting.page_error": "Diese Seite konnte nicht angezeigt werden.",
+  "enchantment.emi_enchanting.unknown.desc": "Unbekannte Verzauberung",
+
+  "config.emi.group.enchanting": "Verzauberungen",
+  "config.emi.enchanting.show_exclusions": "Unvereinbare anzeigen",
+  "config.emi.tooltip.enchanting.show_exclusions": "Ob die Infoseite die Verzauberungen auflistet, die sich nicht mit dieser kombinieren lassen.",
+  "config.emi.enchanting.show_description": "Beschreibung anzeigen",
+  "config.emi.tooltip.enchanting.show_description": "Ob die Infoseite die Beschreibung der Verzauberung zeigt, falls ein Ressourcenpaket oder eine Mod eine mitbringt.",
+  "config.emi.enchanting.show_for_items": "Bei Gegenständen anzeigen",
+  "config.emi.tooltip.enchanting.show_for_items": "Ob die Verwendungen eines verzauberbaren Gegenstands die Infoseiten seiner Verzauberungen auflisten.",
+  "config.emi.enchanting.book_level_limit": "Stufengrenze der Bücher",
+  "config.emi.tooltip.enchanting.book_level_limit": "Wie viele Stufen verzauberter Bücher pro Verzauberung höchstens aufgelistet werden. Verzauberungen mit höherer Höchststufe listen die Stufen bis zu dieser Zahl und die Höchststufe."
 }

@@ -44,6 +44,11 @@
   "emi_mobs.drops.none": "Keine Beutedaten",
   "emi_mobs.drops.tooltip": "Die Beute von %s öffnen",
 
+  "emi_mobs.info.title": "Mob",
+  "emi_mobs.info.mob": "Beschwört: %s",
+  "emi_mobs.info.stat": "%s: %s",
+  "emi_mobs.info.open": "Mob-Seite von %s anzeigen",
+
   "config.emi.group.mobs": "Mobs",
   "config.emi.mobs.attributes_as_icons": "Werte als Symbole",
   "config.emi.tooltip.mobs.attributes_as_icons": "Zeigt Leben, Angriffsschaden und Rüstung als Herz- und Rüstungssymbole statt als reine Zahlen.",

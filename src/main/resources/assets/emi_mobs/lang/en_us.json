@@ -44,6 +44,11 @@
   "emi_mobs.drops.none": "No drop data",
   "emi_mobs.drops.tooltip": "Open the drops of %s",
 
+  "emi_mobs.info.title": "Mob",
+  "emi_mobs.info.mob": "Spawns: %s",
+  "emi_mobs.info.stat": "%s: %s",
+  "emi_mobs.info.open": "Show mob page of %s",
+
   "config.emi.group.mobs": "Mobs",
   "config.emi.mobs.attributes_as_icons": "Attributes as Icons",
   "config.emi.tooltip.mobs.attributes_as_icons": "Show health, attack damage and armor as heart and armor icons instead of plain numbers.",

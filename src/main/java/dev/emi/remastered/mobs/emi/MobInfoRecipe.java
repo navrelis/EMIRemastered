@@ -74,14 +74,19 @@ public class MobInfoRecipe implements EmiRecipe {
 	public MobInfoRecipe(EntityType<?> type, Identifier typeId) {
 		this.type = type;
 		this.typeId = typeId;
-		this.id = Mobs.id("/mob/" + typeId.getNamespace() + "/" + typeId.getPath());
+		this.id = recipeId(typeId);
 		SpawnEggItem item = SpawnEggItem.forEntity(type);
 		this.egg = item == null ? null : EmiStack.of(item);
 		this.stats = readStats(type);
 	}
 
+	/** Recipe id of the mob page of an entity type. */
+	public static Identifier recipeId(Identifier typeId) {
+		return Mobs.id("/mob/" + typeId.getNamespace() + "/" + typeId.getPath());
+	}
+
 	@SuppressWarnings("unchecked")
-	private static MobStats readStats(EntityType<?> type) {
+	public static MobStats readStats(EntityType<?> type) {
 		DefaultAttributeContainer attributes = DefaultAttributeRegistry.get((EntityType<? extends LivingEntity>) type);
 		return new MobStats(
 			attribute(attributes, EntityAttributes.GENERIC_MAX_HEALTH), attribute(attributes, EntityAttributes.GENERIC_ARMOR),
