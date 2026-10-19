@@ -125,7 +125,7 @@ abstract public class AbstractTextKeyParsingClientLootTable<T extends LootReceiv
                 }
                 List<Pair<Integer, Text>> summedList;
                 if (applyToAllList.isEmpty()) {
-                    if (newPoolList.isEmpty() && (LootSettings.showHiddenConditions || !LootSettings.isTooltipStyle())) {
+                    if (newPoolList.isEmpty() && (!LootSettings.isSkippedKey("emi_loot.no_conditions") || !LootSettings.isTooltipStyle())) {
                         summedList = TextKey.noConditionsList.get();
                     } else {
                         summedList = newPoolList;

@@ -74,24 +74,30 @@ public class EMILoot {
     }
 
     public enum Type {
-        BLOCK(() -> LootSettings.compactBlock, () -> false, () -> LootSettings.directDropsBlock),
-        CHEST(() -> LootSettings.compactChest, () -> LootSettings.shouldLogUntranslated(), () -> LootSettings.directDropsChest),
-        MOB(() -> LootSettings.compactMob, () -> false, () -> LootSettings.directDropsMob),
-        GAMEPLAY(() -> LootSettings.compactGameplay, () -> LootSettings.shouldLogUntranslated(), () -> LootSettings.directDropsGameplay),
-        ARCHAEOLOGY(() -> LootSettings.compactArchaeology, () -> LootSettings.shouldLogUntranslated(), () -> LootSettings.directDropsArchaeology);
+        BLOCK(() -> LootSettings.compactBlock, () -> LootSettings.debugBlock, () -> false, () -> LootSettings.directDropsBlock),
+        CHEST(() -> LootSettings.compactChest, () -> LootSettings.debugChest, () -> LootSettings.logUntranslatedChest || LootSettings.isDevelopment(), () -> LootSettings.directDropsChest),
+        MOB(() -> LootSettings.compactMob, () -> LootSettings.debugMob, () -> false, () -> LootSettings.directDropsMob),
+        GAMEPLAY(() -> LootSettings.compactGameplay, () -> LootSettings.debugGameplay, () -> LootSettings.logUntranslatedGameplay || LootSettings.isDevelopment(), () -> LootSettings.directDropsGameplay),
+        ARCHAEOLOGY(() -> LootSettings.compactArchaeology, () -> LootSettings.debugArchaeology, () -> LootSettings.logUntranslatedArchaeology || LootSettings.isDevelopment(), () -> LootSettings.directDropsArchaeology);
 
         private final BooleanSupplier compactLootSupplier;
+        private final BooleanSupplier debugSupplier;
         private final BooleanSupplier logUntranslatedTablesSupplier;
         private final BooleanSupplier doDirectDrops;
 
-        Type(BooleanSupplier compactLootSupplier, BooleanSupplier logUntranslatedTablesSupplier, BooleanSupplier doDirectDrops) {
+        Type(BooleanSupplier compactLootSupplier, BooleanSupplier debugSupplier, BooleanSupplier logUntranslatedTablesSupplier, BooleanSupplier doDirectDrops) {
             this.compactLootSupplier = compactLootSupplier;
+            this.debugSupplier = debugSupplier;
             this.logUntranslatedTablesSupplier = logUntranslatedTablesSupplier;
             this.doDirectDrops = doDirectDrops;
         }
 
         public boolean isCompact() {
             return compactLootSupplier.getAsBoolean();
+        }
+
+        public boolean isDebug() {
+            return debugSupplier.getAsBoolean();
         }
 
         public boolean isLogI18n() {

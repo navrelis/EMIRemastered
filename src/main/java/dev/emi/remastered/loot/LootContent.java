@@ -1,6 +1,5 @@
 package dev.emi.remastered.loot;
 
-import dev.emi.emi.api.EmiInitRegistry;
 import dev.emi.emi.api.EmiRegistry;
 import dev.emi.remastered.loot.client.ClientLootTablesReceiver;
 import dev.emi.remastered.loot.client.ClientResourceData;
@@ -41,10 +40,6 @@ public class LootContent {
 	public static void initClient() {
 		ClientLootTablesReceiver.register();
 		ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(new ClientResourceData.EntityOffsetsReloadListener());
-	}
-
-	public static void initialize(EmiInitRegistry registry) {
-		LootEmiRegistration.initialize(registry);
 	}
 
 	public static void register(EmiRegistry registry) {

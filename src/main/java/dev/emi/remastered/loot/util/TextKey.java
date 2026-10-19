@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -53,8 +52,6 @@ public record TextKey(int index, List<Text> args) {
         list.add(new Pair<>(TextKey.getIndex("emi_loot.no_conditions"), LText.translatable("emi_loot.no_conditions")));
         return list;
     });
-
-    public static final Set<String> defaultSkips = Set.of("emi_loot.function.set_count_add", "emi_loot.function.set_count_set", "emi_loot.function.fill_player_head", "emi_loot.function.limit_count", "emi_loot.no_conditions");
 
     static {
         BiFunction<ItemStack, World, List<ItemStack>> smeltProcessor = (stack, world) -> {
@@ -411,7 +408,7 @@ public record TextKey(int index, List<Text> args) {
     }
 
     public boolean skip() {
-        return !LootSettings.showHiddenConditions && defaultSkips.contains(getKey(this.index));
+        return LootSettings.isSkippedKey(getKey(this.index));
     }
 
     public record TextKeyResult(Text text, List<ItemStack> stacks){}

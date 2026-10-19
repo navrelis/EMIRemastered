@@ -7,6 +7,10 @@ import dev.emi.emi.config.EmiConfig.ConfigValue;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.util.Formatting;
 
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+
 /**
  * Settings of the loot module, shown in the EMI config screen. The fields are read directly.
  * <p>
@@ -14,6 +18,9 @@ import net.minecraft.util.Formatting;
  * A dedicated server does not load the EMI config and always uses the defaults.
  */
 public class LootSettings {
+
+	public static final String DEFAULT_SKIPPED_KEYS = "emi_loot.function.set_count_add,emi_loot.function.set_count_set,"
+		+ "emi_loot.function.fill_player_head,emi_loot.function.limit_count,emi_loot.no_conditions";
 
 	// Parsing (server side)
 
@@ -59,10 +66,10 @@ public class LootSettings {
 	public static boolean directDropsArchaeology = true;
 
 	@ConfigGroupEnd
-	@Comment("Show the conditions that are normally hidden because they say nothing useful "
-		+ "(set count, limit count, player head, no conditions).")
-	@ConfigValue("loot.show-hidden-conditions")
-	public static boolean showHiddenConditions = false;
+	@Comment("Comma separated condition keys that are not shown because they say nothing useful. "
+		+ "Remove a key to show it. 'emi_loot.no_conditions' only matters in the tooltip and plain condition styles.")
+	@ConfigValue("loot.skipped-keys")
+	public static String skippedKeys = DEFAULT_SKIPPED_KEYS;
 
 	// Display (client side)
 
@@ -111,17 +118,69 @@ public class LootSettings {
 	// Debug
 
 	@ConfigGroup("loot.debug")
-	@Comment("Log what the loot parser does and receives. Very noisy, only for troubleshooting.")
+	@Comment("Log what the loot parser does. Very noisy, only for troubleshooting.")
 	@ConfigValue("loot.debug")
 	public static boolean debug = false;
 
-	@ConfigGroupEnd
-	@Comment("Log chest, gameplay and archaeology loot tables that have no translated name.")
-	@ConfigValue("loot.log-untranslated-tables")
-	public static boolean logUntranslatedTables = false;
+	@Comment("Log the block loot tables the client receives.")
+	@ConfigValue("loot.debug-block")
+	public static boolean debugBlock = false;
 
-	public static boolean shouldLogUntranslated() {
-		return logUntranslatedTables || FabricLoader.getInstance().isDevelopmentEnvironment();
+	@Comment("Log the chest loot tables the client receives.")
+	@ConfigValue("loot.debug-chest")
+	public static boolean debugChest = false;
+
+	@Comment("Log the mob loot tables the client receives and the mob display fixers that are loaded.")
+	@ConfigValue("loot.debug-mob")
+	public static boolean debugMob = false;
+
+	@Comment("Log the gameplay loot tables the client receives.")
+	@ConfigValue("loot.debug-gameplay")
+	public static boolean debugGameplay = false;
+
+	@Comment("Log the archaeology loot tables the client receives.")
+	@ConfigValue("loot.debug-archaeology")
+	public static boolean debugArchaeology = false;
+
+	@Comment("Log chest loot tables that have no translated name. Always on in a development environment.")
+	@ConfigValue("loot.log-untranslated-chest")
+	public static boolean logUntranslatedChest = false;
+
+	@Comment("Log gameplay loot tables that have no translated name. Always on in a development environment.")
+	@ConfigValue("loot.log-untranslated-gameplay")
+	public static boolean logUntranslatedGameplay = false;
+
+	@ConfigGroupEnd
+	@Comment("Log archaeology loot tables that have no translated name. Always on in a development environment.")
+	@ConfigValue("loot.log-untranslated-archaeology")
+	public static boolean logUntranslatedArchaeology = false;
+
+	private static volatile String parsedSkippedFrom = null;
+	private static volatile Set<String> parsedSkipped = Set.of();
+
+	public static Set<String> parseKeys(String keys) {
+		Set<String> set = new HashSet<>();
+		if (keys != null) {
+			for (String key : keys.split("[,\\s]+")) {
+				if (!key.isEmpty()) {
+					set.add(key);
+				}
+			}
+		}
+		return set;
+	}
+
+	public static boolean isSkippedKey(String key) {
+		String current = skippedKeys;
+		if (!Objects.equals(current, parsedSkippedFrom)) {
+			parsedSkipped = parseKeys(current);
+			parsedSkippedFrom = current;
+		}
+		return parsedSkipped.contains(key);
+	}
+
+	public static boolean isDevelopment() {
+		return FabricLoader.getInstance().isDevelopmentEnvironment();
 	}
 
 	private static final Formatting[] UNDERLINE = {Formatting.UNDERLINE};

@@ -29,7 +29,7 @@ public class ClientLootTables {
         try {
             LootReceiver table = ClientChestLootTable.INSTANCE.fromBuf(buf);
             chestLoots.add(table);
-            if (EMILoot.isDebug()) EMILoot.LOGGER.info("received chest {}", table.getId());
+            if (EMILoot.Type.CHEST.isDebug()) EMILoot.LOGGER.info("received chest {}", table.getId());
         } catch (Throwable e) {
             EMILoot.LOGGER.error("Critical error encountered while receiving Chest Loot Packet");
             EMILoot.LOGGER.error("Thrown Error: ", e);
@@ -40,7 +40,7 @@ public class ClientLootTables {
         try {
             LootReceiver table = ClientBlockLootTable.INSTANCE.fromBuf(buf);
             blockLoots.add(table);
-            if (EMILoot.isDebug()) EMILoot.LOGGER.info("received block {}", table.getId());
+            if (EMILoot.Type.BLOCK.isDebug()) EMILoot.LOGGER.info("received block {}", table.getId());
         } catch (Throwable e) {
             EMILoot.LOGGER.error("Critical error encountered while receiving Block Loot Packet");
             EMILoot.LOGGER.error("Thrown Error: ", e);
@@ -51,7 +51,7 @@ public class ClientLootTables {
         try {
             LootReceiver table = ClientMobLootTable.INSTANCE.fromBuf(buf);
             mobLoots.add(table);
-            if (EMILoot.isDebug()) EMILoot.LOGGER.info("received mob {}", table.getId());
+            if (EMILoot.Type.MOB.isDebug()) EMILoot.LOGGER.info("received mob {}", table.getId());
         } catch (Throwable e) {
             EMILoot.LOGGER.error("Critical error encountered while receiving Mob Loot Packet");
             EMILoot.LOGGER.error("Thrown Error: ", e);
@@ -62,7 +62,7 @@ public class ClientLootTables {
         try {
             LootReceiver table = ClientGameplayLootTable.INSTANCE.fromBuf(buf);
             gameplayLoots.add(table);
-            if (EMILoot.isDebug()) EMILoot.LOGGER.info("received gameplay loot: {}", table.getId());
+            if (EMILoot.Type.GAMEPLAY.isDebug()) EMILoot.LOGGER.info("received gameplay loot: {}", table.getId());
         } catch (Throwable e) {
             EMILoot.LOGGER.error("Critical error encountered while receiving Gameplay Loot Packet");
             EMILoot.LOGGER.error("Thrown Error: ", e);
@@ -73,7 +73,7 @@ public class ClientLootTables {
         try {
             LootReceiver table = ClientArchaeologyLootTable.INSTANCE.fromBuf(buf);
             archaeologyLoots.add(table);
-            if (EMILoot.isDebug()) EMILoot.LOGGER.info("received archaeology loot: {}", table.getId());
+            if (EMILoot.Type.ARCHAEOLOGY.isDebug()) EMILoot.LOGGER.info("received archaeology loot: {}", table.getId());
         } catch (Throwable e) {
             EMILoot.LOGGER.error("Critical error encountered while receiving Archaeology Loot Packet");
             EMILoot.LOGGER.error("Thrown Error: ", e);

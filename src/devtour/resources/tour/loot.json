@@ -1,0 +1,39 @@
+{
+  "description": "Loot module: block, chest, mob, gameplay and archaeology loot pages.",
+  "warmupTicks": 60,
+  "settleTicks": 20,
+  "steps": [
+    { "type": "resize", "w": 1280, "h": 720 },
+    { "type": "set_gui_scale", "n": 2 },
+    { "type": "open_inventory" },
+
+    { "type": "emi_recipes", "item": "minecraft:diamond" },
+    { "type": "emi_category", "id": "emi_loot:block_drops" },
+    { "type": "screenshot", "name": "diamond-block-drops" },
+    { "type": "emi_category", "id": "emi_loot:chest_loot" },
+    { "type": "screenshot", "name": "diamond-chest-loot" },
+    { "type": "close_screen" },
+
+    { "type": "emi_recipes", "item": "minecraft:rotten_flesh" },
+    { "type": "emi_category", "id": "emi_loot:mob_drops" },
+    { "type": "screenshot", "name": "rotten-flesh-mob-drops" },
+    { "type": "close_screen" },
+
+    { "type": "emi_recipes", "item": "minecraft:cod" },
+    { "type": "emi_category", "id": "emi_loot:gameplay_drops" },
+    { "type": "screenshot", "name": "cod-gameplay-drops" },
+    { "type": "close_screen" },
+
+    { "type": "emi_recipes", "item": "minecraft:angler_pottery_sherd" },
+    { "type": "emi_category", "id": "emi_loot:archaeology_drops" },
+    { "type": "screenshot", "name": "sherd-archaeology" },
+    { "type": "close_screen" },
+
+    { "type": "emi_recipes", "item": "minecraft:wind_charge" },
+    { "type": "screenshot", "name": "wind-charge" },
+    { "type": "close_screen" },
+
+    { "type": "open_emi_config" },
+    { "type": "screenshot", "name": "config" }
+  ]
+}

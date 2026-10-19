@@ -1,6 +1,5 @@
 package dev.emi.remastered.loot.emi;
 
-import dev.emi.emi.api.EmiInitRegistry;
 import dev.emi.emi.api.EmiRegistry;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
@@ -50,7 +49,7 @@ public class LootEmiRegistration {
     /**
      * Starts converting the received loot tables into recipe data off the reload thread.
      */
-    public static void initialize(EmiInitRegistry registry) {
+    private static void startAll() {
         ClientLootTables tables = ClientLootTables.INSTANCE;
         chestFuture = startData("Chest", tables.chestLoots, lr -> ChestLootRecipe.ChestLootRecipeData.of((ClientChestLootTable) lr));
         blockFuture = startData("Block", tables.blockLoots, lr -> new BlockLootRecipe(BlockLootRecipe.BlockLootRecipeData.of((ClientBlockLootTable) lr)));
@@ -102,6 +101,7 @@ public class LootEmiRegistration {
     }
 
     public static void register(EmiRegistry registry) {
+        startAll();
         registry.addCategory(TRIAL_CATEGORY);
         registry.addCategory(CHEST_CATEGORY);
         registry.addCategory(BLOCK_CATEGORY);
