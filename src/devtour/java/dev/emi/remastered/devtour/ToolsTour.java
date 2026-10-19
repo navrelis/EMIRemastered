@@ -160,7 +160,9 @@ public final class ToolsTour {
 		int row = 12;
 		int listX = (int) field(screen, "listX");
 		int listY = (int) field(screen, "listY");
-		scrollY.setInt(scroll, Math.max(0, longest * row - 2 * row));
+		int listH = (int) field(screen, "listH");
+		int max = Math.max(0, results.size() * row + 2 - (listH - 2));
+		scrollY.setInt(scroll, Math.min(max, Math.max(0, longest * row - 2 * row)));
 		int y = listY + 1 + longest * row - scrollY.getInt(scroll) + row / 2;
 		MinecraftClient client = client();
 		double scale = client.getWindow().getScaleFactor();

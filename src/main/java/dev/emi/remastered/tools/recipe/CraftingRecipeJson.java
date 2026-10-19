@@ -155,7 +155,7 @@ public final class CraftingRecipeJson {
 		JsonObject key = new JsonObject();
 		pattern.key().forEach((symbol, ingredient) -> key.add(String.valueOf(symbol), ingredient));
 		json.add("key", key);
-		json.add("result", result);
+		json.add("result", cleanResult(result));
 		if (!showNotification) {
 			json.addProperty("show_notification", false);
 		}
@@ -168,7 +168,7 @@ public final class CraftingRecipeJson {
 		JsonArray array = new JsonArray();
 		ingredients.forEach(array::add);
 		json.add("ingredients", array);
-		json.add("result", result);
+		json.add("result", cleanResult(result));
 		return json;
 	}
 
@@ -180,5 +180,23 @@ public final class CraftingRecipeJson {
 			json.addProperty("group", group);
 		}
 		return json;
+	}
+
+	/** The result without {@code "count": 1}, which is the default and which the item stack codec writes anyway. */
+	private static JsonElement cleanResult(JsonElement result) {
+		if (result.isJsonObject()) {
+			JsonObject object = result.getAsJsonObject();
+			JsonElement count = object.get("count");
+			if (count != null && count.isJsonPrimitive() && count.getAsJsonPrimitive().isNumber() && count.getAsInt() == 1) {
+				JsonObject copy = new JsonObject();
+				object.asMap().forEach((key, value) -> {
+					if (!key.equals("count")) {
+						copy.add(key, value);
+					}
+				});
+				return copy;
+			}
+		}
+		return result;
 	}
 }

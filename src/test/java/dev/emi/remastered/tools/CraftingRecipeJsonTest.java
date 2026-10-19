@@ -152,4 +152,14 @@ class CraftingRecipeJsonTest {
 		assertEquals("a:x", CraftingRecipeJson.chooseTag(List.of("b:x", "a:x")));
 		assertNull(CraftingRecipeJson.chooseTag(List.of()));
 	}
+
+	@Test
+	void aResultCountOfOneIsLeftOutButOtherCountsAndComponentsStay() {
+		JsonElement one = JsonParser.parseString("{\"id\":\"minecraft:stick\",\"count\":1,\"components\":{\"minecraft:damage\":3}}");
+		JsonElement four = JsonParser.parseString("{\"id\":\"minecraft:stick\",\"count\":4}");
+		JsonObject shapeless = CraftingRecipeJson.shapeless("misc", "", List.of(IRON), one);
+		assertEquals("{\"id\":\"minecraft:stick\",\"components\":{\"minecraft:damage\":3}}", shapeless.get("result").toString());
+		JsonObject shaped = CraftingRecipeJson.shaped("misc", "", 1, 1, grid("I"), four, true);
+		assertEquals(four, shaped.get("result"));
+	}
 }
