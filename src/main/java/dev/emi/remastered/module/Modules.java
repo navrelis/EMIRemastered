@@ -11,6 +11,7 @@ import dev.emi.remastered.enchanting.EnchantingModule;
 import dev.emi.remastered.info.InfoModule;
 import dev.emi.remastered.letsdo.LetsDoModule;
 import dev.emi.remastered.loot.LootModule;
+import dev.emi.remastered.mobs.MobsModule;
 import dev.emi.remastered.ores.OresModule;
 import dev.emi.remastered.professions.ProfessionsModule;
 
@@ -32,6 +33,7 @@ public final class Modules {
 	public static final LetsDoModule LETSDO = register(new LetsDoModule());
 	public static final DistractionFreeModule DISTRACTION_FREE = register(new DistractionFreeModule());
 	public static final InfoModule INFO = register(new InfoModule());
+	public static final MobsModule MOBS = register(new MobsModule());
 
 	private Modules() {
 	}
