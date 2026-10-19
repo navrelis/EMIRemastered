@@ -21,3 +21,7 @@ bin/
 run/
 
 .architectury-transformer/
+
+#EMI Remastered
+.upstream/
+.claude/

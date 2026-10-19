@@ -1,150 +1,258 @@
-plugins {
-	id "architectury-plugin" version "3.4-SNAPSHOT"
-	id "dev.architectury.loom" version "1.7-SNAPSHOT" apply false
-}
-
-architectury {
-	minecraft = rootProject.minecraft_version
-}
-
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.ClassWriter
-import org.objectweb.asm.tree.ClassNode
+import org.objectweb.asm.Opcodes
 
-allprojects {
-	apply plugin: "java"
-	apply plugin: "architectury-plugin"
-	apply plugin: "maven-publish"
+plugins {
+	id "fabric-loom" version "1.11.8"
+}
 
-	architectury {
-		compileOnly()
+// mod_version = "2.0.0+1.21.1" goes into fabric.mod.json; the jar is named
+// EMIRemastered-1.21.1-2.0.0-Fabric.jar
+def modBaseVersion = project.mod_version.split("\\+")[0]
+
+version = project.mod_version
+group = project.maven_group
+
+base {
+	archivesName = "${project.archives_base_name}-${project.minecraft_version}"
+}
+
+tasks.withType(AbstractArchiveTask).configureEach {
+	archiveVersion = "${modBaseVersion}-Fabric"
+}
+
+repositories {
+	maven {
+		name = "Fabric"
+		url = "https://maven.fabricmc.net/"
+	}
+	maven {
+		// EMI's own maven
+		name = "Sleeping Town"
+		url = "https://repo.sleeping.town/"
+	}
+	maven {
+		// JEI
+		name = "BlameJared"
+		url = "https://maven.blamejared.com/"
+	}
+	maven {
+		// Mod Menu
+		name = "TerraformersMC"
+		url = "https://maven.terraformersmc.com/releases/"
+	}
+	exclusiveContent {
+		// Let's Do mods and Architectury at the exact pack versions
+		forRepository {
+			maven {
+				name = "CurseMaven"
+				url = "https://cursemaven.com"
+			}
+		}
+		filter {
+			includeGroup "curse.maven"
+		}
+	}
+	mavenCentral()
+}
+
+loom {
+	accessWidenerPath = file("src/main/resources/emi.accesswidener")
+
+	mixin {
+		defaultRefmapName = "emi-refmap.json"
 	}
 
-	base.archivesName = rootProject.archives_base_name
-	ext.mavenVersion = "${rootProject.mod_version}"
-	if (System.getenv("RELEASE") == null) {
-		ext.mavenVersion += "-SNAPSHOT"
-	}
-	ext.mavenVersion += "+${rootProject.minecraft_version}"
-	version = "${project.ext.mavenVersion}+${project.name}"
-	group = rootProject.maven_group
-
-	repositories {
-		maven {
-			url = "https://maven.blamejared.com/"
+	mods {
+		emi {
+			sourceSet sourceSets.main
 		}
 	}
 
-	tasks.withType(JavaCompile).configureEach({
-		options.encoding = "UTF-8"
-		options.release = 21
-	})
+	runs {
+		client {
+			runDir "run"
+		}
+		server {
+			runDir "run"
+		}
+		// Joins the singleplayer world run/saves/devworld directly.
+		// prepareDevWorld copies the dev server's run/world there once if it does not exist yet.
+		clientWorld {
+			client()
+			name = "Minecraft Client (devworld)"
+			runDir "run"
+			programArgs "--quickPlaySingleplayer", "devworld"
+		}
+	}
+}
 
-	java {
-		withSourcesJar()
+dependencies {
+	minecraft "com.mojang:minecraft:${project.minecraft_version}"
+	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+
+	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+
+	// JEMI layer (dev.emi.emi.jemi) compiles against JEI, as upstream
+	modCompileOnly("mezz.jei:${project.jei_version}") {
+		transitive = false
+	}
+	modCompileOnly("com.terraformersmc:modmenu:${project.modmenu_version}") {
+		transitive = false
 	}
 
-	def synthMixinDir = layout.buildDirectory.dir("generated-class")
-
-	tasks.register('generateClassLists') {
-		inputs.files(sourceSets.main.output.classesDirs)
-		outputs.dir(synthMixinDir)
-
-		doLast {
-			def outputFile = new File(synthMixinDir.get().asFile, "dev/emi/emi/mixin/GlobalMixin.class")
-			outputFile.parentFile.mkdirs()
-			
-			def classNames = []
-			def classCount = 0
-
-			(project(":xplat").sourceSets.main.output.classesDirs + sourceSets.main.output.classesDirs).each { dir ->
-				if (dir.exists()) {
-					dir.eachFileRecurse(groovy.io.FileType.FILES) { file ->
-						def p = file.path.toLowerCase()
-						if (file.name.endsWith('.class') && !p.contains("mixin") && !p.contains('emiconfig$')) {
-							def relativePath = dir.toPath().relativize(file.toPath()).toString()
-							
-							def className = relativePath.replace('.class', '').replace(File.separator, '.')
-							
-							classNames += className
-							classCount++
-						}
-					}
-				}
-			}
-
-			def parseHex = { hex ->
-				return hex.split().collect { j ->
-					Integer.parseInt(j, 16)
-				}
-			}
-			def u2 = { num ->
-				return [(num >> 8), (num & 0xff)]
-			}
-
-			def binary = [0xca, 0xfe, 0xba, 0xbe, 0x00, 0x00, 0x00, 0x34];
-			binary += u2(0x0b + classCount)
-			binary += parseHex("""
-				01 00 1d
-					64 65 76 2f 65 6d 69 2f 65 6d 69 2f 6d 69 78 69
-					6e 2f 47 6c 6f 62 61 6c 4d 69 78 69 6e
-				07 00 01
-				01 00 10
-					6a 61 76 61 2f 6c 61 6e 67 2f 4f 62 6a 65 63 74
-				07 00 03
-				01 00 10
-					47 6c 6f 62 61 6c 4d 69 78 69 6e 2e 6a 61 76 61
-				01 00 24
-					4c 6f 72 67 2f 73 70 6f 6e 67 65 70 6f 77 65 72
-					65 64 2f 61 73 6d 2f 6d 69 78 69 6e 2f 50 73 65
-					75 64 6f 3b
-				01 00 23
-					4c 6f 72 67 2f 73 70 6f 6e 67 65 70 6f 77 65 72
-					65 64 2f 61 73 6d 2f 6d 69 78 69 6e 2f 4d 69 78
-					69 6e 3b
-				01 00 07
-					74 61 72 67 65 74 73
-				01 00 0a
-					53 6f 75 72 63 65 46 69 6c 65
-				01 00 1b
-					52 75 6e 74 69 6d 65 49 6e 76 69 73 69 62 6c 65
-					41 6e 6e 6f 74 61 74 69 6f 6e 73
-			""")
-			for (int i = 0; i < classCount; i++) {
-				binary += parseHex("01")
-				binary += u2(classNames[i].length())
-				binary.addAll(classNames[i].getBytes())
-			}
-			binary += parseHex("""
-				06 01 00 02 00 04
-				00 00
-				00 00
-				00 00
-				00 02
-				00 09 00 00 00 02 00 05
-				00 0a 00 00
-			""")
-			binary += u2(9 + (classCount * 3))
-			binary += parseHex("00 02 00 06 00 00 00 07 00 01 00 08 5b")
-			binary += u2(classCount)
-			for (int i = 0; i < classCount; i++) {
-				binary += parseHex("73") + u2(0x0b + i)
-			}
-			
-			ClassReader reader = new ClassReader(binary as byte[]);
-			ClassWriter writer = new ClassWriter(reader, 0);
-
-			reader.accept(writer, 0)
-
-			outputFile.bytes = writer.toByteArray()
+	// Let's Do compat module (later task); compile only, exact pack versions
+	[
+		"architectury-api-${project.architectury_curse}",
+		"letsdo-vinery-${project.vinery_curse}",
+		"letsdo-meadow-${project.meadow_curse}",
+		"letsdo-herbalbrews-${project.herbalbrews_curse}",
+		"letsdo-beachparty-${project.beachparty_curse}",
+		"letsdo-farm-and-charm-${project.farm_and_charm_curse}",
+		"letsdo-bakery-${project.bakery_curse}",
+		"letsdo-candlelight-${project.candlelight_curse}",
+	].each { coordinate ->
+		modCompileOnly("curse.maven:${coordinate}") {
+			transitive = false
 		}
 	}
 
-	if (!project.name.contains("xplat")) {
-		sourceSets {
-			main {
-				output.dir(synthMixinDir, builtBy: generateClassLists)
+	testImplementation platform("org.junit:junit-bom:${project.junit_version}")
+	testImplementation "org.junit.jupiter:junit-jupiter"
+	testRuntimeOnly "org.junit.platform:junit-platform-launcher"
+}
+
+processResources {
+	def modVersion = project.version.toString()
+	inputs.property "version", modVersion
+
+	filesMatching("fabric.mod.json") {
+		expand "version": modVersion
+	}
+}
+
+tasks.withType(JavaCompile).configureEach {
+	options.encoding = "UTF-8"
+	options.release = 21
+}
+
+java {
+	withSourcesJar()
+	sourceCompatibility = JavaVersion.VERSION_21
+	targetCompatibility = JavaVersion.VERSION_21
+}
+
+test {
+	useJUnitPlatform()
+}
+
+// ---------------------------------------------------------------------------
+// GlobalMixin (port of upstream EMI's generateClassLists task)
+//
+// emi.mixins.json lists the mixin "GlobalMixin", which has no source file. This task
+// writes it as a class file: an interface annotated with
+//   @Pseudo @Mixin(targets = { <every EMI class> })
+// so that EmiMixinPlugin.postApply runs for every EMI class on the client. That hook
+// applies EMI's own @Transform/@Extends/... annotations and reports foreign mixins into
+// dev.emi.emi classes ("The following EMI classes have mixins applied to them ...").
+//
+// Targets: every compiled class under the roots below, except (as upstream) classes whose
+// path contains "mixin" (dev.emi.emi.mixin.**, dev.emi.emi.mixinsupport.**) and the inner
+// classes of EmiConfig. Upstream applied this to all classes of the EMI jar, which were all
+// dev.emi.emi; later modules (dev.emi.remastered.*) are deliberately not targeted.
+// ---------------------------------------------------------------------------
+def globalMixinRoots = ["dev/emi/emi/"]
+def synthMixinDir = layout.buildDirectory.dir("generated-class")
+
+def generateClassLists = tasks.register("generateClassLists") {
+	def classesDirs = sourceSets.main.output.classesDirs
+	inputs.files(classesDirs).withPropertyName("classes")
+	inputs.property("roots", globalMixinRoots)
+	outputs.dir(synthMixinDir)
+
+	doLast {
+		def outDir = synthMixinDir.get().asFile
+		outDir.deleteDir()
+		def outputFile = new File(outDir, "dev/emi/emi/mixin/GlobalMixin.class")
+		outputFile.parentFile.mkdirs()
+
+		def classNames = new TreeSet<String>()
+		classesDirs.each { File dir ->
+			if (!dir.exists()) return
+			dir.eachFileRecurse(groovy.io.FileType.FILES) { File file ->
+				if (!file.name.endsWith(".class")) return
+				def relative = dir.toPath().relativize(file.toPath()).toString().replace(File.separatorChar, '/' as char)
+				if (!globalMixinRoots.any { relative.startsWith(it) }) return
+				def lower = relative.toLowerCase(Locale.ROOT)
+				if (lower.contains("mixin") || lower.contains('emiconfig$')) return
+				classNames << relative.substring(0, relative.length() - ".class".length()).replace('/', '.')
 			}
 		}
+		if (classNames.isEmpty()) {
+			throw new GradleException("generateClassLists: no EMI classes found in ${classesDirs.files}")
+		}
+
+		// Same class file as upstream's hand-assembled bytes: Java 8 class version,
+		// public abstract interface, SourceFile "GlobalMixin.java", invisible @Pseudo and
+		// @Mixin(targets = {...dotted class names...}).
+		def cw = new ClassWriter(0)
+		cw.visit(Opcodes.V1_8, Opcodes.ACC_PUBLIC | Opcodes.ACC_INTERFACE | Opcodes.ACC_ABSTRACT,
+			"dev/emi/emi/mixin/GlobalMixin", null, "java/lang/Object", null)
+		cw.visitSource("GlobalMixin.java", null)
+		cw.visitAnnotation("Lorg/spongepowered/asm/mixin/Pseudo;", false).visitEnd()
+		def mixin = cw.visitAnnotation("Lorg/spongepowered/asm/mixin/Mixin;", false)
+		def targets = mixin.visitArray("targets")
+		classNames.each { targets.visit(null, it) }
+		targets.visitEnd()
+		mixin.visitEnd()
+		cw.visitEnd()
+		def bytes = cw.toByteArray()
+		new ClassReader(bytes) // sanity check: must parse
+		outputFile.bytes = bytes
+		logger.lifecycle("generateClassLists: GlobalMixin targets ${classNames.size()} classes")
 	}
+}
+
+sourceSets {
+	main {
+		output.dir(synthMixinDir, builtBy: generateClassLists)
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Dev world for runClientWorld: copy the dev server's world (run/world) to
+// run/saves/devworld once. Run `gradlew runServer` once first.
+// ---------------------------------------------------------------------------
+def runDir = layout.projectDirectory.dir("run")
+
+def prepareDevWorld = tasks.register("prepareDevWorld", Copy) {
+	description = "Copies run/world (dev server world) to run/saves/devworld if that save does not exist yet."
+	from(runDir.dir("world")) {
+		exclude "session.lock"
+	}
+	into(runDir.dir("saves/devworld"))
+	onlyIf {
+		def target = runDir.dir("saves/devworld/level.dat").asFile
+		def source = runDir.dir("world/level.dat").asFile
+		if (!source.exists() && !target.exists()) {
+			throw new GradleException("No dev world: run `gradlew runServer` once to create run/world")
+		}
+		!target.exists()
+	}
+}
+
+// A fresh client shows the accessibility onboarding screen first, which blocks quick play.
+def prepareDevOptions = tasks.register("prepareDevOptions") {
+	description = "Writes run/options.txt with onboardAccessibility:false if it does not exist yet."
+	def options = runDir.file("options.txt").asFile
+	onlyIf { !options.exists() }
+	doLast {
+		options.parentFile.mkdirs()
+		options.text = "onboardAccessibility:false\n"
+	}
+}
+
+tasks.matching { it.name == "runClientWorld" }.configureEach {
+	dependsOn prepareDevWorld, prepareDevOptions
 }

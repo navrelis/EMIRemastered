@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "id": "emi",
+  "version": "${version}",
+  "name": "EMI Remastered",
+  "description": "A featureful and accessible item and recipe viewer. EMI Remastered is EMI with these add-ons built in: EMI Loot, EMI Ores, EMIffect, EMI Enchanting, EMI Professions, Let's Do EMI Compat and Distraction Free Recipes.",
+  "authors": [
+    "Emi",
+    "navrelis"
+  ],
+  "contributors": [
+    "fzzyhmstrs",
+    "Abbie",
+    "Prismwork/Flamarine",
+    "Mrbysco",
+    "ShyNieke",
+    "Pandaismyname1",
+    "Toni (txnimc)",
+    "unilock",
+    "lxly9"
+  ],
+  "contact": {
+    "homepage": "https://github.com/navrelis/EMIRemastered",
+    "sources": "https://github.com/navrelis/EMIRemastered",
+    "issues": "https://github.com/navrelis/EMIRemastered/issues"
+  },
+  "license": [
+    "MIT",
+    "LGPL-3.0-only"
+  ],
+  "icon": "icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "dev.emi.emi.platform.fabric.EmiMainFabric"
+    ],
+    "client": [
+      "dev.emi.emi.platform.fabric.EmiClientFabric"
+    ],
+    "server": [],
+    "emi": [
+      "dev.emi.emi.VanillaPlugin"
+    ],
+    "modmenu": [
+      "dev.emi.emi.compat.EmiModMenu"
+    ],
+    "jei_mod_plugin": [
+      "dev.emi.emi.jemi.JemiPlugin"
+    ]
+  },
+  "custom": {
+    "polymer:disable_mixin": {
+      "polymer-core:client.compat.emi_ItemEmiStackMixin": "Please stop mixing into impl"
+    }
+  },
+  "mixins": [
+    "emi.mixins.json",
+    "emi-fabric.mixins.json"
+  ],
+  "accessWidener": "emi.accesswidener",
+  "provides": [
+    "emi_loot",
+    "emi_enchanting",
+    "emiffect",
+    "emiprofessions",
+    "emi_ores",
+    "emi_letsdo_compat",
+    "distraction_free_recipes"
+  ],
+  "depends": {
+    "fabricloader": ">=0.16.14",
+    "minecraft": "1.21.1",
+    "fabric-api": "*",
+    "java": ">=21"
+  }
+}
