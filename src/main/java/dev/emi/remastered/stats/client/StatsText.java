@@ -1,10 +1,13 @@
 package dev.emi.remastered.stats.client;
 
+import java.util.Locale;
+
 import dev.emi.emi.EmiPort;
-import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.remastered.effects.EffectEmiStack;
 import dev.emi.remastered.module.Modules;
+import dev.emi.remastered.stats.core.StatsNumbers;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
@@ -18,9 +21,18 @@ final class StatsText {
 	private StatsText() {
 	}
 
-	/** Number with at most two decimals, grouped like the rest of EMI. */
+	/** Number with at most two decimals, formatted in the locale of the selected game language. */
 	static String number(double value) {
-		return EmiRenderHelper.TEXT_FORMAT.format(value);
+		return StatsNumbers.format(value, locale());
+	}
+
+	/** Locale of the selected game language ({@code en_us} gives {@code en-US}), the root locale before the client exists. */
+	static Locale locale() {
+		MinecraftClient client = MinecraftClient.getInstance();
+		if (client == null || client.getLanguageManager() == null) {
+			return Locale.ROOT;
+		}
+		return StatsNumbers.localeOf(client.getLanguageManager().getLanguage());
 	}
 
 	static Text percent(double fraction) {

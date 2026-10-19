@@ -30,6 +30,9 @@ import net.minecraft.util.Language;
  */
 final class FoodRecipe implements EmiRecipe {
 	static final int WIDTH = 160;
+	static final int MAX_WIDTH = 224;
+	private static final int EFFECT_LABEL_X = 22;
+	private static final int CHANCE_GAP = 6;
 	/** Best food first, then by saturation, then by id. */
 	static final Comparator<EmiRecipe> SORT = Comparator
 		.comparingInt((EmiRecipe r) -> r instanceof FoodRecipe f ? -f.facts.nutrition() : 0)
@@ -80,9 +83,26 @@ final class FoodRecipe implements EmiRecipe {
 		return false;
 	}
 
+	/**
+	 * At least {@link #WIDTH}, wider when an effect row (icon, label with level and duration, chance) needs more, so
+	 * that no label is cut: the enchanted golden apple's {@code Regeneration II (00:20)} next to {@code 100%} does not
+	 * fit 160 pixels. Capped, the label is only trimmed beyond {@link #MAX_WIDTH}.
+	 */
 	@Override
 	public int getDisplayWidth() {
-		return WIDTH;
+		TextRenderer font = MinecraftClient.getInstance().textRenderer;
+		if (font == null) {
+			return WIDTH;
+		}
+		int needed = WIDTH;
+		int labelX = StatsText.effectStacks() ? EFFECT_LABEL_X : 0;
+		List<EffectFact> effects = facts.effects();
+		for (int i = 0; i < Math.min(effects.size(), MAX_EFFECTS); i++) {
+			EffectFact effect = effects.get(i);
+			needed = Math.max(needed, labelX + font.getWidth(StatsText.effectLabel(effect.instance())) + CHANCE_GAP
+				+ font.getWidth(StatsText.percent(effect.chance())));
+		}
+		return Math.min(needed, MAX_WIDTH);
 	}
 
 	@Override
@@ -169,10 +189,10 @@ final class FoodRecipe implements EmiRecipe {
 			Text label = StatsText.effectLabel(effect.instance());
 			if (slots) {
 				widgets.addSlot(StatsText.effectStack(effect.instance(), 1.0f), 0, y).recipeContext(this);
-				widgets.addText(fit(font, label, width - 22 - chanceWidth - 4), 22, y + 5, -1, true);
+				widgets.addText(fit(font, label, width - EFFECT_LABEL_X - chanceWidth - CHANCE_GAP), EFFECT_LABEL_X, y + 5, -1, true);
 				widgets.addText(chance, width, y + 5, effect.chance() < 1 ? 0xFFFFD27F : GREEN, true).horizontalAlign(Alignment.END);
 			} else {
-				widgets.addText(fit(font, label, width - chanceWidth - 4), 0, y, -1, true);
+				widgets.addText(fit(font, label, width - chanceWidth - CHANCE_GAP), 0, y, -1, true);
 				widgets.addText(chance, width, y, effect.chance() < 1 ? 0xFFFFD27F : GREEN, true).horizontalAlign(Alignment.END);
 			}
 			y += rowHeight;
