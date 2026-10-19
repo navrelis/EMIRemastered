@@ -809,5 +809,11 @@
   "config.emi.modules.distraction_free": "Distraction-Free Recipes",
   "config.emi.tooltip.modules.distraction_free": "Hides EMI's index until you search for something.",
   "config.emi.modules.info": "Item Info",
-  "config.emi.tooltip.modules.info": "A key (default I) on any stack opens an overview: how to get it, what it is used for and its details."
+  "config.emi.tooltip.modules.info": "A key (default I) on any stack opens an overview: how to get it, what it is used for and its details.",
+  "config.emi.modules.mobs": "Mobs (EMI Mobs)",
+  "config.emi.tooltip.modules.mobs": "Shows a page for every mob with its attributes, spawn biomes and a link to its drops.",
+  "config.emi.modules.tools": "Tools (Tag Browser, Copy Recipe)",
+  "config.emi.tooltip.modules.tools": "Tools for pack developers: a browser for all tags and a key that copies the hovered recipe as text or JSON.",
+  "config.emi.modules.stats": "Stats",
+  "config.emi.tooltip.modules.stats": "Shows food, tool, weapon and armour stats: a Food category and details on the Item Info page."
 }

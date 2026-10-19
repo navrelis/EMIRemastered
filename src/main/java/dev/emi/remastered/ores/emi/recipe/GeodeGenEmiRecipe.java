@@ -5,7 +5,7 @@ package dev.emi.remastered.ores.emi.recipe;
 
 import dev.emi.remastered.ores.Ores;
 import dev.emi.remastered.ores.emi.OresRecipeCategories;
-import dev.emi.remastered.ores.emi.stack.BiomeEmiStack;
+import dev.emi.remastered.ores.sync.OresSnapshot;
 import dev.emi.remastered.ores.mixin.accessor.*;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.render.EmiTexture;
@@ -21,7 +21,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.Weighted;
-import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.feature.GeodeFeatureConfig;
 import net.minecraft.world.gen.feature.GeodeLayerConfig;
 import net.minecraft.world.gen.feature.GeodeLayerThicknessConfig;
@@ -38,7 +37,6 @@ import net.minecraft.world.gen.stateprovider.WeightedBlockStateProvider;
 public class GeodeGenEmiRecipe extends AbstractPlacedFeatureEmiRecipe {
 	private final HeightProvider heightProvider;
 	private final int rarityChance;
-	private final EmiIngredient biomes;
 	private final EmiIngredient alternateInner;
 	private final EmiIngredient inner;
 	private final EmiIngredient middle;
@@ -47,11 +45,11 @@ public class GeodeGenEmiRecipe extends AbstractPlacedFeatureEmiRecipe {
 	private final EmiIngredient innerPlacements;
 	private final Identifier id;
 
-	public GeodeGenEmiRecipe(PlacedFeature feature, Identifier id) {
+	public GeodeGenEmiRecipe(PlacedFeature feature, Identifier id, OresSnapshot<PlacedFeature> snapshot) {
+		super(id, snapshot);
 		this.id = id;
 		HeightProvider heightProvider = null;
 		int rarityChance = -1;
-		List<Biome> biomes = getBiomes(id, feature);
 		for (PlacementModifier modifier : feature.placementModifiers()) {
 			if (modifier instanceof HeightRangePlacementModifier heightRangePlacement) {
 				heightProvider = ((HeightRangePlacementAccessor) heightRangePlacement).emi_ores$getHeight();
@@ -61,7 +59,6 @@ public class GeodeGenEmiRecipe extends AbstractPlacedFeatureEmiRecipe {
 		}
 		this.heightProvider = heightProvider;
 		this.rarityChance = rarityChance;
-		this.biomes = EmiIngredient.of(biomes.stream().map(BiomeEmiStack::of).collect(Collectors.toList()));
 
 		GeodeFeatureConfig config = (GeodeFeatureConfig) feature.feature().value().config();
 
@@ -115,6 +112,11 @@ public class GeodeGenEmiRecipe extends AbstractPlacedFeatureEmiRecipe {
 	}
 
 	@Override
+	protected HeightProvider heightProvider() {
+		return heightProvider;
+	}
+
+	@Override
 	public EmiRecipeCategory getCategory() {
 		return OresRecipeCategories.GEODE;
 	}
@@ -126,7 +128,7 @@ public class GeodeGenEmiRecipe extends AbstractPlacedFeatureEmiRecipe {
 
 	@Override
 	public List<EmiIngredient> getInputs() {
-		return List.of(biomes);
+		return List.of(allBiomes);
 	}
 
 	@Override
@@ -144,7 +146,7 @@ public class GeodeGenEmiRecipe extends AbstractPlacedFeatureEmiRecipe {
 
 	@Override
 	public int getDisplayHeight() {
-		return 90;
+		return 90 + biomeBandHeight();
 	}
 
 	@Override
@@ -170,8 +172,7 @@ public class GeodeGenEmiRecipe extends AbstractPlacedFeatureEmiRecipe {
 
 		addDistributionGraph(widgets, 64, 0, heightProvider);
 
-		if (!biomes.isEmpty())
-			widgets.addSlot(biomes, 96, 18);
+		addBiomeBand(widgets, 90);
 
 		Text veinFreq = getVeinFreqComponent(-1, -1, rarityChance);
 		if (veinFreq != null) {

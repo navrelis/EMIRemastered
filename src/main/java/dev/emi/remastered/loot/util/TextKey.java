@@ -178,7 +178,7 @@ public record TextKey(int index, List<Text> args) {
         mapBuilder(134, "emi_loot.function.toggle_tooltip", (key)-> getBasicText(134), Identifier.of(EMILoot.MOD_ID, "textures/gui/tooltip.png"));
 
         //No conditions
-        mapBuilder(150, "emi_loot.no_conditions", (key)-> getBasicText(150), EMPTY);
+        mapBuilder(150, "emi_loot.no_conditions", (key)-> getBasicText(150), Identifier.of(EMILoot.MOD_ID, "textures/gui/no_conditions.png"));
     }
 
     private static void mapBuilder(int index, String key, Function<TextKey, Text> function, Identifier spriteId) {

@@ -1,0 +1,20 @@
+{
+  "description": "Item Info export (/emiexport all json): starts the export through ExportCommand.startAll(), waits and reports whether it finished. Result: run/emi_export/<timestamp>/*.json and the log lines 'Item info export'.",
+  "warmupTicks": 60,
+  "settleTicks": 20,
+  "timeoutSeconds": 240,
+  "steps": [
+    { "type": "resize", "w": 1280, "h": 720 },
+    { "type": "set_gui_scale", "n": 2 },
+    { "type": "emi_wait_loaded" },
+    { "type": "call", "class": "dev.emi.remastered.info.export.ExportCommand", "method": "startAll" },
+    { "type": "wait", "ticks": 200 },
+    { "type": "call", "class": "dev.emi.remastered.info.export.ExportCommand", "method": "isRunning" },
+    { "type": "screenshot", "name": "export-progress" },
+    { "type": "wait", "ticks": 200 },
+    { "type": "wait", "ticks": 200 },
+    { "type": "call", "class": "dev.emi.remastered.info.export.ExportCommand", "method": "isRunning" },
+    { "type": "note", "text": "isRunning above should be false after the second call; the chat shows the finished message" },
+    { "type": "screenshot", "name": "export-done" }
+  ]
+}

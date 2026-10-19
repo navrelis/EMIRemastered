@@ -1,0 +1,31 @@
+{
+  "description": "Item Info advancements section: crafting table, iron ingot and diamond (Details > Advancements, click opens the advancement screen).",
+  "warmupTicks": 60,
+  "settleTicks": 20,
+  "steps": [
+    { "type": "resize", "w": 1280, "h": 720 },
+    { "type": "set_gui_scale", "n": 2 },
+    { "type": "open_inventory" },
+
+    { "type": "emi_stack_key", "item": "minecraft:crafting_table", "key": "I" },
+    { "type": "wait", "ticks": 20 },
+    { "type": "screenshot", "name": "crafting-table-info" },
+    { "type": "screen_scroll", "amount": -10 },
+    { "type": "screenshot", "name": "crafting-table-info-scrolled" },
+    { "type": "close_screen" },
+
+    { "type": "emi_stack_key", "item": "minecraft:iron_ingot", "key": "I" },
+    { "type": "wait", "ticks": 20 },
+    { "type": "screenshot", "name": "iron-ingot-info" },
+    { "type": "screen_scroll", "amount": -10 },
+    { "type": "screenshot", "name": "iron-ingot-info-scrolled" },
+    { "type": "close_screen" },
+
+    { "type": "emi_stack_key", "item": "minecraft:diamond", "key": "I" },
+    { "type": "wait", "ticks": 20 },
+    { "type": "screenshot", "name": "diamond-info" },
+    { "type": "screen_scroll", "amount": -10 },
+    { "type": "screenshot", "name": "diamond-info-scrolled" },
+    { "type": "close_screen" }
+  ]
+}

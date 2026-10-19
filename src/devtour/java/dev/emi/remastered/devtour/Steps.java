@@ -2,6 +2,7 @@ package dev.emi.remastered.devtour;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -20,11 +21,16 @@ import dev.emi.emi.screen.ConfigScreen;
 import dev.emi.emi.screen.EmiScreenManager;
 import dev.emi.emi.screen.RecipeScreen;
 import dev.emi.emi.screen.RecipeTab;
-import dev.emi.remastered.effects.EffectEmiStack;
+import dev.emi.emi.screen.widget.config.ConfigEntryWidget;
+import dev.emi.emi.screen.widget.config.ListWidget;
 import dev.emi.emi.search.EmiSearch;
+import dev.emi.remastered.effects.EffectEmiStack;
+import dev.emi.remastered.config.screen.PluginManagerScreen;
+import dev.emi.remastered.plugin.PluginManager;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
+import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
@@ -41,6 +47,7 @@ import net.minecraft.util.Identifier;
  * step in docs/DEVTOUR.md.
  */
 public final class Steps {
+	private static final String PLUGINS_BUTTON_KEY = "screen.emi_remastered.plugins.button";
 	private static final Map<String, StepHandler> HANDLERS = new LinkedHashMap<>();
 
 	private Steps() {
@@ -233,18 +240,6 @@ public final class Steps {
 			return afterRecipeScreen(ctx, before, "uses", id);
 		});
 
-		// {"type":"click","x":383,"y":270}  left click (optional "button") at GUI-scaled coordinates in the open screen
-		register("click", (args, ctx) -> {
-			Screen screen = ctx.client.currentScreen;
-			if (screen == null) {
-				throw new IllegalStateException("no screen is open");
-			}
-			int button = args.intVal("button", 0);
-			screen.mouseClicked(args.intVal("x"), args.intVal("y"), button);
-			screen.mouseReleased(args.intVal("x"), args.intVal("y"), button);
-			return waitTicks(2);
-		});
-
 		// {"type":"emi_category","id":"emi:fuel"}  switches the open recipe screen to that category's tab
 		register("emi_category", (args, ctx) -> {
 			RecipeScreen rs = requireRecipeScreen(ctx);
@@ -381,6 +376,244 @@ public final class Steps {
 		// {"type":"emi_wait_loaded"}  waits until EMI is loaded again (e.g. after a command that triggers a reload)
 		register("emi_wait_loaded", (args, ctx) -> () -> EmiReloadManager.isLoaded());
 
+		// {"type":"click","text":"Plugins"}  presses the widget on screen whose message (or tooltip line, for the
+		// icon-only jump buttons) equals, else contains, the text, ignoring case.
+		// {"type":"click","key":"screen.emi_remastered.plugins.button"}  same by translation key of the message.
+		// {"type":"click","x":400,"y":120}  clicks at GUI coordinates.
+		// Optional "index" picks the nth match; "button" is the mouse button (0 left, 1 right); "optional": true skips
+		// the step instead of failing when nothing matches. The click goes through
+		// Screen.mouseClicked at the widget centre (overlapping widgets behave as for a real click); a miss fails the
+		// step with the list of button texts on screen.
+		register("click", (args, ctx) -> {
+			Screen screen = requireScreen(ctx);
+			int button = args.intVal("button", 0);
+			if (args.has("text") || args.has("key")) {
+				ClickableWidget w;
+				try {
+					w = ScreenTools.find(screen, args.str("text", null), args.str("key", null), args.intVal("index", 0));
+				} catch (IllegalStateException e) {
+					if (args.bool("optional", false)) {
+						ctx.info("skipped, no match (optional)");
+						return StepRun.DONE;
+					}
+					throw e;
+				}
+				return beginClick(ctx, w, w.getX() + w.getWidth() / 2, w.getY() + w.getHeight() / 2, button);
+			}
+			return beginClick(ctx, null, args.intVal("x"), args.intVal("y"), button);
+		});
+
+		// {"type":"scroll","amount":-5,"x":640,"y":300}  mouse wheel on the current screen at GUI coordinates
+		// (default: screen centre). Negative amount = wheel down (content moves up), positive = wheel up.
+		register("scroll", (args, ctx) -> {
+			Screen screen = requireScreen(ctx);
+			double amount = args.json().get("amount").getAsDouble();
+			int x = args.intVal("x", ScreenTools.centreX(ctx.client));
+			int y = args.intVal("y", ScreenTools.centreY(ctx.client));
+			ScreenTools.moveMouse(ctx.client, x, y);
+			boolean handled = screen.mouseScrolled(x, y, 0, amount);
+			ctx.info("scrolled " + amount + " at " + x + "," + y + (handled ? "" : " (not handled)"));
+			return waitTicks(2);
+		});
+
+		// {"type":"emi_config_jump","group":"modules"}  ConfigScreen.jump(group): scrolls the list to that group
+		register("emi_config_jump", (args, ctx) -> {
+			if (!(ctx.client.currentScreen instanceof ConfigScreen cs)) {
+				throw new IllegalStateException("current screen is " + screenName(ctx.client.currentScreen)
+					+ ", not EMI's ConfigScreen (use open_emi_config first)");
+			}
+			String group = args.str("group");
+			double before = cs.list.getScrollAmount();
+			cs.jump(group);
+			double after = cs.list.getScrollAmount();
+			ctx.info("jump " + group + ": scroll " + (int) before + " -> " + (int) after);
+			return waitTicks(2);
+		});
+
+		// {"type":"open_plugin_manager"}  opens EMI's config screen (unless it is open) and presses "Plugins"
+		register("open_plugin_manager", (args, ctx) -> {
+			if (!(ctx.client.currentScreen instanceof ConfigScreen)) {
+				ctx.client.setScreen(new ConfigScreen(ctx.client.currentScreen));
+			}
+			int[] ticks = {0};
+			StepRun[] click = {null};
+			return () -> {
+				if (click[0] == null) {
+					if (++ticks[0] < 3) {
+						return false;
+					}
+					ClickableWidget w = ScreenTools.find(requireScreen(ctx), null, PLUGINS_BUTTON_KEY, 0);
+					click[0] = beginClick(ctx, w, w.getX() + w.getWidth() / 2, w.getY() + w.getHeight() / 2, 0);
+				}
+				if (!click[0].tick()) {
+					return false;
+				}
+				if (!(ctx.client.currentScreen instanceof PluginManagerScreen)) {
+					throw new IllegalStateException("the Plugins button did not open the Plugin Manager, screen is "
+						+ screenName(ctx.client.currentScreen));
+				}
+				return true;
+			};
+		});
+
+		// {"type":"plugin_toggle","id":"emi_loot","state":"off"}  in the Plugin Manager: scrolls the row of that
+		// plugin id into view and presses its On/Off button. "state" (on|off) makes the step idempotent (clicks only
+		// when the plugin is not in that state yet); without it the button is pressed once. Notes the new state.
+		register("plugin_toggle", (args, ctx) -> {
+			if (!(ctx.client.currentScreen instanceof PluginManagerScreen pm)) {
+				throw new IllegalStateException("current screen is " + screenName(ctx.client.currentScreen)
+					+ ", not the Plugin Manager (use open_plugin_manager first)");
+			}
+			String id = args.str("id");
+			String state = args.lower("state", "toggle");
+			List<PluginManager.PluginEntry> plugins = PluginManager.getPlugins();
+			int row = -1;
+			for (int i = 0; i < plugins.size(); i++) {
+				if (plugins.get(i).id().equals(id)) {
+					row = i;
+				}
+			}
+			if (row < 0) {
+				throw new IllegalStateException("no plugin '" + id + "' in the Plugin Manager; known: "
+					+ plugins.stream().map(PluginManager.PluginEntry::id).toList());
+			}
+			boolean disabled = PluginManager.isDisabled(id);
+			if (state.equals("on") && !disabled || state.equals("off") && disabled) {
+				ctx.info(id + " already " + state);
+				return StepRun.DONE;
+			}
+			ListWidget list = ScreenTools.findList(pm);
+			list.setScrollAmount(row * (20 + list.padding) - (list.getLogicalHeight() - 20) / 2.0);
+			int[] ticks = {0};
+			StepRun[] click = {null};
+			int targetRow = row;
+			return () -> {
+				if (click[0] == null) {
+					if (++ticks[0] < 3) {
+						return false;
+					}
+					ClickableWidget button = (ClickableWidget) list.children().get(targetRow).children().get(0);
+					if (!button.active) {
+						throw new IllegalStateException("the toggle of '" + id + "' is locked");
+					}
+					click[0] = beginClick(ctx, button, button.getX() + button.getWidth() / 2,
+						button.getY() + button.getHeight() / 2, 0);
+					ctx.info(id + " is now " + (PluginManager.isDisabled(id) ? "off" : "on"));
+				}
+				return click[0].tick();
+			};
+		});
+
+		// {"type":"screen_close"}  closes the current screen the way its Done button / Escape does (Screen.close()),
+		// so close hooks run: the config screen saves, the Plugin Manager saves and starts an EMI reload after a
+		// change. (close_screen just drops all screens.) Follow it with emi_wait_loaded when a reload is expected.
+		register("screen_close", (args, ctx) -> {
+			Screen screen = requireScreen(ctx);
+			String name = screenName(screen);
+			screen.close();
+			ctx.info("closed " + name + " -> " + screenName(ctx.client.currentScreen));
+			return waitTicks(3);
+		});
+
+		// {"type":"click_row","text":"Distraction-Free Recipes"}  on EMI's config screen: scrolls the setting row whose
+		// name equals, else contains, the text into view and presses its widget (a boolean switch, an enum button).
+		// Notes the row; fails with the list of row names when nothing matches. Optional "index" (nth match).
+		register("click_row", (args, ctx) -> {
+			if (!(ctx.client.currentScreen instanceof ConfigScreen cs)) {
+				throw new IllegalStateException("current screen is " + screenName(ctx.client.currentScreen)
+					+ ", not EMI's ConfigScreen");
+			}
+			String needle = args.str("text").toLowerCase(Locale.ROOT).strip();
+			List<ConfigEntryWidget> exact = new ArrayList<>();
+			List<ConfigEntryWidget> partial = new ArrayList<>();
+			List<String> names = new ArrayList<>();
+			for (ListWidget.Entry e : cs.list.children()) {
+				if (e instanceof ConfigEntryWidget c) {
+					String name = c.getSearchableText();
+					names.add(name);
+					String lower = name.toLowerCase(Locale.ROOT).strip();
+					if (lower.equals(needle)) {
+						exact.add(c);
+					} else if (lower.contains(needle)) {
+						partial.add(c);
+					}
+				}
+			}
+			exact.addAll(partial);
+			int index = args.intVal("index", 0);
+			if (index >= exact.size()) {
+				throw new IllegalStateException("no config row '" + args.str("text") + "'; rows: " + names);
+			}
+			ConfigEntryWidget row = exact.get(index);
+			cs.list.centerScrollOn(row);
+			int[] ticks = {0};
+			StepRun[] click = {null};
+			return () -> {
+				if (click[0] == null) {
+					if (++ticks[0] < 3) {
+						return false;
+					}
+					ClickableWidget target = null;
+					for (var child : row.children()) {
+						if (child instanceof ClickableWidget w && w.visible) {
+							target = w;
+							break;
+						}
+					}
+					if (target == null) {
+						throw new IllegalStateException("row '" + row.getSearchableText() + "' has no clickable widget");
+					}
+					ctx.info("row '" + row.getSearchableText() + "' was '" + ScreenTools.textOf(target) + "'");
+					click[0] = beginClick(ctx, target, target.getX() + target.getWidth() / 2,
+						target.getY() + target.getHeight() / 2, 0);
+				}
+				return click[0].tick();
+			};
+		});
+
+		// {"type":"window_info"}  records whether the game window has the OS focus (GLFW_FOCUSED), is visible, and
+		// whether the cursor is locked. Dev clients must report focused=false, cursorLocked=false (emi_devtour mixins).
+		register("window_info", (args, ctx) -> {
+			long handle = ctx.client.getWindow().getHandle();
+			ctx.info("focused=" + (GLFW.glfwGetWindowAttrib(handle, GLFW.GLFW_FOCUSED) == GLFW.GLFW_TRUE)
+				+ " visible=" + (GLFW.glfwGetWindowAttrib(handle, GLFW.GLFW_VISIBLE) == GLFW.GLFW_TRUE)
+				+ " cursorLocked=" + ctx.client.mouse.isCursorLocked()
+				+ " cursorMode=" + GLFW.glfwGetInputMode(handle, GLFW.GLFW_CURSOR)
+				+ " windowFocused(mc)=" + ctx.client.isWindowFocused());
+			return StepRun.DONE;
+		});
+
+		// {"type":"hover","x":400,"y":120}  moves the virtual mouse to GUI coordinates so hover states and tooltips
+		// render in the next screenshot. The position stays until another step moves it (or the real mouse does).
+		register("hover", (args, ctx) -> {
+			int x = args.intVal("x");
+			int y = args.intVal("y");
+			ScreenTools.moveMouse(ctx.client, x, y);
+			ctx.info("mouse at " + x + "," + y);
+			return waitTicks(2);
+		});
+
+		// {"type":"screen_info"}  records the screen class, its size and every widget (class, text, bounds) in info
+		register("screen_info", (args, ctx) -> {
+			Screen s = ctx.client.currentScreen;
+			if (s == null) {
+				ctx.info("no screen");
+				return StepRun.DONE;
+			}
+			StringBuilder sb = new StringBuilder("screen " + s.getClass().getName() + " title '" + s.getTitle().getString()
+				+ "' gui " + s.width + "x" + s.height + " mouse " + ScreenTools.mouseString(ctx.client) + "; widgets:");
+			int n = 0;
+			for (ClickableWidget w : ScreenTools.widgets(s)) {
+				if (++n > 400) {
+					sb.append(" ...");
+					break;
+				}
+				sb.append("\n  ").append(ScreenTools.describe(w));
+			}
+			ctx.info(sb.toString());
+			return StepRun.DONE;
+		});
+
 		// {"type":"call","class":"a.b.C","method":"run"}  invokes a public static no-arg method (escape hatch)
 		register("call", (args, ctx) -> {
 			Method m = Class.forName(args.str("class")).getMethod(args.str("method"));
@@ -390,6 +623,33 @@ public final class Steps {
 			}
 			return waitTicks(2);
 		});
+	}
+
+	private static Screen requireScreen(TourContext ctx) {
+		if (ctx.client.currentScreen == null) {
+			throw new IllegalStateException("no screen open");
+		}
+		return ctx.client.currentScreen;
+	}
+
+	/** Mouse down now, mouse up on the next tick, then a short settle. {@code w} is only used for the note. */
+	private static StepRun beginClick(TourContext ctx, ClickableWidget w, int cx, int cy, int button)
+			throws ReflectiveOperationException {
+		Screen screen = requireScreen(ctx);
+		ScreenTools.moveMouse(ctx.client, cx, cy);
+		boolean handled = screen.mouseClicked(cx, cy, button);
+		ctx.info("clicked " + (w == null ? "" : ScreenTools.describe(w) + " ") + "at " + cx + "," + cy
+			+ (handled ? "" : " (click not handled)"));
+		int[] ticks = {0};
+		return () -> {
+			if (ticks[0]++ == 0) {
+				if (ctx.client.currentScreen == screen) {
+					screen.mouseReleased(cx, cy, button);
+				}
+				return false;
+			}
+			return ticks[0] >= 3;
+		};
 	}
 
 	private static RecipeScreen requireRecipeScreen(TourContext ctx) {

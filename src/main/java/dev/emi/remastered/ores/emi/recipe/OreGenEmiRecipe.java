@@ -5,7 +5,7 @@ package dev.emi.remastered.ores.emi.recipe;
 
 import dev.emi.remastered.ores.Ores;
 import dev.emi.remastered.ores.emi.OresRecipeCategories;
-import dev.emi.remastered.ores.emi.stack.BiomeEmiStack;
+import dev.emi.remastered.ores.sync.OresSnapshot;
 import dev.emi.remastered.ores.mixin.accessor.*;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.render.EmiTexture;
@@ -33,7 +33,6 @@ import net.minecraft.structure.rule.TagMatchRuleTest;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.intprovider.IntProvider;
-import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.feature.OreFeatureConfig;
 import net.minecraft.world.gen.feature.PlacedFeature;
 import net.minecraft.world.gen.feature.ScatteredOreFeature;
@@ -49,13 +48,13 @@ public class OreGenEmiRecipe extends AbstractPlacedFeatureEmiRecipe {
 	private final List<EmiIngredient> inputs;
 	private final List<EmiStack> outputs;
 	private final HeightProvider heightProvider;
-	private final EmiIngredient biomes;
 	private final float discardChanceOnAirExposure;
 	private final int countMin;
 	private final int countMax;
 	private final int rarityChance;
 
-	public OreGenEmiRecipe(PlacedFeature feature, Identifier id) {
+	public OreGenEmiRecipe(PlacedFeature feature, Identifier id, OresSnapshot<PlacedFeature> snapshot) {
+		super(id, snapshot);
 		this.id = id;
 
 		List<EmiIngredient> inputs = new ArrayList<>();
@@ -98,7 +97,6 @@ public class OreGenEmiRecipe extends AbstractPlacedFeatureEmiRecipe {
 		this.outputs = Collections.unmodifiableList(outputs);
 
 		HeightProvider heightProvider = null;
-		List<Biome> biomes = getBiomes(id, feature);
 		int countMin = -1;
 		int countMax = -1;
 		int rarityChance = -1;
@@ -122,7 +120,11 @@ public class OreGenEmiRecipe extends AbstractPlacedFeatureEmiRecipe {
 		this.countMax = countMax;
 		this.rarityChance = rarityChance;
 		this.heightProvider = heightProvider;
-		this.biomes = EmiIngredient.of(biomes.stream().map(BiomeEmiStack::of).toList());
+	}
+
+	@Override
+	protected HeightProvider heightProvider() {
+		return heightProvider;
 	}
 
 	@Override
@@ -137,7 +139,7 @@ public class OreGenEmiRecipe extends AbstractPlacedFeatureEmiRecipe {
 
 	@Override
 	public List<EmiIngredient> getInputs() {
-		return Stream.concat(inputs.stream(), Stream.of(biomes)).toList();
+		return Stream.concat(inputs.stream(), Stream.of(allBiomes)).toList();
 	}
 
 	@Override
@@ -152,6 +154,10 @@ public class OreGenEmiRecipe extends AbstractPlacedFeatureEmiRecipe {
 
 	@Override
 	public int getDisplayHeight() {
+		return bodyHeight() + biomeBandHeight();
+	}
+
+	private int bodyHeight() {
 		return Math.max(54, 18 + 18 * inputs.size());
 	}
 
@@ -170,11 +176,10 @@ public class OreGenEmiRecipe extends AbstractPlacedFeatureEmiRecipe {
 
 		addDistributionGraph(widgets, 64, 0, heightProvider);
 
-		if (!biomes.isEmpty())
-			widgets.addSlot(biomes, 96, 18);
+		addBiomeBand(widgets, bodyHeight());
 
 		if (discardChanceOnAirExposure > 0)
-			widgets.addSlot(EmiStack.of(Items.BARRIER).setChance(discardChanceOnAirExposure), 142, 18)
+			widgets.addSlot(EmiStack.of(Items.BARRIER).setChance(discardChanceOnAirExposure), 142, 0)
 					.appendTooltip(Text.translatable("emi_ores.discard_on_air_chance"));
 
 		Text veinFreq = getVeinFreqComponent(countMin, countMax, rarityChance);

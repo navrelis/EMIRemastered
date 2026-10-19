@@ -7,6 +7,9 @@ import dev.emi.emi.api.render.EmiTooltipComponents;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.serializer.EmiStackSerializer;
 import dev.emi.remastered.ores.Ores;
+import dev.emi.remastered.ores.client.OresFeatures;
+import dev.emi.remastered.ores.emi.OresTexts;
+import dev.emi.remastered.ores.sync.OresSnapshot;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.MinecraftClient;
@@ -104,7 +107,24 @@ public class BiomeEmiStack extends EmiStack {
 
 	@Override
 	public List<Text> getTooltipText() {
-		return null;
+		// Line 0 is the name; the following lines are what EMI searches with the $ prefix, so $nether finds biomes of the nether
+		List<Text> lines = new ArrayList<>();
+		lines.add(getName());
+		Text dimensions = dimensionsText();
+		if (dimensions != null) {
+			lines.add(dimensions);
+		}
+		return lines;
+	}
+
+	private Text dimensionsText() {
+		Identifier id = getId();
+		if (id == null) {
+			return null;
+		}
+		List<OresSnapshot.Dimension> dimensions = OresFeatures.snapshot().dimensionsOfBiome(id);
+		return dimensions.isEmpty() ? null
+			: Text.translatable("emi_ores.biome.dimensions", OresTexts.dimensionNames(dimensions.stream().map(OresSnapshot.Dimension::id).toList()));
 	}
 
 	@Override
@@ -115,6 +135,10 @@ public class BiomeEmiStack extends EmiStack {
 		if (id != null) {
 			if (MinecraftClient.getInstance().options.advancedItemTooltips) {
 				list.add(TooltipComponent.of(Text.literal(id.toString()).formatted(Formatting.DARK_GRAY).asOrderedText()));
+			}
+			Text dimensions = dimensionsText();
+			if (dimensions != null) {
+				list.add(TooltipComponent.of(dimensions.copy().formatted(Formatting.GRAY).asOrderedText()));
 			}
 			EmiTooltipComponents.appendModName(list, id.getNamespace());
 		}
