@@ -13,6 +13,7 @@ import dev.emi.remastered.info.api.ItemInfoProvider;
 import dev.emi.remastered.ores.Ores;
 import dev.emi.remastered.ores.OresSettings;
 import dev.emi.remastered.ores.display.BiomeSummary;
+import dev.emi.remastered.ores.display.EntryGroups;
 import dev.emi.remastered.ores.display.HeightModel.Resolved;
 import dev.emi.remastered.ores.display.HeightModel.Shape;
 import dev.emi.remastered.ores.emi.OresRecipeCategories;
@@ -42,6 +43,7 @@ public final class OresInfoProvider implements ItemInfoProvider {
 	private static final int MAX_NAMED_BIOMES = 3;
 	private static final int NAMES_PER_LINE = 4;
 	private static final int MAX_NAME_LINES = 4;
+	private static final int MAX_TOOLTIP_IDS = 4;
 
 	@Override
 	public Identifier getId() {
@@ -72,21 +74,44 @@ public final class OresInfoProvider implements ItemInfoProvider {
 		InfoSection section = collector.addSection(ID, InfoSection.Kind.OBTAIN, Text.translatable("emi_ores.info.title"))
 			.icon(recipes.get(0).getCategory())
 			.source(false);
-		for (int i = 0; i < recipes.size() && i < MAX_ROWS; i++) {
-			addRow(section, recipes.get(i));
+		// the placed features of one ore (large, buried, ...) often look the same on this page, so they share a row
+		List<List<AbstractPlacedFeatureEmiRecipe>> rows = EntryGroups.group(recipes, OresInfoProvider::rowKey);
+		for (int i = 0; i < rows.size() && i < MAX_ROWS; i++) {
+			addRow(section, rows.get(i));
 		}
-		if (recipes.size() > MAX_ROWS) {
-			section.link(Text.translatable("emi_ores.info.more", recipes.size() - MAX_ROWS), InfoLink.recipes(new ArrayList<EmiRecipe>(recipes)));
+		if (rows.size() > MAX_ROWS) {
+			int hidden = 0;
+			for (int i = MAX_ROWS; i < rows.size(); i++) {
+				hidden += rows.get(i).size();
+			}
+			section.link(Text.translatable("emi_ores.info.more", hidden), InfoLink.recipes(new ArrayList<EmiRecipe>(recipes)));
 		}
 	}
 
-	private static void addRow(InfoSection section, AbstractPlacedFeatureEmiRecipe recipe) {
+	/** Rows are equal when they would show the same dimensions, heights and biomes. */
+	static List<Object> rowKey(AbstractPlacedFeatureEmiRecipe recipe) {
+		Facts facts = recipe.facts();
+		List<Object> heights = new ArrayList<>();
+		for (DimensionHeight height : facts.heights()) {
+			heights.add(List.of(height.dimension(), EntryGroups.heightKey(height.height())));
+		}
+		return List.of(heights, facts.biomeSections());
+	}
+
+	/** One row for one or more recipes that show the same facts; the link opens the recipe, or all of them. */
+	private static void addRow(InfoSection section, List<AbstractPlacedFeatureEmiRecipe> group) {
+		AbstractPlacedFeatureEmiRecipe recipe = group.get(0);
 		Facts facts = recipe.facts();
 		List<Identifier> dimensions = facts.heights().stream().map(DimensionHeight::dimension).toList();
 		Text label = dimensions.isEmpty() ? Text.translatable("emi_ores.biomes.other") : OresTexts.dimensionNames(dimensions);
 
 		List<Text> tooltip = new ArrayList<>();
-		tooltip.add(Text.literal(facts.featureId().toString()).formatted(Formatting.DARK_GRAY));
+		for (int i = 0; i < group.size() && i < MAX_TOOLTIP_IDS; i++) {
+			tooltip.add(Text.literal(group.get(i).facts().featureId().toString()).formatted(Formatting.DARK_GRAY));
+		}
+		if (group.size() > MAX_TOOLTIP_IDS) {
+			tooltip.add(Text.literal("...").formatted(Formatting.DARK_GRAY));
+		}
 		for (DimensionHeight entry : facts.heights()) {
 			if (entry.height() != null) {
 				tooltip.add(Text.translatable("emi_ores.info.height_in", OresTexts.dimensionName(entry.dimension()),
@@ -96,7 +121,7 @@ public final class OresInfoProvider implements ItemInfoProvider {
 		List<Text> hidden = hiddenBiomes(facts);
 		tooltip.addAll(hidden);
 
-		var entry = section.entry(recipe.getCategory(), label).link(InfoLink.recipe(recipe)).tooltip(tooltip);
+		var entry = section.entry(recipe.getCategory(), label).link(group.size() == 1 ? InfoLink.recipe(recipe) : InfoLink.recipes(new ArrayList<EmiRecipe>(group))).tooltip(tooltip);
 		Resolved best = firstHeight(facts);
 		if (best != null) {
 			entry.detail(bestText(best));

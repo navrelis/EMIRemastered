@@ -23,6 +23,7 @@ import dev.emi.remastered.ores.mixin.accessor.UniformHeightAccessor;
 import dev.emi.remastered.ores.sync.OresSnapshot;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -80,9 +81,12 @@ public abstract class AbstractPlacedFeatureEmiRecipe implements EmiRecipe {
 		int limit = OresSettings.biomeIconLimit();
 		boolean compact = OresSettings.compactBiomeList;
 		for (BiomeSummary.Section section : BiomeSummary.summarize(biomes, snapshot.dimensionsOf(featureId), limit, compact)) {
-			BiomeSummary.Split split = BiomeSummary.split(section.listed(), limit, compact);
+			// the data above is sorted by id, the icons the player sees by the translated name
+			List<Identifier> listed = BiomeSummary.sortedByName(section.listed(), id -> OresTexts.biomeName(id).getString());
+			BiomeSummary.Section named = new BiomeSummary.Section(section.dimension(), section.kind(), section.total(), listed);
+			BiomeSummary.Split split = BiomeSummary.split(listed, limit, compact);
 			List<EmiStack> shown = split.shown().stream().map(id -> BiomeEmiStack.of(registry.get(id))).toList();
-			bandSections.add(new BandSection(section, shown, split.hidden()));
+			bandSections.add(new BandSection(named, shown, split.hidden()));
 		}
 	}
 
@@ -294,7 +298,8 @@ public abstract class AbstractPlacedFeatureEmiRecipe implements EmiRecipe {
 		Resolved resolved = HeightModel.resolve(spec, page.bottomY(), page.topY());
 		Anchor[] peak = HeightModel.peakAnchors(spec, resolved);
 
-		widgets.addDrawable(x, y, GRAPH_WIDTH, GRAPH_HEIGHT, (gui, mouseX, mouseY, delta) -> drawGraph(gui, resolved, page));
+		Supplier<Text> peakLabel = resolved.shape() == Shape.TRIANGULAR ? () -> anchorText(peak[0], page, useResolvedHeights(), false) : null;
+		widgets.addDrawable(x, y, GRAPH_WIDTH, GRAPH_HEIGHT, (gui, mouseX, mouseY, delta) -> drawGraph(gui, resolved, page, peakLabel));
 		widgets.addTooltip((mouseX, mouseY) -> getDistributionGraphTooltip(spec, resolved, peak, page), x, y, GRAPH_WIDTH, GRAPH_HEIGHT);
 		addAnchorText(widgets, page, spec.min(), x, y + 8, TextWidget.Alignment.CENTER, TextWidget.Alignment.END);
 		addAnchorText(widgets, page, spec.max(), x + GRAPH_WIDTH, y + 8, TextWidget.Alignment.CENTER, TextWidget.Alignment.START);
@@ -342,7 +347,11 @@ public abstract class AbstractPlacedFeatureEmiRecipe implements EmiRecipe {
 		return client.player.getBlockY();
 	}
 
-	private static void drawGraph(DrawContext gui, Resolved resolved, Page page) {
+	/**
+	 * @param peakLabel the label in the middle of the graph (triangular distributions), null for none; the marker of the
+	 *                  player leaves its rows free instead of crossing the text
+	 */
+	private static void drawGraph(DrawContext gui, Resolved resolved, Page page, Supplier<Text> peakLabel) {
 		int color = switch (resolved.shape()) {
 			case UNIFORM -> COLOR_UNIFORM;
 			case TRIANGULAR -> COLOR_TRIANGLE;
@@ -377,7 +386,23 @@ public abstract class AbstractPlacedFeatureEmiRecipe implements EmiRecipe {
 		Integer player = OresSettings.showPlayerHeight ? playerHeight(page) : null;
 		if (player != null && resolved.contains(player)) {
 			int px = resolved.pixelOf(player, GRAPH_WIDTH);
-			gui.fill(px, 0, px + 1, GRAPH_HEIGHT, COLOR_PLAYER);
+			int gapFrom = 0;
+			int gapTo = 0;
+			if (peakLabel != null) {
+				TextRenderer font = MinecraftClient.getInstance().textRenderer;
+				int width = font.getWidth(peakLabel.get());
+				int left = GRAPH_WIDTH / 2 - width / 2;
+				if (px >= left - 1 && px <= left + width) {
+					gapFrom = GRAPH_HEIGHT / 2 - font.fontHeight / 2 - 1;
+					gapTo = GRAPH_HEIGHT / 2 - font.fontHeight / 2 + font.fontHeight + 1;
+				}
+			}
+			if (gapTo > gapFrom) {
+				gui.fill(px, 0, px + 1, gapFrom, COLOR_PLAYER);
+				gui.fill(px, gapTo, px + 1, GRAPH_HEIGHT, COLOR_PLAYER);
+			} else {
+				gui.fill(px, 0, px + 1, GRAPH_HEIGHT, COLOR_PLAYER);
+			}
 			gui.fill(px - 1, 0, px + 2, 1, COLOR_PLAYER);
 		}
 	}

@@ -63,13 +63,14 @@ public record MobStats(double health, double armor, double toughness, double att
 		return list;
 	}
 
-	/** Short value for the page cell. With icons, health, attack and armour are in heart / armour icon units. */
-	public String value(Stat stat, boolean icons) {
+	/**
+	 * Short value for the page cell and the Item Info line. Health, damage and armour are always in points (2 points
+	 * are one heart or armour icon), so every place of the module shows the same number.
+	 */
+	public String value(Stat stat) {
 		double value = raw(stat);
 		return switch (stat) {
-			case HEALTH, ATTACK -> icons ? MobFormat.hearts(value) : MobFormat.number(value, 1);
-			case ARMOR -> icons ? MobFormat.number(value / 2.0, 1) : MobFormat.number(value, 1);
-			case TOUGHNESS -> MobFormat.number(value, 1);
+			case HEALTH, ATTACK, ARMOR, TOUGHNESS -> MobFormat.number(value, 1);
 			case SPEED -> MobFormat.blocksPerSecond(value);
 			case KNOCKBACK_RESISTANCE -> MobFormat.number(value * 100.0, 0) + "%";
 			case FOLLOW_RANGE -> MobFormat.number(value, 0);

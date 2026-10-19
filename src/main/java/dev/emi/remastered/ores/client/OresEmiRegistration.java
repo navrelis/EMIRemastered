@@ -13,6 +13,7 @@ import dev.emi.remastered.ores.emi.recipe.GeodeGenEmiRecipe;
 import dev.emi.remastered.ores.emi.recipe.OreGenEmiRecipe;
 import dev.emi.remastered.ores.emi.stack.BiomeEmiStack;
 import dev.emi.remastered.ores.sync.OresSnapshot;
+import java.util.Comparator;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import net.minecraft.client.MinecraftClient;
@@ -41,7 +42,11 @@ public class OresEmiRegistration {
 	public static void register(EmiRegistry registry) {
 		Registry<Biome> biomeRegistry = getBiomeRegistry();
 		if (biomeRegistry != null && OresSettings.addBiomesToIndex) {
-			biomeRegistry.stream().map(BiomeEmiStack::of).forEach(registry::addEmiStack);
+			// the registry is hash ordered, so the index would get the biomes in a different order on every start
+			biomeRegistry.streamEntries()
+				.sorted(Comparator.comparing(entry -> entry.registryKey().getValue()))
+				.map(entry -> BiomeEmiStack.of(entry.value()))
+				.forEach(registry::addEmiStack);
 		}
 
 		registry.addCategory(OresRecipeCategories.OREGEN);

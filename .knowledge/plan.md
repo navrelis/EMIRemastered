@@ -1,6 +1,6 @@
 # Plan
 
-Usage tally (work units: short = 1, long = 2): Opus 25 (F1, F2, Q3 x6, A1 x2, FX1 x4, FOCUS1 x4 = two delegations) / Sonnet 101 -> Opus 20 % (sessions 4+5 re-delegations counted again)
+Usage tally (work units: short = 1, long = 2): Opus 25 (F1, F2, Q3 x6, A1 x2, FX1 x4, FOCUS1 x4 = two delegations) / Sonnet 106 -> Opus 19 % (sessions 4+5 re-delegations counted again)
 
 Status: open / in progress / in review / done. `||` = can run in parallel.
 
@@ -63,10 +63,13 @@ Status: open / in progress / in review / done. `||` = can run in parallel.
 | FOCUS1 | T1-1: dev clients report focused=true; default hidden window (GLFW_VISIBLE false, cancel show/focus calls), opt-in -PdevtourVisible, foreground check | Opus long | done (merged; hidden window verified by foreground check in 3 runs; visible-mode launch not run, owner was gaming) |
 | FX-STATS | T1-20 armour section missing, T1-21 honey bottle, T1-22 locale numbers, T1-23 effect rows cut, T1-24 weapon/tool sections | Sonnet long | done (merged; stats tour 100/100 ok, lead viewed armour + food screenshots) |
 | FX-TOOLS | T1-5 crafting JSON copy, T1-6 toast, T1-8 locale, T1-9 stale selection, T1-10 truncation, T1-11 names, KB44 regex tag search | Sonnet long | done (merged; tools tour 89/89 ok; KB44 not reproducible: #/pickax/ = #pickax = 426) |
-| FX-WD | T1-12..19 loot placeholder slot, cost line, grammar, geode slot, ores info merge, graph label, bat portrait, mob units; KB43 | Sonnet long | in review (code accepted by lead; client check running) |
+| FX-WD | T1-12..19 loot placeholder slot, cost line, grammar, geode slot, ores info merge, graph label, bat portrait, mob units; KB43 | Sonnet long | done (merged; tours mobs 43, ores-extras 44, loot-extras 85, ores 27 all ok) |
 | CFG1 | world jump icon slot 12, T1-3 module jumps at small windows, T1-25 info tag wording | Sonnet short | done (merged; config tour 111/111 ok, one correction: Modules first) |
 | DOC2 | README, CREDITS.md (authors, refs, licences), CHANGELOG 2.0.0, licence files in jar | Sonnet short | done (merged; jar has CREDITS.md, LICENSE, LGPL text; 0 devtour entries) |
-| -- | Later: KB7, KB13 | - | open |
+| KB7 | Favourite remainder counts (port aMelonRind/emi 2508321, e7fd7d9) | Sonnet long | in progress (port 25665) |
+| T2 | Regression: server smoke + all tours on merged remastered, findings list | Sonnet long | in progress (port 25666) |
+| DOC3 | KNOWN_BUGS (KB7, KB43, KB44) + TOUR_REPORT statuses after wave 6, CREDITS for KB7 port | Sonnet short | open (after KB7, T2) |
+| -- | Later: KB13 (Sodium vertex path, needs pack measurement), T1-29 core string | - | open |
 
 ## Phase 4 Acceptance
 Pack install under game lock, end-to-end check, report, push.

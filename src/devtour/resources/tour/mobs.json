@@ -1,5 +1,5 @@
 {
-  "description": "Mobs module: mob pages (reached through the spawn egg of the mob), the spawn egg list in the index, and the mob section of the Item Info screen of a spawn egg.",
+  "description": "Mobs module (FX-WD: one unit - points - on the page and in the Item Info, fitted portraits): mob pages (reached through the spawn egg of the mob), the spawn egg list in the index, and the mob section of the Item Info screen of a spawn egg.",
   "warmupTicks": 60,
   "settleTicks": 20,
   "stepTimeoutSeconds": 30,
@@ -13,6 +13,9 @@
     { "type": "emi_recipes", "item": "minecraft:zombie_spawn_egg" },
     { "type": "emi_category", "id": "emi_mobs:mob_info" },
     { "type": "screenshot", "name": "zombie" },
+    { "type": "hover", "x": 250, "y": 147 },
+    { "type": "screenshot", "name": "zombie-damage-tooltip" },
+    { "type": "hover", "x": 630, "y": 5 },
     { "type": "close_screen" },
 
     { "type": "emi_recipes", "item": "minecraft:wither_skeleton_spawn_egg" },
@@ -23,6 +26,20 @@
     { "type": "emi_recipes", "item": "minecraft:bat_spawn_egg" },
     { "type": "emi_category", "id": "emi_mobs:mob_info" },
     { "type": "screenshot", "name": "bat" },
+    { "type": "close_screen" },
+
+    { "type": "note", "text": "FX-WD: portraits fit the box whatever the model size (silverfish and bee tiny, ghast huge)" },
+    { "type": "emi_recipes", "item": "minecraft:silverfish_spawn_egg" },
+    { "type": "emi_category", "id": "emi_mobs:mob_info" },
+    { "type": "screenshot", "name": "silverfish" },
+    { "type": "close_screen" },
+    { "type": "emi_recipes", "item": "minecraft:bee_spawn_egg" },
+    { "type": "emi_category", "id": "emi_mobs:mob_info" },
+    { "type": "screenshot", "name": "bee" },
+    { "type": "close_screen" },
+    { "type": "emi_recipes", "item": "minecraft:ghast_spawn_egg" },
+    { "type": "emi_category", "id": "emi_mobs:mob_info" },
+    { "type": "screenshot", "name": "ghast" },
     { "type": "close_screen" },
 
     { "type": "open_inventory" },

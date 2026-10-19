@@ -10,6 +10,7 @@ import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
 import net.minecraft.util.Identifier;
 
 /**
@@ -93,6 +94,15 @@ public final class BiomeSummary {
 	public static List<Identifier> sorted(Collection<Identifier> biomes) {
 		List<Identifier> list = new ArrayList<>(biomes);
 		list.sort(Comparator.comparing((Identifier id) -> !id.getNamespace().equals("minecraft"))
+			.thenComparing(Identifier::getNamespace)
+			.thenComparing(Identifier::getPath));
+		return list;
+	}
+
+	/** Sorted by the display name (case-insensitive), equal names by id; for lists the player reads. */
+	public static List<Identifier> sortedByName(Collection<Identifier> biomes, Function<Identifier, String> name) {
+		List<Identifier> list = new ArrayList<>(biomes);
+		list.sort(Comparator.comparing((Identifier id) -> name.apply(id), String.CASE_INSENSITIVE_ORDER)
 			.thenComparing(Identifier::getNamespace)
 			.thenComparing(Identifier::getPath));
 		return list;

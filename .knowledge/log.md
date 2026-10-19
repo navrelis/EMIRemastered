@@ -87,3 +87,6 @@
 2026-10-19 | CFG1 client review (lead) | tour ok 111/111, globe + T1-25 accepted; correction sent: partial jumps must keep 'Modules' first then its module jumps (720p shot read as dev sub-entries)
 2026-10-19 | FX-TOOLS client review (lead) | accepted: tour 89/89 ok twice, iron pickaxe/flint and steel data-pack JSON checked, notice drawn via EmiScreenManager hook, husk shot: selection cleared; KB44 not reproducible (426 = 426); merged, build green
 2026-10-19 | CFG1 correction review (lead) | accepted: Modules first then trimmed module jumps (lead viewed 720p shot); merged, build green
+2026-10-19 | KB7 delegated (Sonnet long): port fork fix for synthetic favourite remainders, worktree kb7
+2026-10-19 | FX-WD client review (lead) | accepted: 4 tours ok, lead viewed bat portrait + diamond ore info; silverfish fit fixed by horizontal reach; merged, build green
+2026-10-19 | T2 delegated (Sonnet long): server smoke + all tours regression on merged remastered

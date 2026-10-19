@@ -11,13 +11,12 @@ import dev.emi.remastered.loot.EMILoot;
 import dev.emi.remastered.loot.client.ClientBuiltPool;
 import dev.emi.remastered.loot.client.ClientGameplayLootTable;
 import dev.emi.remastered.loot.util.ConditionalStack;
-import dev.emi.remastered.loot.util.FloatTrimmer;
 import dev.emi.remastered.loot.util.stack.GameplayLootEmiStack;
 import dev.emi.remastered.loot.util.IconGroupEmiWidget;
 import dev.emi.remastered.loot.util.InteractableTextWidget;
 import dev.emi.remastered.loot.util.ClientText;
 import dev.emi.remastered.loot.util.ConditionIcons;
-import dev.emi.remastered.loot.util.LText;
+import dev.emi.remastered.loot.util.RollsText;
 import dev.emi.remastered.loot.util.WidgetRowBuilder;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
@@ -162,8 +161,7 @@ public class GameplayLootRecipe implements EmiRecipe {
             int j = 0;
             for (ConditionalStack stack: stacks) {
                 SlotWidget widget = widgets.addSlot(stack.getIngredient(), i * 18, 11 + (18 * j));
-                String rounded = FloatTrimmer.trimFloatString(stack.weight() / 100f, LootSettings.chanceDecimalPlaces());
-                widget.appendTooltip(LText.translatable("emi_loot.rolls", rounded).formatted(Formatting.GRAY));
+                widget.appendTooltip(RollsText.of(stack.weight(), LootSettings.chanceDecimalPlaces()).formatted(Formatting.GRAY));
                 if (LootSettings.showConditionsInTooltip()) {
                     for (Pair<Integer, Text> pair : stack.conditions()) {
                         for (Text line : ConditionIcons.tooltipLines(pair)) {

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.jetbrains.annotations.Nullable;
+import org.joml.Vector3f;
 
 import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.api.recipe.EmiRecipe;
@@ -18,6 +19,7 @@ import dev.emi.remastered.loot.client.ClientLootTables;
 import dev.emi.remastered.loot.client.ClientMobLootTable;
 import dev.emi.remastered.loot.client.ClientResourceData;
 import dev.emi.remastered.loot.client.LootReceiver;
+import dev.emi.remastered.loot.util.EntityBounds;
 import dev.emi.remastered.loot.util.stack.EntityEmiStack;
 import dev.emi.remastered.mobs.Mobs;
 import dev.emi.remastered.mobs.MobsSettings;
@@ -25,6 +27,7 @@ import dev.emi.remastered.mobs.client.ClientSpawnData;
 import dev.emi.remastered.mobs.data.MobFormat;
 import dev.emi.remastered.mobs.data.MobStats;
 import dev.emi.remastered.mobs.data.MobStats.Stat;
+import dev.emi.remastered.mobs.data.PortraitFit;
 import dev.emi.remastered.mobs.data.SpawnRow;
 import dev.emi.remastered.module.Modules;
 import net.minecraft.client.MinecraftClient;
@@ -59,6 +62,8 @@ public class MobInfoRecipe implements EmiRecipe {
 	private static final int STAT_COLUMN_2 = 88;
 	private static final int SPAWN_ROW = 10;
 	private static final int TOOLTIP_LIMIT = 28;
+	/** Side of the square the mob is fitted into, inside the 26x26 portrait slot. */
+	private static final int PORTRAIT_BOX = 22;
 	private static final int TEXT = 0x404040;
 	private static final int TEXT_DARK = 0x202020;
 	private static final int TEXT_LIGHT = 0x6A6A6A;
@@ -200,6 +205,11 @@ public class MobInfoRecipe implements EmiRecipe {
 			// resize first so the bounding box used for the scale below is the one that gets rendered
 			slime.setSize(5, false);
 		}
+		EmiStack fitted = fitted(entity);
+		if (fitted != null) {
+			widgets.addSlot(fitted, 0, 0).large(true);
+			return;
+		}
 		Box box = entity.getBoundingBox();
 		double len = box.getAverageSideLength();
 		if (len > 1.05) {
@@ -218,6 +228,27 @@ public class MobInfoRecipe implements EmiRecipe {
 			widgets.addDrawable(0, 0, 16, 16, (draw, mx, my, delta) -> stack.render(draw, 5, 6 + offset, delta));
 			widgets.addTooltip(stack.getTooltip(), 0, 0, 26, 26);
 		}
+	}
+
+	/**
+	 * The mob scaled and centred by what its model really renders (a bat is drawn far smaller than its hit box), so
+	 * that small and large mobs fill the portrait box alike. Null if it could not be measured.
+	 */
+	private static @Nullable EmiStack fitted(Entity entity) {
+		if (!(entity instanceof LivingEntity living)) {
+			return null;
+		}
+		Vector3f rotation = ClientResourceData.MOB_ROTATIONS.get(entity.getType());
+		EntityBounds.Box bounds = EntityBounds.measure(living, rotation == null ? null : new Vector3f(rotation).mul(0.017453292F));
+		if (bounds == null) {
+			Mobs.LOGGER.warn("Could not measure {} for its portrait, using the hit box scale", entity.getType());
+			return null;
+		}
+		// the portrait turns with the mouse, so a long mob seen from the front may end up seen from the side
+		double centre = (bounds.minX() + bounds.maxX()) / 2.0;
+		double reach = Math.hypot(bounds.width(), bounds.depth()) / 2.0;
+		PortraitFit fit = PortraitFit.of(centre - reach, bounds.minY(), centre + reach, bounds.maxY(), PORTRAIT_BOX);
+		return fit == null ? null : EntityEmiStack.ofFitted(entity, fit.scale(), fit.offsetX(), fit.offsetY());
 	}
 
 	private void addStats(WidgetHolder widgets) {
@@ -240,7 +271,7 @@ public class MobInfoRecipe implements EmiRecipe {
 				widgets.addDrawable(valueX, y, 9, 9, (draw, mx, my, delta) -> draw.drawGuiTexture(icon, 0, 0, 9, 9));
 				valueX += 11;
 			}
-			String value = stats.value(stat, icons);
+			String value = stats.value(stat);
 			if (stat == Stat.SPEED) {
 				value = "≈" + value;
 			}

@@ -41,6 +41,28 @@ class LootLogicTest {
 	}
 
 	@Test
+	void detectsChancesBelowTheResolution() {
+		assertTrue(FloatTrimmer.isBelowResolution(0.0009f, 1));
+		assertTrue(FloatTrimmer.isBelowResolution(0.0009f, 2));
+		assertFalse(FloatTrimmer.isBelowResolution(0.0009f, 4));
+		assertFalse(FloatTrimmer.isBelowResolution(0.15f, 1));
+		assertTrue(FloatTrimmer.isBelowResolution(0.05f, 1));
+		assertFalse(FloatTrimmer.isBelowResolution(0f, 1));
+		assertFalse(FloatTrimmer.isBelowResolution(Float.NaN, 1));
+	}
+
+	@Test
+	void showsTinyChancesAsPercentWithTwoSignificantDigits() {
+		// the junk of a fishing roll: 0.000909 of a roll is 0.09 percent
+		assertEquals("0.09", FloatTrimmer.trimPercent(0.000909f));
+		assertEquals("0.04", FloatTrimmer.trimPercent(0.0004f));
+		assertEquals("0.0083", FloatTrimmer.trimPercent(0.000083f));
+		assertEquals("0.1", FloatTrimmer.trimPercent(0.001f));
+		assertEquals("0.5", FloatTrimmer.trimPercent(0.005f));
+		assertEquals("0", FloatTrimmer.trimPercent(0f));
+	}
+
+	@Test
 	void parsesSkippedKeys() {
 		assertEquals(Set.of("a.b", "c", "d"), LootSettings.parseKeys(" a.b, c ,,d "));
 		assertTrue(LootSettings.parseKeys("").isEmpty());

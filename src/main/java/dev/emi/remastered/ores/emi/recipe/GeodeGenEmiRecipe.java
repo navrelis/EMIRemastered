@@ -128,6 +128,12 @@ public class GeodeGenEmiRecipe extends AbstractPlacedFeatureEmiRecipe {
 
 	@Override
 	public List<EmiIngredient> getInputs() {
+		return List.of();
+	}
+
+	/** The biomes are no ingredients (the page shows them as a list), but EMI still finds the page from a biome. */
+	@Override
+	public List<EmiIngredient> getCatalysts() {
 		return List.of(allBiomes);
 	}
 
@@ -136,6 +142,7 @@ public class GeodeGenEmiRecipe extends AbstractPlacedFeatureEmiRecipe {
 		return Stream.of(innerPlacements, filling, alternateInner, inner, middle, outer)
 				.map(EmiIngredient::getEmiStacks)
 				.flatMap(Collection::stream)
+				.filter(stack -> !stack.isEmpty())
 				.toList();
 	}
 
@@ -146,7 +153,12 @@ public class GeodeGenEmiRecipe extends AbstractPlacedFeatureEmiRecipe {
 
 	@Override
 	public int getDisplayHeight() {
-		return 90 + biomeBandHeight();
+		return bodyHeight() + biomeBandHeight();
+	}
+
+	/** The layer rows above the biome list; the filling row is left out when the geode has no filling (air). */
+	private int bodyHeight() {
+		return filling.isEmpty() ? 72 : 90;
 	}
 
 	@Override
@@ -156,23 +168,32 @@ public class GeodeGenEmiRecipe extends AbstractPlacedFeatureEmiRecipe {
 
 	@Override
 	public void addWidgets(WidgetHolder widgets) {
-		widgets.addSlot(filling, 0, 18)
+		int y = 18;
+		boolean hasFilling = !filling.isEmpty();
+		if (hasFilling) {
+			widgets.addSlot(filling, 0, y)
+					.recipeContext(this);
+			widgets.addSlot(innerPlacements, 46, y)
+					.recipeContext(this);
+			y += 18;
+		}
+		widgets.addSlot(inner, 0, y)
 				.recipeContext(this);
-		widgets.addSlot(innerPlacements, 46, 18)
+		widgets.addTexture(EmiTexture.EMPTY_ARROW, 20, y);
+		widgets.addSlot(alternateInner, 46, y)
 				.recipeContext(this);
-		widgets.addSlot(inner, 0, 36)
+		if (!hasFilling) {
+			widgets.addSlot(innerPlacements, 46, y + 18)
+					.recipeContext(this);
+		}
+		widgets.addSlot(middle, 0, y + 18)
 				.recipeContext(this);
-		widgets.addTexture(EmiTexture.EMPTY_ARROW, 20, 36);
-		widgets.addSlot(alternateInner, 46, 36)
-				.recipeContext(this);
-		widgets.addSlot(middle, 0, 54)
-				.recipeContext(this);
-		widgets.addSlot(outer, 0, 72)
+		widgets.addSlot(outer, 0, y + 36)
 				.recipeContext(this);
 
 		addDistributionGraph(widgets, 64, 0, heightProvider);
 
-		addBiomeBand(widgets, 90);
+		addBiomeBand(widgets, bodyHeight());
 
 		Text veinFreq = getVeinFreqComponent(-1, -1, rarityChance);
 		if (veinFreq != null) {

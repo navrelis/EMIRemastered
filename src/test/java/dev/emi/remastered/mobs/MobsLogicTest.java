@@ -78,19 +78,19 @@ class MobsLogicTest {
 	}
 
 	@Test
-	void statValuesFollowTheIconSetting() {
+	void statValuesAreAlwaysInPoints() {
 		MobStats zombie = zombie();
-		assertEquals("10", zombie.value(Stat.HEALTH, true));
-		assertEquals("20", zombie.value(Stat.HEALTH, false));
-		assertEquals("1.5", zombie.value(Stat.ATTACK, true));
-		assertEquals("3", zombie.value(Stat.ATTACK, false));
-		assertEquals("1", zombie.value(Stat.ARMOR, true));
-		assertEquals("2", zombie.value(Stat.ARMOR, false));
-		assertEquals("9.9", zombie.value(Stat.SPEED, true));
-		assertEquals("35", zombie.value(Stat.FOLLOW_RANGE, true));
+		// the mob page and the Item Info section of the spawn egg show the same numbers
+		assertEquals("20", zombie.value(Stat.HEALTH));
+		assertEquals("3", zombie.value(Stat.ATTACK));
+		assertEquals("2", zombie.value(Stat.ARMOR));
+		assertEquals("10", zombie.tooltipArgs(Stat.HEALTH)[1]);
+		assertEquals("1.5", zombie.tooltipArgs(Stat.ATTACK)[1]);
+		assertEquals("9.9", zombie.value(Stat.SPEED));
+		assertEquals("35", zombie.value(Stat.FOLLOW_RANGE));
 		assertEquals("0.6 x 1.95", zombie.sizeText());
 		MobStats golem = new MobStats(100, 0, 0, 15, 0.25, 1, 16, 1.4, 2.7, false, "misc");
-		assertEquals("100%", golem.value(Stat.KNOCKBACK_RESISTANCE, true));
+		assertEquals("100%", golem.value(Stat.KNOCKBACK_RESISTANCE));
 		assertEquals(2, zombie.tooltipArgs(Stat.HEALTH).length);
 		assertEquals(1, zombie.tooltipArgs(Stat.FOLLOW_RANGE).length);
 	}

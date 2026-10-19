@@ -4,6 +4,7 @@
 package dev.emi.remastered.ores.emi.recipe;
 
 import dev.emi.remastered.ores.Ores;
+import dev.emi.remastered.ores.display.ChanceFormat;
 import dev.emi.remastered.ores.emi.OresRecipeCategories;
 import dev.emi.remastered.ores.sync.OresSnapshot;
 import dev.emi.remastered.ores.mixin.accessor.*;
@@ -11,15 +12,16 @@ import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.render.EmiTexture;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
+import dev.emi.emi.api.widget.SlotWidget;
 import dev.emi.emi.api.widget.TextWidget;
 import dev.emi.emi.api.widget.WidgetHolder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.entry.RegistryEntry;
@@ -31,6 +33,7 @@ import net.minecraft.structure.rule.RandomBlockStateMatchRuleTest;
 import net.minecraft.structure.rule.RuleTest;
 import net.minecraft.structure.rule.TagMatchRuleTest;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.intprovider.IntProvider;
 import net.minecraft.world.gen.feature.OreFeatureConfig;
@@ -139,7 +142,13 @@ public class OreGenEmiRecipe extends AbstractPlacedFeatureEmiRecipe {
 
 	@Override
 	public List<EmiIngredient> getInputs() {
-		return Stream.concat(inputs.stream(), Stream.of(allBiomes)).toList();
+		return inputs;
+	}
+
+	/** The biomes are no ingredients (the page shows them as a list), but EMI still finds the page from a biome. */
+	@Override
+	public List<EmiIngredient> getCatalysts() {
+		return List.of(allBiomes);
 	}
 
 	@Override
@@ -178,9 +187,18 @@ public class OreGenEmiRecipe extends AbstractPlacedFeatureEmiRecipe {
 
 		addBiomeBand(widgets, bodyHeight());
 
-		if (discardChanceOnAirExposure > 0)
-			widgets.addSlot(EmiStack.of(Items.BARRIER).setChance(discardChanceOnAirExposure), 142, 0)
-					.appendTooltip(Text.translatable("emi_ores.discard_on_air_chance"));
+		if (discardChanceOnAirExposure > 0) {
+			List<TooltipComponent> tooltip = List.of(
+				TooltipComponent.of(Text.translatable("emi_ores.discard_on_air_chance").formatted(Formatting.WHITE).asOrderedText()),
+				TooltipComponent.of(Text.translatable("emi_ores.discard_on_air_detail", ChanceFormat.percent(discardChanceOnAirExposure)).formatted(Formatting.GRAY).asOrderedText()));
+			// not the tooltip of the barrier item: the icon only stands for the rule, and a "consumption chance" line would mislead
+			widgets.add(new SlotWidget(EmiStack.of(Items.BARRIER).setChance(discardChanceOnAirExposure), 142, 0) {
+				@Override
+				public List<TooltipComponent> getTooltip(int mouseX, int mouseY) {
+					return tooltip;
+				}
+			});
+		}
 
 		Text veinFreq = getVeinFreqComponent(countMin, countMax, rarityChance);
 		if (veinFreq != null) {
