@@ -192,6 +192,42 @@ activation). Check the protection with `gradlew runClientTour -Ptour=focus-check
 `focused=false cursorLocked=false cursorMode=212993` (GLFW_CURSOR_NORMAL).
 Limitation: a real mouse that moves over the game window still moves the in-game cursor.
 
+## EMI reload benchmark (perf tours)
+
+Dev-only harness for measuring EMI's reload (cold on world join, warm on `EmiReloadManager.reload()` = F3+T) and for
+checking that an optimisation leaves EMI's baked state unchanged. Code: `BenchMod` (main entrypoint of `emi_devtour`,
+active only with `-Demi.tour`), `BenchSteps`, `PhaseTimer`, `StateDump` in `src/devtour`; scripts in `scripts/perf/`.
+
+| Piece | What it does |
+|---|---|
+| `PhaseTimer` | Log4j appender on EMI's own log lines; turns the lines of one reload into phase durations (tags, stack list, plugins, per plugin, recipe bake, search bake, async sorted manager, ...) |
+| `BenchMod` | registers the bench steps and, when `run/config/emi_bench.properties` exists (`items=`, `tools=`, `armor=`), that many load-test items (`emi_bench:*`) so the dev client resembles a big pack |
+| step `bench_record` | `label` (`join`): records the last complete reload (the join reload) as one line of `bench.jsonl` |
+| step `emi_reload` | `label`, `settleTicks` (40): full GC, triggers a reload, waits for EMI and its async recipe sorting, records phases, heap after GC before/after and bytes allocated during the reload |
+| step `emi_dump` | `name`: writes EMI's baked state (index, recipes, lookups, tags, BoM defaults, search results) as text plus a SHA-256 per section to `dump-<name>/` (`hashes.txt`); `*_norm` sections are order-normalised where upstream iterates identity-hash maps; `*_stable` sections also remove the run-to-run noise of world interaction/tag recipe order, emi_loot (random loot samples) and emi_ores (biome list order) and name recipes by id. Two runs of the same build give identical `*_stable` hashes, so these (plus the sections that are already stable: stacks, stack_flags, tags_by_size_norm, bom_defaults, search, persistent_data) are the before/after identity check |
+| steps `jfr_start` / `jfr_stop` | `name`: JFR recording with the JDK `profile` settings, written to `<name>.jfr` |
+| tour `perf-bench` | join record, 1 warm-up and 5 measured warm reloads, `emi_dump final` |
+| tour `perf-profile` | 2 warm-ups, then 3 reloads under JFR (`reload.jfr`) |
+
+Scripts (Python 3, from the project root; one client at a time, they refuse to start while a dev client of the
+project runs):
+
+* `py -3 scripts/perf/run_bench.py --label <name> [--stock] [--vanilla | --repair-check] [--profile]` runs one bench
+  session through `gradlew runClientTour` (no-grab protection on; `soundCategory_master:0.0` is forced in
+  `run/options.txt` before the launch). It uses a fresh copy of the dev world (template `run/saves/emi_perf_template`,
+  the real devworld is restored afterwards), generates the load datapack (`gen_datapack.py`, pack mode: ~92k EMI
+  recipes, ~12k items, 4k tags) and sets `dev-mode`/`log-untranslated-tags` false like the pack. `--stock` runs a copy
+  of the project in `build/stk` whose `dev.emi.emi` sources come from the merge base with `remastered` (the
+  "before"). `--vanilla`: no datapack, no extra items. `--repair-check`: only empties
+  `#minecraft:stone_tool_materials` (KB4). `--boost` (off by default) raises only the bench's own game JVM to
+  AboveNormal priority; use it only when the start-up hangs at "Datafixer Bootstrap" because of CPU starvation, since the
+  owner may be playing at the same time. Results go to `build/emi_perf/<label>/` (`bench.jsonl`, `dump-final/`,
+  `summary.json`, `latest.log`).
+* `py -3 scripts/perf/summarize.py build/emi_perf/<before> build/emi_perf/<after> [<control> ...]` prints the warm
+  means and the join reload per run, a before/after table and the matrix of dump section hashes. Run a second stock
+  session as control: sections that differ between two stock runs are run-to-run noise of upstream EMI.
+* `py -3 scripts/perf/jfr_top.py build/emi_perf/<label>/reload.jfr` lists the hottest methods of EMI's reload threads.
+
 ## Release safety
 
 * `devtour` is a separate source set; the jar and sources jar only package `main`. `gradlew build` compiles it

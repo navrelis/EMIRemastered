@@ -58,6 +58,7 @@ public final class StateDump {
 	private final Map<EmiRecipe, Integer> recipeIndex = new IdentityHashMap<>();
 	private final Map<EmiRecipeCategory, Integer> categoryIndex = new IdentityHashMap<>();
 	private boolean normalized;
+	private boolean sortAllIds;
 	private final Map<String, String> hashes = new LinkedHashMap<>();
 	private final Path dir;
 
@@ -139,6 +140,7 @@ public final class StateDump {
 			section("by_workstation" + suffix, workstations);
 		}
 		normalized = false;
+		stableSections(manager, recipes);
 
 		List<String> tags = new ArrayList<>();
 		for (EmiTagKey<?> key : EmiTags.TAGS) {
@@ -203,6 +205,112 @@ public final class StateDump {
 		List<String> summary = new ArrayList<>();
 		hashes.forEach((k, v) -> summary.add(k + " " + v));
 		Files.write(dir.resolve("hashes.txt"), summary, StandardCharsets.UTF_8);
+	}
+
+	/**
+	 * Run-to-run noise that does not come from the reload code under test: emi_loot samples loot tables (random
+	 * outputs), emi_ores builds its biome lists from hash sets, upstream EMI registers world interaction and tag
+	 * recipes in identity-hash order (which also shifts every later recipe index). The *_stable sections name recipes
+	 * by id instead of index, compare emi_loot/emi_ores recipes by id only, leave emi_loot recipes out of the lookups
+	 * and sort the order-noise categories by id; every other order is kept. Two runs of the same build must give
+	 * identical *_stable hashes.
+	 */
+	private static boolean orderNoise(EmiRecipeCategory category) {
+		String id = category.getId().toString();
+		return id.equals("emi:world_interaction") || id.equals("emi:tag") || category.getId().getNamespace().equals("emi_loot");
+	}
+
+	private static boolean contentNoise(EmiRecipe recipe) {
+		String namespace = recipe.getCategory().getId().getNamespace();
+		return namespace.equals("emi_loot") || namespace.equals("emi_ores");
+	}
+
+	private void stableSections(EmiRecipeManager manager, List<EmiRecipe> recipes) throws Exception {
+		List<String> out = new ArrayList<>();
+		for (EmiRecipe r : recipes) {
+			out.add(contentNoise(r) ? r.getId() + " | " + r.getClass().getName() + " | " + r.getCategory().getId() : recipe(r));
+		}
+		out.sort(null);
+		section("recipes_stable", out);
+
+		out = new ArrayList<>();
+		for (EmiRecipeCategory c : manager.getCategories()) {
+			out.add("category " + c.getId() + " workstations=" + ingredients(manager.getWorkstations(c)));
+			List<String> ids = new ArrayList<>();
+			for (EmiRecipe r : manager.getRecipes(c)) {
+				ids.add("  " + r.getId());
+			}
+			if (orderNoise(c)) {
+				ids.sort(null);
+			}
+			out.addAll(ids);
+		}
+		section("categories_stable", out);
+
+		section("by_input_stable", stableLookup(manager, "byInput"));
+		section("by_output_stable", stableLookup(manager, "byOutput"));
+		out = new ArrayList<>();
+		for (EmiStack s : EmiStackList.stacks) {
+			out.add(stack(s) + " in=" + stableKeys(manager.getRecipesByInput(s)) + " out=" + stableKeys(manager.getRecipesByOutput(s)));
+		}
+		section("index_lookups_stable", out);
+		// byWorkstation also keeps the lists of the unsorted first manager (registration order, e.g. composting from
+		// an identity-hash map): sorted by category and id
+		sortAllIds = true;
+		section("by_workstation_stable", stableLookup(EmiRecipes.byWorkstation, false));
+		sortAllIds = false;
+
+		out = new ArrayList<>();
+		for (EmiTagKey<?> key : EmiTags.TAGS) {
+			out.add(key.raw().registry().getValue() + " #" + key.id() + " = " + stacks(EmiTags.getValues(key)));
+		}
+		out.sort(null);
+		section("tags_stable", out);
+	}
+
+	@SuppressWarnings("unchecked")
+	private List<String> stableLookup(EmiRecipeManager manager, String fieldName) throws ReflectiveOperationException {
+		Field f = manager.getClass().getDeclaredField(fieldName);
+		f.setAccessible(true);
+		return stableLookup((Map<EmiStack, List<EmiRecipe>>) f.get(manager), true);
+	}
+
+	/**
+	 * Upstream keys these maps by the first stack copy that reached them, whose amount, components and remainder
+	 * depend on the category iteration order (identity hashes): {@code keyIdOnly} prints the keys as class and id
+	 * only. Entries whose keys print the same are listed in sorted order.
+	 */
+	private List<String> stableLookup(Map<EmiStack, List<EmiRecipe>> map, boolean keyIdOnly) {
+		TreeMap<String, List<String>> sorted = new TreeMap<>();
+		for (Map.Entry<EmiStack, List<EmiRecipe>> e : map.entrySet()) {
+			if (e.getValue().stream().anyMatch(r -> !r.getCategory().getId().getNamespace().equals("emi_loot"))) {
+				EmiStack s = e.getKey();
+				String key = keyIdOnly ? s.getClass().getSimpleName() + ":" + s.getId() : stack(s);
+				sorted.computeIfAbsent(key, k -> new ArrayList<>()).add(stableKeys(e.getValue()));
+			}
+		}
+		List<String> out = new ArrayList<>();
+		sorted.forEach((k, v) -> {
+			v.sort(null);
+			out.add(k + " -> " + String.join(" | ", v));
+		});
+		return out;
+	}
+
+	private String stableKeys(List<EmiRecipe> list) {
+		List<EmiRecipe> kept = new ArrayList<>(list.size());
+		for (EmiRecipe r : list) {
+			if (!r.getCategory().getId().getNamespace().equals("emi_loot")) {
+				kept.add(r);
+			}
+		}
+		kept.sort(Comparator.<EmiRecipe>comparingInt(r -> categoryIndex.getOrDefault(r.getCategory(), Integer.MAX_VALUE))
+			.thenComparing(r -> sortAllIds || orderNoise(r.getCategory()) ? String.valueOf(r.getId()) : ""));
+		List<String> parts = new ArrayList<>(kept.size());
+		for (EmiRecipe r : kept) {
+			parts.add(String.valueOf(r.getId()));
+		}
+		return kept.size() + ":" + (kept.size() <= 8 ? parts.toString() : hash(parts));
 	}
 
 	@SuppressWarnings("unchecked")

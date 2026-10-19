@@ -92,6 +92,9 @@ public class EmiRecipes {
 		recipes.addAll(EmiData.recipes.stream().map(r -> r.get()).toList());
 		categories.sort((a, b) -> EmiRecipeCategoryProperties.getOrder(a) - EmiRecipeCategoryProperties.getOrder(b));
 		invalidators.addAll(EmiData.recipeFilters);
+		// EMI Remastered: KB2, a recipe without a category is dropped and logged instead of aborting the reload
+		// (upstream PR #1222); first, because datapack filters and plugin invalidators read the category
+		invalidators.add(0, RecipeBakeSupport::missingCategory);
 
 		invalidators.add(r -> {
 			for (EmiIngredient i : Iterables.concat(r.getInputs(), r.getOutputs(), r.getCatalysts())) {
@@ -110,6 +113,8 @@ public class EmiRecipes {
 			}
 			return true;
 		}).toList();
+		// EMI Remastered: KB12, identical tag stack lists share one instance (upstream PR #933)
+		RecipeBakeSupport.shareTagStacks(filtered);
 		Map<EmiRecipeCategory, List<EmiIngredient>> filteredWorkstations = Maps.newHashMap();
 		for (Map.Entry<EmiRecipeCategory, List<EmiIngredient>> entry : workstations.entrySet()) {
 			List<EmiIngredient> w = entry.getValue().stream().filter(s -> !EmiHidden.isDisabled(s)).toList();

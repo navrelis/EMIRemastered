@@ -2,7 +2,7 @@
 
 The datapack adds many crafting/cooking/stonecutting/smithing recipes, many item tags
 and data-driven enchantments (which multiply EMI's anvil/grindstone recipes). Datapacks
-cannot add items; the extra items come from the dev-only BenchItems initializer in
+cannot add items; the extra items come from the dev-only BenchMod initializer in
 src/devtour (config/emi_bench.properties, written by run_bench.py). Pass the same counts
 with --bench-items/--bench-tools/--bench-armor so recipes and tags use those items and the
 bench tools/armor join the vanilla enchantable tags (like modded tools do).
@@ -107,9 +107,9 @@ def main():
     ap.add_argument("--recipes", type=int, default=50000)
     ap.add_argument("--tags", type=int, default=3000, help="number of generated item tags")
     ap.add_argument("--enchantments", type=int, default=40)
-    ap.add_argument("--bench-items", type=int, default=0, help="plain emi_bench:item_NNNNN items registered by BenchItems")
-    ap.add_argument("--bench-tools", type=int, default=0, help="emi_bench:sword_/pickaxe_NNNNN tools registered by BenchItems")
-    ap.add_argument("--bench-armor", type=int, default=0, help="emi_bench:armor_NNNNN pieces registered by BenchItems")
+    ap.add_argument("--bench-items", type=int, default=0, help="plain emi_bench:item_NNNNN items registered by BenchMod")
+    ap.add_argument("--bench-tools", type=int, default=0, help="emi_bench:sword_/pickaxe_NNNNN tools registered by BenchMod")
+    ap.add_argument("--bench-armor", type=int, default=0, help="emi_bench:armor_NNNNN pieces registered by BenchMod")
     ap.add_argument("--empty-stone-tool-materials", action="store_true",
                     help="also make #minecraft:stone_tool_materials empty (reproduces the repair AIOOBE in VanillaPlugin.addRepair)")
     ap.add_argument("--seed", type=int, default=1234)

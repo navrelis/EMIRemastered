@@ -38,6 +38,7 @@ import os
 import shutil
 import subprocess
 import sys
+import threading
 import time
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -81,9 +82,28 @@ def game_pids(root):
     return [int(x) for x in out.split() if x.strip().isdigit()]
 
 
+def raise_priority(root, proc, done):
+    """--boost only: raise only OUR game JVM to AboveNormal (never other processes)."""
+    while not done.is_set() and proc.poll() is None:
+        pids = game_pids(root)
+        if pids:
+            for pid in pids:
+                ps(f"(Get-Process -Id {pid}).PriorityClass = 'AboveNormal'")
+            print(f"game pid(s) {pids}: priority AboveNormal")
+            return
+        done.wait(5)
+
+
 def git(*args, binary=False):
-    out = subprocess.run(["git", *args], cwd=ROOT, capture_output=True, check=True).stdout
-    return out if binary else out.decode("utf-8")
+    # git.exe sometimes fails to start (0xC0000142) while a game JVM is shutting down on a busy PC: retry
+    for attempt in range(3):
+        try:
+            out = subprocess.run(["git", *args], cwd=ROOT, capture_output=True, check=True).stdout
+            return out if binary else out.decode("utf-8")
+        except subprocess.CalledProcessError:
+            if attempt == 2:
+                raise
+            time.sleep(5)
 
 
 def sync_stock(base_ref):
@@ -194,6 +214,9 @@ def main():
     mode.add_argument("--vanilla", action="store_true", help="no generated datapack and no extra items")
     mode.add_argument("--repair-check", action="store_true", help="only empty #minecraft:stone_tool_materials")
     ap.add_argument("--profile", action="store_true", help="run the perf-profile tour (JFR of 3 warm reloads)")
+    ap.add_argument("--boost", action="store_true",
+                    help="raise OUR game JVM (by PID) to AboveNormal priority. Off by default: only meant for a start-up "
+                         "that hangs at 'Datafixer Bootstrap' under CPU starvation; the owner may be playing at the same time")
     ap.add_argument("--timeout", type=int, default=3600, help="seconds")
     ap.add_argument("gen_args", nargs="*", help="extra args for gen_datapack.py (after --)")
     a = ap.parse_args()
@@ -218,6 +241,9 @@ def main():
         with open(gradle_log_path, "w") as gradle_log:
             proc = subprocess.Popen([os.path.join(game.root, "gradlew.bat"), "runClientTour", "-Ptour=" + tour, "--console=plain"],
                                     cwd=game.root, stdout=gradle_log, stderr=subprocess.STDOUT)
+            done = threading.Event()
+            if a.boost:
+                threading.Thread(target=raise_priority, args=(game.root, proc, done), daemon=True).start()
             try:
                 proc.wait(timeout=a.timeout)
                 ok = proc.returncode == 0
@@ -226,6 +252,8 @@ def main():
                 for pid in game_pids(game.root):
                     subprocess.run(["taskkill", "/PID", str(pid), "/F"], capture_output=True)
                 proc.wait(timeout=120)
+            finally:
+                done.set()
         print(f"game run took {time.time() - start:.0f}s, gradle exit {proc.returncode}")
     finally:
         restore(game)

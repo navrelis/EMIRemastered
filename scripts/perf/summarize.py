@@ -6,8 +6,9 @@ Per result folder: the mean (and min/max) of every phase over the measured warm 
 bench.jsonl, plus the join reload (cold: first reload of the JVM, on world join). With two or more folders: a
 markdown before/after table (first folder = before, second = after; warm means and the cold join reload) and a
 matrix of the dump section hashes (dump-final/hashes.txt) of all folders. Sections that also differ between two
-runs of the same build (a control folder) are run-to-run noise of upstream EMI (identity-hash map orders); see
-the *_norm sections for order-normalised variants.
+runs of the same build (a control folder) are run-to-run noise of upstream EMI (identity-hash map orders) and of the
+emi_loot/emi_ores modules (random loot samples, hash-set biome lists). The identical-results check uses the
+*_stable sections (see StateDump.orderNoise) plus every section that is already equal between two stock runs.
 """
 import json
 import os
