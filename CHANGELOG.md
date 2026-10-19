@@ -23,6 +23,8 @@ provides their ids, and a leftover jar stops the game at start-up. Credits and l
 * **Plugin manager** (button "Plugins" next to "Presets"): every EMI plugin of every mod with last reload time, number of
   recipes and stacks, error marker and an on/off switch; closing the screen starts an EMI reload. Turn off duplicate
   plugins of other mods by mod id.
+* Every module jump button has its own icon, including the world icon. As many module jumps as fit next to EMI's own
+  jumps are shown, "Modules" first.
 
 ### New features
 **Item Info (module `info`)**
@@ -87,6 +89,9 @@ provides their ids, and a leftover jar stops the game at start-up. Credits and l
 * EMI Remastered's own mixins are no longer logged as "EMI class is tainted".
 * Hiding stacks no longer rewrites `emi.json` and re-bakes the index on every click; saves are debounced.
 * The check for a focused text field only looked at the first container of a screen; fixed.
+* Favourite remainder counts: the remaining amount of a synthetic favourite now includes what recipe remainders already
+  serve (for example the stick left over from one stick recipe that a later step needs; upstream 1113, 895, 766). Port of
+  aMelonRind/emi commits 2508321 and e7fd7d9.
 
 **Modules**
 * Loot: the `copy_name` condition showed a raw key and a typo; a mob loot build no longer logs thousands of stack traces
@@ -106,6 +111,21 @@ provides their ids, and a leftover jar stops the game at start-up. Credits and l
 * Distraction free: the mixin crashes with JEI versions are gone (the module has no mixins), hidden item icons can no
   longer be clicked, and it works with current EMI versions.
 * Professions: profession recipe ids no longer cause warnings from the recipe manager.
+* Stats: armour sections show again (read through `ItemStack#applyAttributeModifiers`), numbers use the language of the
+  game (9.6 instead of 9,6 in English), the honey bottle takes 2 s and leaves a glass bottle, the food page is wide
+  enough for long effect rows, the Weapon section is only for melee weapons (axes kept), the mace has no Tool section and
+  tag names are readable.
+* Tools: copying a shaped or shapeless crafting recipe as JSON gives real data-pack JSON (pattern and key, tags where the
+  items equal a tag); a notice is drawn top right after copying (EMI hides toasts on its screens); in the tag browser
+  numbers follow the game language, the selection is cleared when the search filters it out, long tag names are no longer
+  cut (the registry label and the count give way first, the full id is in the row tooltip), all registries have friendly
+  titles, biome members are translated and empty tags are dimmed with a red count.
+* Loot, ores and mobs: the Item Info loot rows no longer show an empty slot and the block drop cost has a single entry;
+  condition tooltips read "pickaxe of iron or better" and small chances "x% of a roll"; the geode page skips the empty
+  filling slot; ore rows that only differ by feature are merged and the biomes are shown as catalysts; the barrier tooltip
+  explains the chance; mob portraits fit the rendered model; mob stats use points with hearts in brackets. Biome lists and
+  dimensions of ore pages are sorted (translated name), so they no longer change order between launches.
+* Item Info: the tag list has one "Show all N tags" link and translated or readable tag names, the raw id is in the tooltip.
 
 ### Performance
 * Warm reload on a bench pack with about 92,000 recipes: 5761 ms to 2445 ms in the paired run, about 40 % faster pooled
@@ -115,7 +135,7 @@ provides their ids, and a leftover jar stops the game at start-up. Credits and l
 * Method: `docs/DEVTOUR.md`, "EMI reload benchmark".
 
 ### Known limits
-* Recipe tree remainders of synthetic favourites can still be off when a remainder feeds a later step (upstream 1113).
+* At GUI scale 3 in a 1280x720 window only the "Modules" jump button of the config screen fits next to EMI's own jumps.
 * Sodium's optimised vertex path is not used for batched unlit items.
 * Drops that mods give in code instead of a loot table are not shown, and ore features of custom configured feature types
   (for example Mekanism) are not shown.

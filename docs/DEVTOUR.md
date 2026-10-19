@@ -48,6 +48,7 @@ Tours for single fixes and features (also in `src/devtour/resources/tour/`):
 * `fx3.json`: loot `copy_name` tooltip on the banner block drops, enchanted books above the maximum level (Sharpness 7 and 12), and `U` on a Smite book (own page first in the Enchantments tab).
 * `p8.json`: Item Info sections of the professions (trades sold/bought by villagers) and effects modules (potions, tipped arrows, stews, effect stacks) and clicking their rows.
 * `world.json`: biome and structure pages (village, stronghold, trial chambers, nether portal; plains, desert, nether wastes, deep dark), also after a `/reload`. Biome and structure stacks are no items, and tour clicks do not reach index stacks, so the tour opens the pages with the dev-only helper `src/devtour/java/dev/emi/remastered/devtour/WorldTour.java` through `call` steps (it does what a click on the stack in the index does).
+* `kb7.json`: recipe tree remainder counts of synthetic favourites (KB7). The dev-only helper `src/devtour/java/dev/emi/remastered/devtour/Kb7Tour.java` (`call` steps `goalActivatorRail` and `report`) sets the activator rail as the recipe tree goal and notes per recipe the batches and the remaining amount with the old formula and with the fix. The stick recipe makes 4 per batch, so the stick of the redstone torch is served by the remainder: the stick favourite must show 3 with an empty inventory, 2 of 3 with one stick (`/give`) and be gone with three.
 
 ## How it works
 
