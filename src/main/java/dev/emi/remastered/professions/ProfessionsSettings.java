@@ -1,11 +1,11 @@
 package dev.emi.remastered.professions;
 
-/**
- * PORTER-owned stub (P3): settings of the {@code professions} module as public static fields with
- * {@code @ConfigValue("professions.<key>")} (+ optional {@code @Comment}, {@code @ConfigGroup}/{@code @ConfigGroupEnd}).
- */
-public final class ProfessionsSettings {
+import dev.emi.emi.config.EmiConfig.Comment;
+import dev.emi.emi.config.EmiConfig.ConfigValue;
 
-	private ProfessionsSettings() {
-	}
+public class ProfessionsSettings {
+
+	@Comment("Whether profession pages render the villager model next to the workstation.")
+	@ConfigValue("professions.show-villager-model")
+	public static boolean showVillagerModel = true;
 }
