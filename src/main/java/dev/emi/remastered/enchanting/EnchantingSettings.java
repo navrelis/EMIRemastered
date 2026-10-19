@@ -34,6 +34,12 @@ public final class EnchantingSettings {
 	@ConfigValue("enchanting.book-level-limit")
 	public static int bookLevelLimit = 10;
 
+	@Comment("Whether the info page also covers enchanted books above the enchantment's maximum level (up to 5 levels "
+		+ "above it, at most level 10, never above the level cap of the game), so a book from loot, commands or a mod "
+		+ "that lifts the cap still opens the page. Needs an EMI reload.")
+	@ConfigValue("enchanting.show-above-max")
+	public static boolean showAboveMax = true;
+
 	private EnchantingSettings() {
 	}
 }

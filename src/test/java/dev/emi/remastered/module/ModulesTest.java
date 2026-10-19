@@ -33,10 +33,11 @@ import dev.emi.remastered.ores.OresEmiPlugin;
 import dev.emi.remastered.plugin.PluginIds;
 import dev.emi.remastered.professions.ProfessionsEmiPlugin;
 import dev.emi.remastered.stats.StatsEmiPlugin;
+import dev.emi.remastered.world.WorldEmiPlugin;
 
 /** Guards the module contract (docs/MODULES.md) for the real modules. */
 class ModulesTest {
-	private static final List<String> IDS = List.of("loot", "ores", "effects", "enchanting", "professions", "letsdo", "distraction_free", "info", "mobs", "tools", "stats");
+	private static final List<String> IDS = List.of("loot", "ores", "effects", "enchanting", "professions", "letsdo", "distraction_free", "info", "mobs", "tools", "stats", "world");
 
 	private static JsonObject json(String path) throws IOException {
 		try (InputStream in = ModulesTest.class.getClassLoader().getResourceAsStream(path)) {
@@ -94,6 +95,7 @@ class ModulesTest {
 		assertEquals("emiprofessions", PluginIds.resolve(new ProfessionsEmiPlugin(), "emi"));
 		assertEquals("emi_letsdo_compat", PluginIds.resolve(new LetsDoEmiPlugin(), "emi"));
 		assertEquals("emi_stats", PluginIds.resolve(new StatsEmiPlugin(), "emi"));
+		assertEquals("emi_world", PluginIds.resolve(new WorldEmiPlugin(), "emi"));
 		assertEquals(Modules.LOOT, new LootEmiPlugin().getModule());
 	}
 
@@ -105,7 +107,7 @@ class ModulesTest {
 		assertTrue(strings(entrypoints.getAsJsonArray("client")).contains("dev.emi.remastered.EmiRemasteredClient"));
 		Set<String> emi = strings(entrypoints.getAsJsonArray("emi"));
 		for (Class<?> plugin : List.of(LootEmiPlugin.class, OresEmiPlugin.class, EffectsEmiPlugin.class,
-				EnchantingEmiPlugin.class, ProfessionsEmiPlugin.class, LetsDoEmiPlugin.class, StatsEmiPlugin.class)) {
+				EnchantingEmiPlugin.class, ProfessionsEmiPlugin.class, LetsDoEmiPlugin.class, StatsEmiPlugin.class, WorldEmiPlugin.class)) {
 			assertTrue(emi.contains(plugin.getName()), plugin.getName());
 		}
 		Set<String> mixins = strings(mod.getAsJsonArray("mixins"));

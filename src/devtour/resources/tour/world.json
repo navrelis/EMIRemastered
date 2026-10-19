@@ -1,0 +1,52 @@
+{
+  "description": "World module: structure pages (pillager outpost, village, stronghold with rings, trial chambers with loot links, nether portal) and biome pages (plains, desert, nether wastes, deep dark), opened through the same lookup as a click on the stack in the index (WorldTour); the structure stacks are also searchable in the index.",
+  "warmupTicks": 60,
+  "settleTicks": 20,
+  "stepTimeoutSeconds": 30,
+  "worldJoinTimeoutSeconds": 120,
+  "timeoutSeconds": 300,
+  "steps": [
+    { "type": "resize", "w": 1280, "h": 720 },
+    { "type": "set_gui_scale", "n": 2 },
+    { "type": "emi_wait_loaded" },
+    { "type": "open_inventory" },
+
+    { "type": "emi_search", "text": "village" },
+    { "type": "screenshot", "name": "index-search-village" },
+    { "type": "close_screen" },
+
+    { "type": "open_inventory" },
+    { "type": "call", "class": "dev.emi.remastered.devtour.WorldTour", "method": "pillagerOutpost" },
+    { "type": "screenshot", "name": "structure-pillager-outpost" },
+    { "type": "call", "class": "dev.emi.remastered.devtour.WorldTour", "method": "villagePlains" },
+    { "type": "screenshot", "name": "structure-village-plains" },
+    { "type": "click", "x": 240, "y": 192 },
+    { "type": "screenshot", "name": "click-biome-icon-opens-biome-page" },
+    { "type": "call", "class": "dev.emi.remastered.devtour.WorldTour", "method": "villagePlains" },
+    { "type": "click", "x": 272, "y": 218 },
+    { "type": "screenshot", "name": "click-loot-link-opens-chest-page" },
+    { "type": "call", "class": "dev.emi.remastered.devtour.WorldTour", "method": "stronghold" },
+    { "type": "screenshot", "name": "structure-stronghold-rings" },
+    { "type": "call", "class": "dev.emi.remastered.devtour.WorldTour", "method": "trialChambers" },
+    { "type": "screenshot", "name": "structure-trial-chambers-loot" },
+    { "type": "call", "class": "dev.emi.remastered.devtour.WorldTour", "method": "ruinedPortalNether" },
+    { "type": "screenshot", "name": "structure-ruined-portal-nether" },
+
+    { "type": "call", "class": "dev.emi.remastered.devtour.WorldTour", "method": "plains" },
+    { "type": "screenshot", "name": "biome-plains" },
+    { "type": "call", "class": "dev.emi.remastered.devtour.WorldTour", "method": "desert" },
+    { "type": "screenshot", "name": "biome-desert" },
+    { "type": "call", "class": "dev.emi.remastered.devtour.WorldTour", "method": "netherWastes" },
+    { "type": "screenshot", "name": "biome-nether-wastes" },
+    { "type": "call", "class": "dev.emi.remastered.devtour.WorldTour", "method": "deepDark" },
+    { "type": "screenshot", "name": "biome-deep-dark" },
+
+    { "type": "close_screen" },
+    { "type": "command", "text": "/reload", "waitTicks": 120 },
+    { "type": "emi_wait_loaded" },
+    { "type": "call", "class": "dev.emi.remastered.devtour.WorldTour", "method": "villagePlains" },
+    { "type": "screenshot", "name": "village-plains-after-reload" },
+    { "type": "call", "class": "dev.emi.remastered.devtour.WorldTour", "method": "plains" },
+    { "type": "screenshot", "name": "biome-plains-after-reload" }
+  ]
+}

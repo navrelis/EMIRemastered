@@ -49,3 +49,27 @@
 2026-10-19 | X1 review (lead) | accepted: /emiexport client command, render-thread slices (10 ms/tick), compute() bypasses page cache, abort on reload/leave, async write; merged, build green, pushed. Client run pending (tour export.json via call step)
 2026-10-19 | B5 review (lead) | correction: listener replay calls setListener(null) and would drop other mods listeners -> use accessor on progress map
 2026-10-19 | A8 review (lead) | correction: structure prefetch on server thread at start -> background build with join/timeout, skip when setting off
+2026-10-19 | A9 review (lead) | protocol start/batch/complete + OresSyncState accepted; correction: OresSelfCheck dev-only, cache sync plan per data generation
+2026-10-19 | A2 review (lead) | accepted: measured level cap, incompatibility matrix (either direction), tag sources page, info provider; merged, build green
+2026-10-19 | Q2 review (lead) | accepted: docs/KNOWN_BUGS.md (42 rows, 22 affect us, top 10); merged
+2026-10-19 | B5, A8, A9 corrections | accepted (accessor instead of listener; async structure build; dev-only self check + cached plan); merged, build green
+2026-10-19 | A5+B1 review (lead) | accepted: stats module (food category, tool/weapon/armour sections), order info-mobs-tools-stats; merged, build green
+2026-10-19 | Q1b review (lead) | accepted: mixins cancel lockCursor/unlockCursor/setCursorParameters/raw mouse/fullscreen, no-focus hints, never pause on lost focus; devtour on all client runs, not in release jar (0 entries); 4 tour launches clean; merged, pushed. Client ban lifted (D13 fix in place)
+2026-10-19 | Q3 code review (lead) | accepted: tag index (skips only tags with no shared value), RecipeBuckets (identity adjacency when allDistinct), repair fix; benchmark + KB2/KB12 sent
+2026-10-19 | wave 5 delegated: T1 tours+icons (Sonnet long), FX1 reload/persistence (Opus long), FX2 core small fixes (Sonnet), FX3 module fixes (Sonnet), P8 trades/effects providers (Sonnet), B2 world module (Sonnet long); client launches allowed (one per agent)
+2026-10-19 | auto-handoff: wave 5 agents stopped; see F:\Coding\EMI_Remastered\handoff-2026-10-19-827bbbd2.md
+2026-10-19 | session 4: handoff matches repo (remastered=origin=9aa35e85); agent rules copied to new scratchpad (client launches allowed via gradle run configs, no KNOWN_BUGS edits by agents)
+2026-10-19 | wave 5 re-delegated in existing worktrees: Q3 bench+KB2/KB12 (Opus long), FX1 (Opus long), T1, FX2, P8, B2 (Sonnet long), FX3 (Sonnet); ports 25640-25646
+2026-10-19 | FX2 review (lead) | accepted: KB5 creative namespaces drop fallback, KB6 port 4c22e3b0 + EmiTagKey cache concurrent (CME on first block-tag search), KB8 cropped remainder index (+6 tests), KB9 long clamp, KB10 ThreadLocal bake flag, KB11 remastered mixins exempt, hasFocusedTextField; merged, build green. KB rows: 5,6,8,9,10,11 fixed
+2026-10-19 | FX1 review (lead) | mostly accepted (disconnect(Screen,boolean) hook was the KB1 root cause, abort checks, raw-JSON preservation, debounced save, client executor); correction: unconditional thread.interrupt can close zipfs NIO channels -> only interrupt waiting threads; prove client stop flushes the save
+2026-10-19 | FX3 review (lead) | accepted: KB17 lower-case key + text, KB18 world-gone skip + first-5 stack traces, KB22 proven fixed by A9 (OresSyncState swap only on complete), KB23 null-world guards, KB28 extra books up to min(max+5,10,cap,limit) setting enchanting.show-above-max, KB29 own books as single inputs + catalyst; merged, build green
+2026-10-19 | FX1 correction review (lead) | accepted: interrupt only WAITING/TIMED_WAITING (+1 s re-check, pass counter), stop path proven via Main->stop()->disconnect()->disconnect(Screen,boolean); merged, build green. KB rows: 1,3,14,15,38 fixed
+2026-10-19 | P8 review (lead) | providers emiprofessions:trades + emiffect:effects accepted (lazy index per reload, food effects left to stats); follow-up sent: ItemInfoProvider.coveredCategories so recipes provider drops duplicate rows, module-off check, docs rows
+2026-10-19 | P8 follow-up review (lead) | accepted: coveredCategories(EmiStack) (stack-aware so lectern keeps its row), recipes provider filters once per page, module gates, docs rows; merged, build green
+2026-10-19 | B2 review (lead) | accepted: world module (pos 12), server data on SERVER_STARTED + per reloadable-registries cache, loot lookup on daemon with 25 s deadline, batched payload canSend-guarded, reuses BiomeEmiStack, StructureEmiStack; merged, build green
+2026-10-19 | Q3 bench review (lead) | accepted: pack bench warm total 5761->2445 ms (pooled -40%), emi plugin -49..66%, join -21%, heap -60 MB (KB12), alloc/reload -37%; stable dump sections identical stock/after/stock-control; KB2 invalidator first; repair check ok; correction: priority boost opt-in only
+2026-10-19 | Q3 merged (lead) | EmiTagKey conflict resolved by agent (concurrent cache + listVersion, no recursive computeIfAbsent); repair check after FX2: 0 remainder errors; merged, build green (301 tests)
+2026-10-19 | DOC1 delegated (Sonnet short): KNOWN_BUGS rows + DEVTOUR tour list
+2026-10-19 | DOC2 delegated (Sonnet short): README, CREDITS, CHANGELOG, licences in jar
+2026-10-19 | DOC1 review (lead) | accepted: 30 rows fixed, KB43-45 added; merged
+2026-10-19 | DOC2 review (lead) | accepted: README, CREDITS from upstream metadata, CHANGELOG 2.0.0, jar root licences; merged, build green, jar checked

@@ -13,6 +13,9 @@
     "emi_devtour.mixins.json"
   ],
   "entrypoints": {
+    "main": [
+      "dev.emi.remastered.devtour.BenchMod"
+    ],
     "client": [
       "dev.emi.remastered.devtour.TourMod"
     ]

@@ -49,7 +49,8 @@
       "dev.emi.remastered.professions.ProfessionsEmiPlugin",
       "dev.emi.remastered.letsdo.LetsDoEmiPlugin",
       "dev.emi.remastered.mobs.MobsEmiPlugin",
-      "dev.emi.remastered.stats.StatsEmiPlugin"
+      "dev.emi.remastered.stats.StatsEmiPlugin",
+      "dev.emi.remastered.world.WorldEmiPlugin"
     ],
     "modmenu": [
       "dev.emi.emi.compat.EmiModMenu"
@@ -76,7 +77,8 @@
     "emi_remastered_info.mixins.json",
     "emi_remastered_mobs.mixins.json",
     "emi_remastered_tools.mixins.json",
-    "emi_remastered_stats.mixins.json"
+    "emi_remastered_stats.mixins.json",
+    "emi_remastered_world.mixins.json"
   ],
   "accessWidener": "emi.accesswidener",
   "provides": [

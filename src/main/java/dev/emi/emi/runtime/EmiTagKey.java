@@ -7,9 +7,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
-
-import com.google.common.collect.Maps;
 
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiUtil;
@@ -27,7 +26,10 @@ import net.minecraft.util.Identifier;
 
 // Wrapper around TagKeys
 public class EmiTagKey<T> {
-	public static final Map<TagKey<?>, EmiTagKey<?>> CACHE = Maps.newHashMap();
+	// EMI Remastered: concurrent, tag searches (search thread) and reloads create keys at the same time (CME in computeIfAbsent)
+	public static final Map<TagKey<?>, EmiTagKey<?>> CACHE = new java.util.concurrent.ConcurrentHashMap<>();
+	// EMI Remastered: bumped whenever an existing key's cached list is recalculated (EmiTags' lookup index checks it)
+	private static volatile int listVersion = 0;
 	private final TagKey<T> raw;
 	private List<T> cached;
 	
@@ -37,7 +39,16 @@ public class EmiTagKey<T> {
 	}
 
 	public void recalculate() {
+		if (cached != null) {
+			listVersion++; // EMI Remastered
+		}
 		cached = stream().toList();
+	}
+
+	// EMI Remastered: see listVersion
+	@ApiStatus.Internal
+	public static int getListVersion() {
+		return listVersion;
 	}
 
 	public TagKey<T> raw() {

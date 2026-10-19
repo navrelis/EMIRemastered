@@ -55,7 +55,8 @@ public class EmiMixinTransformation {
 			for (var m : targetClass.methods) {
 				AnnotationNode annot = Annotations.getVisible(m, MixinMerged.class);
 				String tainter = Annotations.getValue(annot, "mixin", (String) null);
-				if (tainter != null && !tainter.startsWith("dev.emi.emi.mixin")) {
+				// EMI Remastered: our own mixins (dev.emi.remastered.) are not reported as tainting (KB11)
+				if (tainter != null && !tainter.startsWith("dev.emi.emi.mixin") && !tainter.startsWith("dev.emi.remastered.")) {
 					tainters.add(tainter);
 				}
 			}

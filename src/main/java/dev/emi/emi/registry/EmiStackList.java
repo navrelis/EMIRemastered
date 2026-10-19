@@ -79,6 +79,8 @@ public class EmiStackList {
 				EmiLog.error("Item " + itemName + " threw while EMI was attempting to construct the index, items may be missing.", e);
 			}
 		}
+		// EMI Remastered: namespaces that appear in any creative tab (KB5)
+		Set<String> creativeNamespaces = new java.util.HashSet<>();
 		if (EmiConfig.indexSource != IndexSource.REGISTERED) {
 			// There is an unwritten convention that ItemGroup.updateEntries is only invoked on the main thread
 			long groupReloadStart = System.currentTimeMillis();
@@ -116,21 +118,18 @@ public class EmiStackList {
 						usedNamespaces.put(namespace, usedNamespaces.getOrDefault(namespace, 0) + 1);
 						ig.stacks.add(es);
 					}
-					if (EmiConfig.indexSource == IndexSource.CREATIVE) {
-						for (String namespace : usedNamespaces.keySet()) {
-							if (namespaceGroups.containsKey(namespace)) {
-								IndexGroup ng = namespaceGroups.get(namespace);
-								if (usedNamespaces.getInt(namespace) * 3 >= searchStacks.size() || usedNamespaces.getInt(namespace) * 3 >= ng.stacks.size()) {
-									ng.suppressedBy.add(ig);
-								}
-							}
-						}
-					}
+					// EMI Remastered: replaces the one-third suppression heuristic, see below (KB5)
+					creativeNamespaces.addAll(usedNamespaces.keySet());
 					groups.add(ig);
 				} catch (Exception e) {
 					EmiLog.error("Creative item group " + groupName + " threw while EMI was attempting to construct the index, items may be missing.", e);
 				}
 			}
+		}
+		if (EmiConfig.indexSource == IndexSource.CREATIVE) {
+			// EMI Remastered: items in no creative tab must not return through the registry fallback; only
+			// namespaces without any creative tab entry (mods without tabs) keep their fallback group (KB5)
+			namespaceGroups.keySet().removeAll(creativeNamespaces);
 		}
 		groups.addAll(namespaceGroups.values());
 		IndexGroup fluidGroup = new IndexGroup();

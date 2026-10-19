@@ -13,6 +13,10 @@ public final class LevelCap {
 	public static final int UNLIMITED = Integer.MAX_VALUE;
 	/** The level the probe tries to store; above {@link #VANILLA}. */
 	public static final int PROBE_LEVEL = 1000;
+	/** How many levels above the maximum level of an enchantment get a listed book. */
+	public static final int EXTRA_LEVELS = 5;
+	/** No book above this level is listed above the maximum level. */
+	public static final int LIST_CEILING = 10;
 
 	private LevelCap() {
 	}
@@ -29,5 +33,18 @@ public final class LevelCap {
 	/** @return whether the cap differs from vanilla's, i.e. is worth showing */
 	public static boolean isCustom(int cap) {
 		return cap != VANILLA;
+	}
+
+	/**
+	 * @return the highest level of the books listed above an enchantment's maximum level: at most {@link #EXTRA_LEVELS}
+	 * above it, at most {@link #LIST_CEILING}, never above the stack cap or the book level limit; the maximum level
+	 * itself when nothing is listed above it. Enchantments with a single level have no scale to extend.
+	 */
+	public static int aboveMaxTop(int maxLevel, int cap, int bookLevelLimit) {
+		if (maxLevel < 2) {
+			return maxLevel;
+		}
+		long top = Math.min(Math.min((long) maxLevel + EXTRA_LEVELS, LIST_CEILING), Math.min(cap, bookLevelLimit));
+		return (int) Math.max(maxLevel, top);
 	}
 }

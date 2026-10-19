@@ -1,6 +1,6 @@
 # Plan
 
-Usage tally (work units: short = 1, long = 2): Opus 14 (F1, F2, Q3 x3, A1 x2) / Sonnet 65 -> Opus 18 %
+Usage tally (work units: short = 1, long = 2): Opus 21 (F1, F2, Q3 x6, A1 x2, FX1 x4) / Sonnet 86 -> Opus 20 % (session 4 re-delegation of interrupted wave 5 counted again)
 
 Status: open / in progress / in review / done. `||` = can run in parallel.
 
@@ -26,30 +26,43 @@ Status: open / in progress / in review / done. `||` = can run in parallel.
 | ID | Task | Model | Status |
 |---|---|---|---|
 | Q1 | Dev-client screenshot tour + log check harness | Sonnet long | done |
-| Q1b | Tour steps + D12 mute enforcement + D13 no-grab/no-focus dev mixin on all client runs (blocks every client check) | Sonnet short | in progress (session 3, top priority) |
-| Q2 | Known bugs (EMI repair AIOOBE, upstream issues of each module) | Sonnet | in progress (survey -> docs/KNOWN_BUGS.md, session 3) |
-| Q3 | A12 reload performance, before/after numbers | Opus long | in progress (session 3: review/finish code; benchmark after Q1b) |
+| Q1b | Tour steps + D12 mute enforcement + D13 no-grab/no-focus dev mixin on all client runs (blocks every client check) | Sonnet short | done (merged; 4 muted no-grab launches clean; client ban lifted) |
+| Q2 | Known bugs (EMI repair AIOOBE, upstream issues of each module) | Sonnet | done (docs/KNOWN_BUGS.md: 22 open rows; fixes in FX1-FX3, Q3) |
+| Q3 | A12 reload performance, before/after numbers | Opus long | done (merged; warm reload -40..58 %, join -21 %, heap -60 MB; KB2, KB4, KB12) |
 
 ## Phase 3 Features (after the module each builds on is merged)
 | ID | Task | Builds on | Model | Status |
 |---|---|---|---|---|
 | A1 | Item Info screen + provider API ("How to get": recipes by output grouped, loot, mob drops, ores, trades, brewing; "no known source" marker); key bind on hovered stack | F2 | Opus long | done (client module-off check pending) |
-| A2 | Enchanting: real max level (cap mods), incompatibilities via canBeCombined, sources (table/loot/librarian), info provider | P4, A1 | Sonnet | in progress (session 3) |
+| A2 | Enchanting: real max level (cap mods), incompatibilities via canBeCombined, sources (table/loot/librarian), info provider | P4, A1 | Sonnet | done (merged; client tour in T1) |
 | A3 | Effects sources (in P2) | P2 | Sonnet | done (P2) |
 | A4 | Villager trades per profession/level (client dummy villager, wandering trader, Fabric TradeOfferHelper trades; Villager-API plans if reachable) | P3 | Sonnet long | done |
-| A5+B1 | `stats` module: food page, tool/weapon/armour stats pages, fuel/compost in info screen (A6) | F2, A1 | Sonnet long | in progress (session 3) |
+| A5+B1 | `stats` module: food page, tool/weapon/armour stats pages, fuel/compost in info screen (A6) | F2, A1 | Sonnet long | done (merged; client tour in T1) |
 | A7 | `mobs` module: mob pages (health, armour, attack, speed, spawn biomes via server sync, drops link) | P7 | Sonnet long | done (merged eab051f; client tour pending after Q1b) |
-| A8 | Loot: structure/dimension filters, condition icons, Lootr per-player note | P7 | Sonnet | in review (correction: async structure lookup) |
-| A9 | Ores: modded dimensions, compact biome list, Y-range highlight | P5 | Sonnet | in progress (session 3, continued + info provider) |
+| A8 | Loot: structure/dimension filters, condition icons, Lootr per-player note | P7 | Sonnet | done (merged; client tour in T1) |
+| A9 | Ores: modded dimensions, compact biome list, Y-range highlight | P5 | Sonnet | done (merged; client tour in T1) |
 | A10 | Distraction-free extras (in P1) | P1 | Sonnet | done (P1) |
 | A11 | Unified config + plugin manager (in F2) | F2 | Opus | done |
-| A12 | Reload performance (Q3) | - | Opus | in progress (Q3) |
-| B2 | `world` module: biome pages (climate, tags, spawns, ores) + structure pages (server sync) | P5, A7 | Sonnet long | open |
+| A12 | Reload performance (Q3) | - | Opus | done (Q3) |
+| B2 | `world` module: biome pages (climate, tags, spawns, ores) + structure pages (server sync) | P5, A7 | Sonnet long | done (merged; 34 structures/64 biomes in dev; real multiplayer untested; jump icon slot 12 pending) |
 | B3 | Tag browser screen (all tags, search, members) | F2 | Sonnet | done (merged; client tour pending after Q1b) |
 | B4 | Copy recipe as text/JSON bind | F2 | Sonnet short | done (with B3) |
-| B5 | Advancement links in item info (icon/display) | A1 | Sonnet short | in review (correction: no setListener) |
+| B5 | Advancement links in item info (icon/display) | A1 | Sonnet short | done (merged; client tour in T1) |
 | X1 | Pack-dev export command `/emiexport` (recipes, items, sources, nosource, tags; JSON/CSV) | A1 | Sonnet | done (merged; client run pending) |
 | X2 | Let's Do port fixes + dedupe (P6) | - | Sonnet long | done (in P6) |
+
+## Phase 3b Verification and fixes (session 3)
+| ID | Task | Model | Status |
+|---|---|---|---|
+| T1 | Batched client tours of all merged features + jump icons mobs/stats -> docs/TOUR_REPORT.md | Sonnet long | in progress (session 4) |
+| FX1 | KB1, KB3, KB14, KB15, KB38: reload lifecycle (world gone, disconnect, daemon threads), keep unparsable emi.json entries, debounced hide save | Opus long | done (merged; ali interrupt and hide click not client-verified; crash shutdown may lose last 500 ms of changes) |
+| FX2 | KB5, KB6, KB8, KB9, KB10, KB11 + hasFocusedTextField (EMI core, small) | Sonnet long | done (merged 714005d; manual: regex tag search #/pickax/ showed empty in tour, I with anvil field focused) |
+| FX3 | KB17, KB18, KB22, KB23, KB28, KB29 (loot, ores, enchanting) | Sonnet | done (merged; limits: R/U on books only up to listed level (max+5, <=10), Grinding tab before Enchantments on U) |
+| P8 | Info providers: villager trades (professions), effects | Sonnet long | done (merged; coveredCategories(stack) API; item-info toggle not client-checked) |
+| DOC1 | KNOWN_BUGS.md rows from FX1-FX3/Q3 + DEVTOUR.md tour list (world, fx2, fx3, p8, WorldTour) | Sonnet short | done (open: KB7, KB13, KB28 partly, KB43, KB44) |
+| ICON12 | world jump icon slot 12 (after T1) | Sonnet short | open |
+| DOC2 | README, CREDITS.md (authors, refs, licences), CHANGELOG 2.0.0, licence files in jar | Sonnet short | done (merged; jar has CREDITS.md, LICENSE, LGPL text; 0 devtour entries) |
+| -- | Later: KB7, KB13 | - | open |
 
 ## Phase 4 Acceptance
 Pack install under game lock, end-to-end check, report, push.

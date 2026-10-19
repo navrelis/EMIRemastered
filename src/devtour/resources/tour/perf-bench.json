@@ -1,0 +1,18 @@
+{
+  "description": "EMI reload benchmark (scripts/perf/run_bench.py): records the join reload, one warm-up reload and 5 measured warm reloads, then dumps EMI's baked state for the identical-results check.",
+  "warmupTicks": 100,
+  "settleTicks": 10,
+  "stepTimeoutSeconds": 900,
+  "worldJoinTimeoutSeconds": 900,
+  "timeoutSeconds": 3600,
+  "steps": [
+    { "type": "bench_record", "label": "join" },
+    { "type": "emi_reload", "label": "warmup" },
+    { "type": "emi_reload", "label": "warm-1" },
+    { "type": "emi_reload", "label": "warm-2" },
+    { "type": "emi_reload", "label": "warm-3" },
+    { "type": "emi_reload", "label": "warm-4" },
+    { "type": "emi_reload", "label": "warm-5" },
+    { "type": "emi_dump", "name": "final" }
+  ]
+}

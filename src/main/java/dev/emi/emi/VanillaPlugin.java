@@ -496,12 +496,20 @@ public class VanillaPlugin implements EmiPlugin {
 				if (i.getComponents().getOrDefault(DataComponentTypes.MAX_DAMAGE, 0) > 0) {
 					if (i instanceof ArmorItem ai && ai.getMaterial() != null && ai.getMaterial().value().repairIngredient().get() != null
 							&& !ai.getMaterial().value().repairIngredient().get().isEmpty()) {
-						Identifier id = synthetic("anvil/repairing/material", EmiUtil.subId(i) + "/" + EmiUtil.subId(ai.getMaterial().value().repairIngredient().get().getMatchingStacks()[0].getItem()));
-						addRecipeSafe(registry, () -> new EmiAnvilRecipe(EmiStack.of(i), EmiIngredient.of(ai.getMaterial().value().repairIngredient().get()), id));
+						// EMI Remastered: an ingredient with entries can match no stack (empty repair tag): no material repair recipe
+						ItemStack[] matching = ai.getMaterial().value().repairIngredient().get().getMatchingStacks();
+						if (matching.length > 0) {
+							Identifier id = synthetic("anvil/repairing/material", EmiUtil.subId(i) + "/" + EmiUtil.subId(matching[0].getItem()));
+							addRecipeSafe(registry, () -> new EmiAnvilRecipe(EmiStack.of(i), EmiIngredient.of(ai.getMaterial().value().repairIngredient().get()), id));
+						}
 					} else if (i instanceof ToolItem ti && ti.getMaterial().getRepairIngredient() != null
 							&& !ti.getMaterial().getRepairIngredient().isEmpty()) {
-						Identifier id = synthetic("anvil/repairing/material", EmiUtil.subId(i) + "/" + EmiUtil.subId(ti.getMaterial().getRepairIngredient().getMatchingStacks()[0].getItem()));
-						addRecipeSafe(registry, () -> new EmiAnvilRecipe(EmiStack.of(i), EmiIngredient.of(ti.getMaterial().getRepairIngredient()), id));
+						// EMI Remastered: same; [0] threw ArrayIndexOutOfBoundsException and lost the item's other repair recipes
+						ItemStack[] matching = ti.getMaterial().getRepairIngredient().getMatchingStacks();
+						if (matching.length > 0) {
+							Identifier id = synthetic("anvil/repairing/material", EmiUtil.subId(i) + "/" + EmiUtil.subId(matching[0].getItem()));
+							addRecipeSafe(registry, () -> new EmiAnvilRecipe(EmiStack.of(i), EmiIngredient.of(ti.getMaterial().getRepairIngredient()), id));
+						}
 					}
 				}
 				// TODO used to be isDamageable, the 20.1 impl of that method appears to just be maxDamage > 0 though

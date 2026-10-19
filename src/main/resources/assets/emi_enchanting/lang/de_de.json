@@ -47,5 +47,7 @@
   "config.emi.enchanting.show_in_item_info": "In Gegenstandsinfo anzeigen",
   "config.emi.tooltip.enchanting.show_in_item_info": "Ob der Gegenstandsinfo-Bildschirm die Verzauberungen von verzauberten Büchern und Gegenständen zeigt sowie die Verzauberungen, die zu einem unverzauberten Gegenstand passen.",
   "config.emi.enchanting.book_level_limit": "Stufengrenze der Bücher",
-  "config.emi.tooltip.enchanting.book_level_limit": "Wie viele Stufen verzauberter Bücher pro Verzauberung höchstens aufgelistet werden. Verzauberungen mit höherer Höchststufe listen die Stufen bis zu dieser Zahl und die Höchststufe."
+  "config.emi.tooltip.enchanting.book_level_limit": "Wie viele Stufen verzauberter Bücher pro Verzauberung höchstens aufgelistet werden. Verzauberungen mit höherer Höchststufe listen die Stufen bis zu dieser Zahl und die Höchststufe.",
+  "config.emi.enchanting.show_above_max": "Bücher über der Höchststufe anzeigen",
+  "config.emi.tooltip.enchanting.show_above_max": "Ob die Infoseite auch verzauberte Bücher über der Höchststufe der Verzauberung abdeckt (bis zu 5 Stufen darüber, höchstens Stufe 10, nie über der Stufengrenze des Spiels), damit ein Buch aus Beute, Befehlen oder einer Mod, die die Grenze aufhebt, die Seite trotzdem öffnet.\nBenötigt ein Neuladen von EMI."
 }

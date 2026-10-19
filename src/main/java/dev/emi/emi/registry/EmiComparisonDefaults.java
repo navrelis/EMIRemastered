@@ -8,9 +8,7 @@ public class EmiComparisonDefaults {
 	public static Map<Object, Comparison> comparisons = Map.of();
 
 	public static Comparison get(Object obj) {
-		if (comparisons.containsKey(obj)) {
-			return comparisons.get(obj);
-		}
-		return Comparison.DEFAULT_COMPARISON;
+		// EMI Remastered: one lookup instead of containsKey + get (same result, this is on the recipe index hot path)
+		return comparisons.getOrDefault(obj, Comparison.DEFAULT_COMPARISON);
 	}
 }

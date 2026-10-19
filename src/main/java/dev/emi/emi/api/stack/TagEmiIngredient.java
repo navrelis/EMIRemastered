@@ -1,6 +1,7 @@
 package dev.emi.emi.api.stack;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.jetbrains.annotations.ApiStatus;
 import org.joml.Matrix4f;
@@ -89,6 +90,31 @@ public class TagEmiIngredient implements EmiIngredient {
 	@Override
 	public List<EmiStack> getEmiStacks() {
 		return stacks;
+	}
+
+	// EMI Remastered: KB12, EmiRecipes.bake shares identical stack lists between tag ingredients (upstream PR #933)
+	@ApiStatus.Internal
+	public void setEmiStacks(List<EmiStack> stacks) {
+		this.stacks = stacks;
+	}
+
+	// EMI Remastered: KB12, whether two stacks are interchangeable in a shared list: same class, key, components,
+	// amount, chance, comparison and (recursively) remainder; stricter than equals
+	@ApiStatus.Internal
+	public static boolean identicalStacks(EmiStack a, EmiStack b) {
+		return identicalStacks(a, b, 0);
+	}
+
+	private static boolean identicalStacks(EmiStack a, EmiStack b, int depth) {
+		if (a == b) {
+			return true;
+		}
+		if (a == null || b == null || depth > 4 || a.getClass() != b.getClass() || a.comparison != b.comparison
+				|| a.getAmount() != b.getAmount() || a.getChance() != b.getChance() || !a.getKey().equals(b.getKey())
+				|| !Objects.equals(a.getComponentChanges(), b.getComponentChanges())) {
+			return false;
+		}
+		return identicalStacks(a.getRemainder(), b.getRemainder(), depth + 1);
 	}
 
 	@Override
