@@ -1,0 +1,44 @@
+{
+  "description": "Mobs module: mob pages (reached through the spawn egg of the mob), the spawn egg list in the index, and the mob section of the Item Info screen of a spawn egg.",
+  "warmupTicks": 60,
+  "settleTicks": 20,
+  "stepTimeoutSeconds": 30,
+  "worldJoinTimeoutSeconds": 120,
+  "timeoutSeconds": 300,
+  "steps": [
+    { "type": "resize", "w": 1280, "h": 720 },
+    { "type": "set_gui_scale", "n": 2 },
+    { "type": "open_inventory" },
+
+    { "type": "emi_recipes", "item": "minecraft:zombie_spawn_egg" },
+    { "type": "emi_category", "id": "emi_mobs:mob_info" },
+    { "type": "screenshot", "name": "zombie" },
+    { "type": "close_screen" },
+
+    { "type": "emi_recipes", "item": "minecraft:wither_skeleton_spawn_egg" },
+    { "type": "emi_category", "id": "emi_mobs:mob_info" },
+    { "type": "screenshot", "name": "wither-skeleton" },
+    { "type": "close_screen" },
+
+    { "type": "emi_recipes", "item": "minecraft:bat_spawn_egg" },
+    { "type": "emi_category", "id": "emi_mobs:mob_info" },
+    { "type": "screenshot", "name": "bat" },
+    { "type": "close_screen" },
+
+    { "type": "open_inventory" },
+    { "type": "emi_search", "text": "spawn egg" },
+    { "type": "screenshot", "name": "spawn-egg-list" },
+
+    { "type": "emi_stack_key", "item": "minecraft:zombie_spawn_egg", "key": "I" },
+    { "type": "screenshot", "name": "zombie-egg-item-info" },
+    { "type": "close_screen" },
+
+    { "type": "open_inventory" },
+    { "type": "emi_stack_key", "item": "minecraft:wither_skeleton_spawn_egg", "key": "I" },
+    { "type": "screenshot", "name": "wither-skeleton-egg-item-info" },
+    { "type": "close_screen" },
+
+    { "type": "open_emi_config" },
+    { "type": "screenshot", "name": "config" }
+  ]
+}

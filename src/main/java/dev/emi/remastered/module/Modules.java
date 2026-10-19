@@ -11,8 +11,10 @@ import dev.emi.remastered.enchanting.EnchantingModule;
 import dev.emi.remastered.info.InfoModule;
 import dev.emi.remastered.letsdo.LetsDoModule;
 import dev.emi.remastered.loot.LootModule;
+import dev.emi.remastered.mobs.MobsModule;
 import dev.emi.remastered.ores.OresModule;
 import dev.emi.remastered.professions.ProfessionsModule;
+import dev.emi.remastered.tools.ToolsModule;
 
 /**
  * Registry of all EMI Remastered modules. The order here is the order of the module switches and module config
@@ -32,6 +34,8 @@ public final class Modules {
 	public static final LetsDoModule LETSDO = register(new LetsDoModule());
 	public static final DistractionFreeModule DISTRACTION_FREE = register(new DistractionFreeModule());
 	public static final InfoModule INFO = register(new InfoModule());
+	public static final MobsModule MOBS = register(new MobsModule());
+	public static final ToolsModule TOOLS = register(new ToolsModule());
 
 	private Modules() {
 	}

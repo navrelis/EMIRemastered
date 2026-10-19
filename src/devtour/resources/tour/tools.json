@@ -1,0 +1,66 @@
+{
+  "description": "Tools module: tag browser (list, tag selected, search, member search, registry filter, reverse lookup, recipes/uses and back) and copy recipe (crafting and smelting, text and JSON, module off).",
+  "warmupTicks": 60,
+  "settleTicks": 12,
+  "stepTimeoutSeconds": 30,
+  "worldJoinTimeoutSeconds": 120,
+  "timeoutSeconds": 300,
+  "steps": [
+    { "type": "resize", "w": 1280, "h": 720 },
+    { "type": "set_gui_scale", "n": 2 },
+
+    { "type": "open_inventory" },
+    { "type": "key", "key": "T" },
+    { "type": "note", "text": "T pressed in the inventory (open bind, real key path)" },
+    { "type": "screenshot", "name": "tag-browser-list" },
+    { "type": "close_screen" },
+    { "type": "open_inventory" },
+
+    { "type": "call", "class": "dev.emi.remastered.devtour.ToolsTour", "method": "openLogs" },
+    { "type": "call", "class": "dev.emi.remastered.devtour.ToolsTour", "method": "hoverFirstMember" },
+    { "type": "wait", "ticks": 4 },
+    { "type": "screenshot", "name": "tag-logs-selected-hover" },
+
+    { "type": "call", "class": "dev.emi.remastered.devtour.ToolsTour", "method": "searchAxe" },
+    { "type": "screenshot", "name": "search-axe" },
+    { "type": "call", "class": "dev.emi.remastered.devtour.ToolsTour", "method": "registryAll" },
+    { "type": "call", "class": "dev.emi.remastered.devtour.ToolsTour", "method": "searchHusk" },
+    { "type": "screenshot", "name": "search-member-husk" },
+    { "type": "call", "class": "dev.emi.remastered.devtour.ToolsTour", "method": "searchClear" },
+    { "type": "call", "class": "dev.emi.remastered.devtour.ToolsTour", "method": "registryEntities" },
+    { "type": "screenshot", "name": "registry-entity-types" },
+    { "type": "call", "class": "dev.emi.remastered.devtour.ToolsTour", "method": "registryBiomes" },
+    { "type": "screenshot", "name": "registry-biomes" },
+
+    { "type": "call", "class": "dev.emi.remastered.devtour.ToolsTour", "method": "closeScreen" },
+    { "type": "call", "class": "dev.emi.remastered.devtour.ToolsTour", "method": "openForOakLog" },
+    { "type": "screenshot", "name": "reverse-lookup-oak-log" },
+
+    { "type": "call", "class": "dev.emi.remastered.devtour.ToolsTour", "method": "clickFirstMember" },
+    { "type": "screenshot", "name": "click-member-no-recipes" },
+    { "type": "call", "class": "dev.emi.remastered.devtour.ToolsTour", "method": "clickFirstMemberUses" },
+    { "type": "screenshot", "name": "click-member-uses" },
+    { "type": "key", "key": "ESCAPE" },
+    { "type": "note", "text": "escape from the EMI uses returns to the tag browser" },
+    { "type": "screenshot", "name": "back-in-browser" },
+    { "type": "key", "key": "ESCAPE" },
+    { "type": "note", "text": "escape from the browser returns to the inventory" },
+    { "type": "screenshot", "name": "back-in-inventory" },
+
+    { "type": "emi_recipes", "item": "minecraft:iron_pickaxe" },
+    { "type": "call", "class": "dev.emi.remastered.devtour.ToolsTour", "method": "copyDefaultFirst" },
+    { "type": "call", "class": "dev.emi.remastered.devtour.ToolsTour", "method": "copyOtherFirst" },
+    { "type": "call", "class": "dev.emi.remastered.devtour.ToolsTour", "method": "copyDefault" },
+    { "type": "wait", "ticks": 20 },
+    { "type": "screenshot", "name": "copy-crafting-toast" },
+    { "type": "call", "class": "dev.emi.remastered.devtour.ToolsTour", "method": "copyOther" },
+    { "type": "call", "class": "dev.emi.remastered.devtour.ToolsTour", "method": "copyModuleOff" },
+
+    { "type": "emi_recipes", "item": "minecraft:iron_ingot" },
+    { "type": "emi_category", "id": "minecraft:smelting" },
+    { "type": "call", "class": "dev.emi.remastered.devtour.ToolsTour", "method": "copyDefault" },
+    { "type": "call", "class": "dev.emi.remastered.devtour.ToolsTour", "method": "copyOther" },
+
+    { "type": "close_screen" }
+  ]
+}
