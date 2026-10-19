@@ -571,15 +571,22 @@ public final class Steps {
 			};
 		});
 
-		// {"type":"window_info"}  records whether the game window has the OS focus (GLFW_FOCUSED), is visible, and
-		// whether the cursor is locked. Dev clients must report focused=false, cursorLocked=false (emi_devtour mixins).
+		// {"type":"window_info"}  records the window mode, GLFW_VISIBLE, GLFW_FOCUSED, position, sizes and whether the
+		// cursor is locked. Fails unless focused=false and cursorLocked=false, in the default (hidden) mode also unless
+		// visible=false (emi_devtour mixins, DevWindow).
 		register("window_info", (args, ctx) -> {
 			long handle = ctx.client.getWindow().getHandle();
-			ctx.info("focused=" + (GLFW.glfwGetWindowAttrib(handle, GLFW.GLFW_FOCUSED) == GLFW.GLFW_TRUE)
-				+ " visible=" + (GLFW.glfwGetWindowAttrib(handle, GLFW.GLFW_VISIBLE) == GLFW.GLFW_TRUE)
-				+ " cursorLocked=" + ctx.client.mouse.isCursorLocked()
-				+ " cursorMode=" + GLFW.glfwGetInputMode(handle, GLFW.GLFW_CURSOR)
-				+ " windowFocused(mc)=" + ctx.client.isWindowFocused());
+			boolean focused = DevWindow.attrib(handle, GLFW.GLFW_FOCUSED);
+			boolean visible = DevWindow.attrib(handle, GLFW.GLFW_VISIBLE);
+			boolean locked = ctx.client.mouse.isCursorLocked();
+			String line = "mode=" + DevWindow.mode() + " " + DevWindow.describe(handle) + " focused=" + focused
+				+ " cursorLocked=" + locked + " cursorMode=" + GLFW.glfwGetInputMode(handle, GLFW.GLFW_CURSOR)
+				+ " windowFocused(mc)=" + ctx.client.isWindowFocused();
+			ctx.info(line);
+			if (focused || locked || (!DevWindow.VISIBLE && visible)) {
+				throw new IllegalStateException("dev window must be unfocused, unlocked"
+					+ (DevWindow.VISIBLE ? "" : " and hidden") + ": " + line);
+			}
 			return StepRun.DONE;
 		});
 

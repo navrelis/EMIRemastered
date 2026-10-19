@@ -18,6 +18,7 @@ public final class TourMod implements ClientModInitializer {
 
 	@Override
 	public void onInitializeClient() {
+		ClientTickEvents.END_CLIENT_TICK.register(DevWindow::tick);
 		String tour = System.getProperty("emi.tour");
 		if (tour == null || tour.isBlank()) {
 			LOG.info("emi.tour is not set, tour disabled");
