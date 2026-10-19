@@ -6,3 +6,16 @@ accessible method net/minecraft/client/gui/screen/Screen addSelectableChild (Lne
 
 accessible field net/minecraft/client/gui/widget/ClickableWidget x I
 accessible field net/minecraft/client/gui/widget/ClickableWidget y I
+
+# Loot module (formerly EMI Loot): nested predicate and loot function classes the loot parser reads
+accessible class net/minecraft/predicate/entity/EntitySubPredicateTypes$VariantType$VariantPredicate
+accessible class net/minecraft/predicate/StatePredicate$Condition
+accessible class net/minecraft/predicate/StatePredicate$ExactValueMatcher
+accessible class net/minecraft/predicate/StatePredicate$RangedValueMatcher
+accessible class net/minecraft/predicate/entity/LocationPredicate$PositionRange
+accessible class net/minecraft/predicate/entity/PlayerPredicate$AdvancementPredicate
+accessible class net/minecraft/predicate/entity/PlayerPredicate$AdvancementCriteriaPredicate
+accessible class net/minecraft/predicate/entity/PlayerPredicate$CompletedAdvancementPredicate
+accessible class net/minecraft/predicate/entity/PlayerPredicate$StatMatcher
+accessible class net/minecraft/loot/function/SetAttributesLootFunction$Attribute
+accessible class net/minecraft/loot/function/SetStewEffectLootFunction$StewEffect

@@ -1,0 +1,171 @@
+package dev.emi.remastered.loot.emi;
+
+import dev.emi.remastered.loot.LootSettings;
+import com.google.common.collect.ArrayListMultimap;
+import dev.emi.emi.api.recipe.EmiRecipe;
+import dev.emi.emi.api.recipe.EmiRecipeCategory;
+import dev.emi.emi.api.stack.EmiIngredient;
+import dev.emi.emi.api.stack.EmiStack;
+import dev.emi.emi.api.widget.SlotWidget;
+import dev.emi.emi.api.widget.WidgetHolder;
+import dev.emi.remastered.loot.EMILoot;
+import dev.emi.remastered.loot.client.ClientArchaeologyLootTable;
+import dev.emi.remastered.loot.util.stack.ArchaeologyLootEmiStack;
+import dev.emi.remastered.loot.util.InteractableTextWidget;
+import dev.emi.remastered.loot.util.ClientText;
+import dev.emi.remastered.loot.util.LText;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.recipe.Ingredient;
+import net.minecraft.registry.Registries;
+import net.minecraft.util.Formatting;
+import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import static dev.emi.remastered.loot.util.FloatTrimmer.trimFloatString;
+
+public class ArchaeologyLootRecipe implements EmiRecipe {
+
+	public ArchaeologyLootRecipe(ArchaeologyLootRecipeData data) {
+		this.loot = data.loot;
+		this.isGuaranteedNonChance = data.guaranteed;
+
+		ArrayListMultimap<Float, EmiStack> map2 = ArrayListMultimap.create();
+		List<EmiStack> outputsList = new ArrayList<>();
+		data.map.forEach((weight, item) -> {
+			EmiStack stack = EmiStack.of(item);
+			map2.put(weight, stack);
+			outputsList.add(stack);
+		});
+
+		lootStacksSorted = map2;
+
+		if(loot.items.size() > 48 || LootSettings.chestLootAlwaysStackSame) {
+			this.lootStacksSortedSize = lootStacksSorted.keySet().size();
+		} else {
+			this.lootStacksSortedSize = loot.items.size();
+		}
+
+		outputs = outputsList;
+		inputStack = new ArchaeologyLootEmiStack(this.loot.id);
+	}
+
+	private final ClientArchaeologyLootTable loot;
+	private final ArrayListMultimap<Float, EmiStack> lootStacksSorted;
+	private final int lootStacksSortedSize;
+	private final List<EmiStack> outputs;
+	private boolean isGuaranteedNonChance = false;
+	private final ArchaeologyLootEmiStack inputStack;
+	private final float columns = 8f;
+
+	@Override
+	public EmiRecipeCategory getCategory() {
+		return LootEmiRegistration.ARCHAEOLOGY_CATEGORY;
+	}
+
+	@Override
+	public @Nullable Identifier getId() {
+		return Identifier.of(EMILoot.MOD_ID, "/" + getCategory().id.getPath() + "/" + loot.id.getNamespace() + "/" + loot.id.getPath());
+	}
+
+	@Override
+	public List<EmiIngredient> getInputs() {
+		EmiIngredient sand = EmiIngredient.of(Ingredient.ofItems(Items.SUSPICIOUS_SAND, Items.SUSPICIOUS_GRAVEL));
+		EmiIngredient brush = EmiIngredient.of(Ingredient.ofItems(Items.BRUSH));
+		return Arrays.asList(sand, brush);
+	}
+
+	@Override
+	public List<EmiStack> getOutputs() {
+		return outputs;
+	}
+
+	@Override
+	public int getDisplayWidth() {
+		return 144;
+	}
+
+	@Override
+	public int getDisplayHeight() {
+		int titleHeight = 11;
+		int boxesHeight = ((int) Math.ceil(lootStacksSortedSize / columns) * (EMILoot.Type.ARCHAEOLOGY.isCompact() ? 18 : 19)) - 1;
+		return titleHeight + boxesHeight;
+	}
+
+	@Override
+	public void addWidgets(WidgetHolder widgets) {
+		final int titleSpace;
+		final int finalRowHeight;
+		if(widgets.getHeight() < getDisplayHeight()) {
+			titleSpace = 9;
+			finalRowHeight = (widgets.getHeight() - titleSpace) / ((int) Math.ceil(lootStacksSortedSize / 8.0));
+		} else {
+			titleSpace = 11;
+			finalRowHeight = 18;
+		}
+
+		widgets.add(new InteractableTextWidget(inputStack, 1, 0, 0x404040, false).recipeContext(this));
+		if (EMILoot.isModLoaded(loot.id.getNamespace())) {
+			widgets.addTooltip(ClientText.components(inputStack.getName(), loot.id.getNamespace()), 0, 0, 144, 10);
+		} else {
+			widgets.addTooltipText(List.of(inputStack.getName()), 0, 0, 144, 10);
+		}
+		AtomicInteger index = new AtomicInteger(lootStacksSortedSize);
+		for (var entry : lootStacksSorted.asMap().entrySet()) {
+			float weight = entry.getKey();
+			Collection<EmiStack> items = entry.getValue();
+			if ((loot.items.size() <= 48) && !LootSettings.chestLootAlwaysStackSame) {
+				for (EmiStack stack : items) {
+					int row = (int) Math.ceil(index.get() / columns) - 1;
+					int column= (index.get() - 1) % (int) columns;
+					index.getAndDecrement();
+					String fTrim = trimFloatString(weight, LootSettings.chanceDecimalPlaces());
+					SlotWidget slotWidget = new SlotWidget(stack, column * 18, titleSpace + row * finalRowHeight).recipeContext(this);
+					widgets.add(slotWidget.appendTooltip(LText.translatable("emi_loot.percentage", fTrim).formatted(Formatting.GRAY)));
+				}
+			} else {
+				int row = (int) Math.ceil(index.get() / columns) - 1;
+				int column = (int)((index.get() - 1) % columns);
+				index.getAndDecrement();
+				EmiIngredient ingredient = EmiIngredient.of(items.stream().toList());
+				String fTrim = trimFloatString(Math.max(weight / 100f, 0.01f), Math.max(LootSettings.chanceDecimalPlaces() + 1, 2));
+				SlotWidget slotWidget = new SlotWidget(ingredient, column * 18, titleSpace + row * finalRowHeight).recipeContext(this);
+				widgets.add(slotWidget.appendTooltip(LText.translatable("emi_loot.rolls", fTrim).formatted(Formatting.GRAY)));
+			}
+		}
+	}
+
+	@Override
+	public boolean supportsRecipeTree() {
+		return EmiRecipe.super.supportsRecipeTree() && isGuaranteedNonChance;
+	}
+
+	public record ArchaeologyLootRecipeData(ClientArchaeologyLootTable loot, ArrayListMultimap<Float, ItemStack> map, boolean guaranteed) {
+
+		public static ArchaeologyLootRecipeData of(ClientArchaeologyLootTable loot) {
+			boolean isGuaranteedNonChance = false;
+			if (loot.items.size() == 1) {
+				if (loot.items.values().toFloatArray()[0] == 1f) {
+					isGuaranteedNonChance = true;
+				}
+			}
+
+			ArrayListMultimap<Float, ItemStack> map2 = ArrayListMultimap.create();
+			loot.items.forEach((item, weight)-> {
+				map2.put(weight, item);
+			});
+			for (float key : map2.keySet()) {
+				map2.get(key).sort(Comparator.comparingInt(s -> Registries.ITEM.getRawId(s.getItem())));
+			}
+			return new ArchaeologyLootRecipeData(loot, map2, isGuaranteedNonChance);
+		}
+
+	}
+}
