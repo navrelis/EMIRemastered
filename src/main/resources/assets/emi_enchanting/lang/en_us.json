@@ -47,5 +47,7 @@
   "config.emi.enchanting.show_in_item_info": "Show in Item Info",
   "config.emi.tooltip.enchanting.show_in_item_info": "Whether the Item Info screen shows the enchantments of enchanted books and items, and the enchantments that fit a plain item.",
   "config.emi.enchanting.book_level_limit": "Book Level Limit",
-  "config.emi.tooltip.enchanting.book_level_limit": "The most enchanted book levels listed per enchantment. Enchantments with a higher maximum level list levels up to this number and the maximum level."
+  "config.emi.tooltip.enchanting.book_level_limit": "The most enchanted book levels listed per enchantment. Enchantments with a higher maximum level list levels up to this number and the maximum level.",
+  "config.emi.enchanting.show_above_max": "Show Books Above Maximum",
+  "config.emi.tooltip.enchanting.show_above_max": "Whether the info page also covers enchanted books above the enchantment's maximum level (up to 5 levels above it, at most level 10, never above the level cap of the game), so a book from loot, commands or a mod that lifts the cap still opens the page.\nNeeds an EMI reload."
 }

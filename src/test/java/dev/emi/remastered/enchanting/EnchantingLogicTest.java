@@ -72,6 +72,32 @@ class EnchantingLogicTest {
 	}
 
 	@Test
+	void booksAboveTheMaximumLevelAreFewAndLimited() {
+		// Sharpness: five levels above the maximum, but never above level 10
+		assertEquals(10, LevelCap.aboveMaxTop(5, LevelCap.VANILLA, 10));
+		// Protection: max 4 + 5 = 9
+		assertEquals(9, LevelCap.aboveMaxTop(4, LevelCap.VANILLA, 10));
+		// Unbreaking: max 3 + 5 = 8
+		assertEquals(8, LevelCap.aboveMaxTop(3, LevelCap.UNLIMITED, 10));
+		// a lower level cap of the game wins
+		assertEquals(6, LevelCap.aboveMaxTop(5, 6, 10));
+		assertEquals(5, LevelCap.aboveMaxTop(5, 5, 10));
+		assertEquals(5, LevelCap.aboveMaxTop(5, 1, 10));
+		// the book level limit setting wins too
+		assertEquals(7, LevelCap.aboveMaxTop(5, LevelCap.VANILLA, 7));
+		assertEquals(5, LevelCap.aboveMaxTop(5, LevelCap.VANILLA, 3));
+		// modded enchantments that already reach the ceiling, and single level enchantments, get no extra books
+		assertEquals(10, LevelCap.aboveMaxTop(10, LevelCap.VANILLA, 10));
+		assertEquals(30, LevelCap.aboveMaxTop(30, LevelCap.VANILLA, 10));
+		assertEquals(1, LevelCap.aboveMaxTop(1, LevelCap.VANILLA, 10));
+		assertEquals(Integer.MAX_VALUE, LevelCap.aboveMaxTop(Integer.MAX_VALUE, LevelCap.UNLIMITED, 10));
+		// never more than 255 books
+		for (int max = 1; max < 300; max++) {
+			assertTrue(LevelCap.aboveMaxTop(max, LevelCap.UNLIMITED, 10) - max <= LevelCap.EXTRA_LEVELS);
+		}
+	}
+
+	@Test
 	void everySourceHasADistinctLangKey() {
 		long distinct = List.of(Source.values()).stream().map(Source::key).distinct().count();
 		assertEquals(Source.values().length, distinct);
