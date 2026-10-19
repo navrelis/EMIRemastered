@@ -95,3 +95,6 @@
 2026-10-19 | DOC3 review (lead) | accepted: Status column in TOUR_REPORT, KB7/KB43 fixed, KB44 closed not reproducible, counts recomputed, CREDITS + CHANGELOG; merged
 2026-10-19 | owner decision Phase 4: swap after owner closes the game, owner launches, lead checks the log
 2026-10-19 | auto-handoff: T2 stopped after its tour runs (report not written); see F:\Coding\EMI_Remastered\handoff-2026-10-19-2db405d6.md
+2026-10-19 | session 6: handoff matches repo (remastered=origin=f5a6cd84 + status board commit); owner pack still running (PID 43056/47224), Phase 4 waits
+2026-10-19 | T2 evaluation (lead) | tours: 22 ok (advancements 52, config 111, default 19, distraction-free 33, effects 37, enchanting 14, enchanting-extras 33, export 12, focus-check 18, fx2 33, fx3 42, loot 26, loot-extras 85, mobs 43, ores 27, ores-extras 44, p8 132, plugin-manager 48, professions 24, stats 100, tools 89, world 38), all-steps 30/31 (intentional bedrock failure); server smoke clean (12 modules, ore sync self check, 34 structures); findings: plugin-manager 9 ERROR NPE deserializing emiffect:effect stacks (-> FX-SER), only 9 of 34 structures get chest tables, code-placed vanilla chests unknown (-> LOOT-VAN); tour fixes fx3/p8 merged
+2026-10-19 | delegated: FX-SER (Sonnet short), LOOT-VAN (Sonnet short), T2-SHOTS screenshot review (Sonnet short, read-only)

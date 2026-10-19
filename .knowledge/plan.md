@@ -1,6 +1,6 @@
 # Plan
 
-Usage tally (work units: short = 1, long = 2): Opus 25 (F1, F2, Q3 x6, A1 x2, FX1 x4, FOCUS1 x4 = two delegations) / Sonnet 106 -> Opus 19 % (sessions 4+5 re-delegations counted again)
+Usage tally (work units: short = 1, long = 2): Opus 25 (F1, F2, Q3 x6, A1 x2, FX1 x4, FOCUS1 x4 = two delegations) / Sonnet 109 -> Opus 19 % (sessions 4+5 re-delegations counted again)
 
 Status: open / in progress / in review / done. `||` = can run in parallel.
 
@@ -67,7 +67,10 @@ Status: open / in progress / in review / done. `||` = can run in parallel.
 | CFG1 | world jump icon slot 12, T1-3 module jumps at small windows, T1-25 info tag wording | Sonnet short | done (merged; config tour 111/111 ok, one correction: Modules first) |
 | DOC2 | README, CREDITS.md (authors, refs, licences), CHANGELOG 2.0.0, licence files in jar | Sonnet short | done (merged; jar has CREDITS.md, LICENSE, LGPL text; 0 devtour entries) |
 | KB7 | Favourite remainder counts (port aMelonRind/emi 2508321, e7fd7d9) | Sonnet long | done (merged; kb7 tour before 2/2 -> after 3/3, 5 tests) |
-| T2 | Regression: server smoke + all tours on merged remastered, findings list | Sonnet long | open (interrupted at handoff: all 23 tours had run, summaries in .claude/worktrees/t2/run/tour-out/*/summary.json not yet evaluated; uncommitted tour JSON fixes fx3.json, p8.json) |
+| T2 | Regression: server smoke + all tours on merged remastered, findings list | Sonnet long | done (lead evaluated: 22/23 tours ok, all-steps fails only its intentional bedrock step; server smoke clean; tour fixes fx3/p8 merged; findings -> FX-SER, LOOT-VAN, screenshot review T2-SHOTS) |
+| T2-SHOTS | Read-only screenshot review of all T2 tour shots, findings table | Sonnet short | in progress |
+| FX-SER | Unknown stack type (disabled plugin/removed mod) logs 1 WARN per type instead of ERROR+NPE per entry (EmiIngredientSerializers) | Sonnet short | in progress (worktree fx-ser, port 25671) |
+| LOOT-VAN | Code-placed vanilla chest tables mapped by structure type (desert pyramid, fortress, stronghold, ...) in StructureLookup | Sonnet short | in progress (worktree loot-van, port 25670) |
 | DOC3 | KNOWN_BUGS (KB7, KB43, KB44) + TOUR_REPORT statuses after wave 6, CREDITS for KB7 port | Sonnet short | done (merged; T2 findings may need a follow-up) |
 | -- | Later: KB13 (Sodium vertex path, needs pack measurement), T1-29 core string | - | open |
 
