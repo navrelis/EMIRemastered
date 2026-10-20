@@ -1,0 +1,33 @@
+{
+  "description": "X-PERF: the pages whose data is built differently since X-PERF: the Item Info list of enchantments of a sword (shared item columns, lazy item index), the Sharpness page (its item columns), the mob drops of rotten flesh (mob loot data started at the plugin initialize step).",
+  "warmupTicks": 60,
+  "settleTicks": 10,
+  "stepTimeoutSeconds": 30,
+  "worldJoinTimeoutSeconds": 180,
+  "timeoutSeconds": 300,
+  "steps": [
+    { "type": "resize", "w": 1280, "h": 720 },
+    { "type": "set_gui_scale", "n": 2 },
+    { "type": "emi_wait_loaded" },
+    { "type": "open_inventory" },
+    { "type": "emi_stack_key", "item": "minecraft:diamond_sword", "key": "I" },
+    { "type": "screen_scroll", "amount": -20 },
+    { "type": "screenshot", "name": "sword-item-info-middle" },
+    { "type": "screen_scroll", "amount": -100 },
+    { "type": "screenshot", "name": "sword-item-info-enchantments" },
+    { "type": "close_screen" },
+
+    { "type": "open_inventory" },
+    { "type": "emi_uses", "item": "minecraft:diamond_sword" },
+    { "type": "emi_category", "id": "emi_enchanting:enchantments" },
+    { "type": "emi_recipe_tab", "index": 4, "page": 5 },
+    { "type": "screenshot", "name": "sharpness" },
+    { "type": "close_screen" },
+
+    { "type": "open_inventory" },
+    { "type": "emi_recipes", "item": "minecraft:rotten_flesh" },
+    { "type": "emi_category", "id": "emi_loot:mob_drops" },
+    { "type": "screenshot", "name": "rotten-flesh-mob-drops" },
+    { "type": "close_screen" }
+  ]
+}
