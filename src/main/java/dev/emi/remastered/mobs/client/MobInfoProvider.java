@@ -12,6 +12,7 @@ import dev.emi.remastered.info.api.ItemInfoProvider;
 import dev.emi.remastered.mobs.Mobs;
 import dev.emi.remastered.mobs.data.MobStats;
 import dev.emi.remastered.mobs.data.MobStats.Stat;
+import dev.emi.remastered.mobs.emi.MobEmiStack;
 import dev.emi.remastered.mobs.emi.MobInfoRecipe;
 import net.minecraft.entity.EntityType;
 import net.minecraft.item.SpawnEggItem;
@@ -20,7 +21,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 /**
- * Item Info provider of the mobs module: a spawn egg gets a Details section with the key stats of its mob and a link
+ * Item Info provider of the mobs module: a spawn egg (or the stack of a mob without one) gets a Details section with the key stats of its mob and a link
  * to the mob page. Drops need no section here, the loot module's providers already list them.
  */
 public final class MobInfoProvider implements ItemInfoProvider {
@@ -39,12 +40,12 @@ public final class MobInfoProvider implements ItemInfoProvider {
 
 	@Override
 	public boolean appliesTo(EmiStack stack) {
-		return stack.getKey() instanceof SpawnEggItem;
+		return stack.getKey() instanceof SpawnEggItem || stack instanceof MobEmiStack;
 	}
 
 	@Override
 	public void collect(EmiStack stack, InfoCollector collector) {
-		EntityType<?> type = ((SpawnEggItem) stack.getKey()).getEntityType(stack.getItemStack());
+		EntityType<?> type = stack instanceof MobEmiStack mob ? mob.getType() : ((SpawnEggItem) stack.getKey()).getEntityType(stack.getItemStack());
 		EmiRecipe page = EmiApi.getRecipeManager().getRecipe(MobInfoRecipe.recipeId(Registries.ENTITY_TYPE.getId(type)));
 		if (page == null) {
 			return;

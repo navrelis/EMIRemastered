@@ -13,6 +13,10 @@ public final class WorldSettings {
 	@ConfigValue("world.biome-pages")
 	public static boolean biomePages = true;
 
+	@Comment("Adds all biomes to the EMI index so that they can be searched and opened with R. Needs the biome pages and an EMI reload. If the ores module adds the biomes (ores.add-biomes-to-index), they are not added a second time.")
+	@ConfigValue("world.biomes-in-index")
+	public static boolean biomesInIndex = true;
+
 	@Comment("Adds the Structure category: one page per structure with dimensions, biomes, generation step, spacing and loot. Needs an EMI reload.")
 	@ConfigValue("world.structure-pages")
 	public static boolean structurePages = true;

@@ -84,7 +84,7 @@ public class BiomeInfoRecipe implements EmiRecipe {
 		return new BiomeInfoRecipe(biomeId, biome, tags, downfall(biome));
 	}
 
-	private static float downfall(Biome biome) {
+	public static float downfall(Biome biome) {
 		synchronized (DOWNFALL) {
 			Float cached = DOWNFALL.get(biome);
 			if (cached != null) {

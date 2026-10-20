@@ -55,8 +55,7 @@ public class StructureInfoRecipe implements EmiRecipe {
 	public StructureInfoRecipe(StructureRow row, Registry<Biome> registry) {
 		this.row = row;
 		this.stack = StructureEmiStack.of(row.id());
-		Identifier structure = Identifier.tryParse(row.id());
-		this.id = World.id("/structure/" + (structure == null ? row.id().replace(':', '/') : structure.getNamespace() + "/" + structure.getPath()));
+		this.id = recipeId(row.id());
 		List<EmiStack> stacks = new ArrayList<>();
 		for (String biome : row.biomes()) {
 			Identifier biomeId = Identifier.tryParse(biome);
@@ -66,6 +65,12 @@ public class StructureInfoRecipe implements EmiRecipe {
 			}
 		}
 		this.biomes = List.copyOf(stacks);
+	}
+
+	/** Recipe id of the page of a structure. */
+	public static Identifier recipeId(String structureId) {
+		Identifier structure = Identifier.tryParse(structureId);
+		return World.id("/structure/" + (structure == null ? structureId.replace(':', '/') : structure.getNamespace() + "/" + structure.getPath()));
 	}
 
 	@Override

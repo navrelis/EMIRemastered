@@ -133,6 +133,8 @@ an input (repairing, cloning) are listed but do not count as a source. Info page
 |---|---|---|---|
 | `emiprofessions:trades` (professions, setting `professions.item-info`) | 1000 | `emiprofessions:sold_by` (OBTAIN, trades that give the stack; "Earned from Villagers" for the emerald), `emiprofessions:bought_by` (USE, trades that take it): profession, level, price, max uses; many trades are grouped per profession | `emiprofessions:villager_trades`, `emiprofessions:wandering_trader` for stacks that have trades |
 | `emiffect:effects` (effects, setting `effects.item-info`) | 1000 | `emiffect:item_effects` (DETAILS: effects of potions, tipped arrows, stew, ominous bottles with level and duration; foods are left to the stats Food section); for effect stacks `emiffect:source/*` (OBTAIN), `emiffect:cures/*`, `emiffect:attributes/*` (DETAILS) | `emiffect:status_effect_info` for items with effects and effects with sources |
+| `emi_world:world` (world, no setting) | 1000 | `emi_world:world` (DETAILS): only for biome and structure stacks; biome: temperature, downfall, dimensions; structure: dimensions, generation step, number of biomes; with a link to their page | none |
+| `emi_mobs:mob` (mobs) | 1000 | `emi_mobs:mob` (DETAILS): for spawn eggs and for the mob stacks of mobs without egg; health, armor, damage, speed and a link to the mob page | none |
 
 ## Opening the screen from code
 
