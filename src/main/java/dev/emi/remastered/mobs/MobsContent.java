@@ -1,5 +1,6 @@
 package dev.emi.remastered.mobs;
 
+import dev.emi.emi.api.EmiInitRegistry;
 import dev.emi.emi.api.EmiRegistry;
 import dev.emi.remastered.info.api.ItemInfoRegistry;
 import dev.emi.remastered.mobs.client.MobInfoProvider;
@@ -23,6 +24,11 @@ public class MobsContent {
 	public static void initClient() {
 		MobsClient.init();
 		ItemInfoRegistry.register(new MobInfoProvider());
+	}
+
+	/** EMI initialisation (stack serializers), only while the module is enabled. */
+	public static void initialize(EmiInitRegistry registry) {
+		MobsEmiRegistration.initialize(registry);
 	}
 
 	public static void register(EmiRegistry registry) {

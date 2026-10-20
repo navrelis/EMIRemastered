@@ -75,6 +75,8 @@ public class MobInfoRecipe implements EmiRecipe {
 	private final Identifier typeId;
 	private final Identifier id;
 	private final @Nullable EmiStack egg;
+	/** The mob itself as stack: what the page opens from when its spawn egg is missing or not in the index. */
+	private final EmiStack mobStack;
 	private final MobStats stats;
 
 	public MobInfoRecipe(EntityType<?> type, Identifier typeId) {
@@ -83,6 +85,7 @@ public class MobInfoRecipe implements EmiRecipe {
 		this.id = recipeId(typeId);
 		SpawnEggItem item = SpawnEggItem.forEntity(type);
 		this.egg = item == null ? null : EmiStack.of(item);
+		this.mobStack = MobEmiStack.of(type);
 		this.stats = readStats(type);
 	}
 
@@ -125,16 +128,20 @@ public class MobInfoRecipe implements EmiRecipe {
 		return List.of();
 	}
 
-	/** The spawn egg is a catalyst so that "uses" of the egg find the page. */
+	/** The spawn egg and the mob stack are catalysts so that "uses" of them find the page. */
 	@Override
 	public List<EmiIngredient> getCatalysts() {
-		return egg == null ? List.of() : List.of(egg);
+		return List.copyOf(outputs());
 	}
 
-	/** The spawn egg is the output so that "recipes" of the egg find the page. */
+	/** The spawn egg and the mob stack are the outputs so that "recipes" of them find the page. */
 	@Override
 	public List<EmiStack> getOutputs() {
-		return egg == null ? List.of() : List.of(egg);
+		return outputs();
+	}
+
+	private List<EmiStack> outputs() {
+		return mobStack.isEmpty() ? (egg == null ? List.of() : List.of(egg)) : (egg == null ? List.of(mobStack) : List.of(egg, mobStack));
 	}
 
 	@Override
@@ -210,7 +217,7 @@ public class MobInfoRecipe implements EmiRecipe {
 			// resize first so the bounding box used for the scale below is the one that gets rendered
 			slime.setSize(5, false);
 		}
-		EmiStack fitted = fitted(entity);
+		EmiStack fitted = fitted(entity, PORTRAIT_BOX);
 		if (fitted != null) {
 			widgets.addSlot(fitted, 0, 0).large(true);
 			return;
@@ -239,7 +246,7 @@ public class MobInfoRecipe implements EmiRecipe {
 	 * The mob scaled and centred by what its model really renders (a bat is drawn far smaller than its hit box), so
 	 * that small and large mobs fill the portrait box alike. Null if it could not be measured.
 	 */
-	private static @Nullable EmiStack fitted(Entity entity) {
+	static @Nullable EmiStack fitted(Entity entity, int box) {
 		if (!(entity instanceof LivingEntity living)) {
 			return null;
 		}
@@ -252,7 +259,7 @@ public class MobInfoRecipe implements EmiRecipe {
 		// the portrait turns with the mouse, so a long mob seen from the front may end up seen from the side
 		double centre = (bounds.minX() + bounds.maxX()) / 2.0;
 		double reach = Math.hypot(bounds.width(), bounds.depth()) / 2.0;
-		PortraitFit fit = PortraitFit.of(centre - reach, bounds.minY(), centre + reach, bounds.maxY(), PORTRAIT_BOX);
+		PortraitFit fit = PortraitFit.of(centre - reach, bounds.minY(), centre + reach, bounds.maxY(), box);
 		return fit == null ? null : EntityEmiStack.ofFitted(entity, fit.scale(), fit.offsetX(), fit.offsetY());
 	}
 

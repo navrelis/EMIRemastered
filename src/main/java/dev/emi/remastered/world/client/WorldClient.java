@@ -1,5 +1,6 @@
 package dev.emi.remastered.world.client;
 
+import dev.emi.remastered.info.api.ItemInfoRegistry;
 import dev.emi.remastered.world.World;
 import dev.emi.remastered.world.data.LootLinksWire;
 import dev.emi.remastered.world.data.WorldWire;
@@ -15,6 +16,7 @@ public final class WorldClient {
 	}
 
 	public static void init() {
+		ItemInfoRegistry.register(new WorldInfoProvider());
 		ClientPlayNetworking.registerGlobalReceiver(StructuresPayload.TYPE, (payload, context) -> {
 			try {
 				ClientWorldData.accept(payload.first(), payload.last(), WorldWire.decode(payload.data()));

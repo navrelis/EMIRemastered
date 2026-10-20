@@ -1,0 +1,39 @@
+{
+  "description": "X-UX restart check: run after x-ux. The ender dragon mob stack favourited by x-ux must be restored from emi.json (serializer type emi_mobs:mob); it is removed again at the end.",
+  "warmupTicks": 60,
+  "settleTicks": 20,
+  "stepTimeoutSeconds": 40,
+  "worldJoinTimeoutSeconds": 120,
+  "timeoutSeconds": 240,
+  "steps": [
+    {
+      "type": "resize",
+      "w": 1280,
+      "h": 720
+    },
+    {
+      "type": "set_gui_scale",
+      "n": 2
+    },
+    {
+      "type": "emi_wait_loaded"
+    },
+    {
+      "type": "open_inventory"
+    },
+    {
+      "type": "call",
+      "class": "dev.emi.remastered.devtour.XUxTour",
+      "method": "checkDragonFavourite"
+    },
+    {
+      "type": "screenshot",
+      "name": "dragon-favourite-after-restart"
+    },
+    {
+      "type": "call",
+      "class": "dev.emi.remastered.devtour.XUxTour",
+      "method": "unfavoriteDragon"
+    }
+  ]
+}

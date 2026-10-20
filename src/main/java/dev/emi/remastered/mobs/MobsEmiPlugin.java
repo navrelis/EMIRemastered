@@ -1,5 +1,6 @@
 package dev.emi.remastered.mobs;
 
+import dev.emi.emi.api.EmiInitRegistry;
 import dev.emi.emi.api.EmiRegistry;
 import dev.emi.remastered.module.ModuleEmiPlugin;
 import dev.emi.remastered.module.Modules;
@@ -13,6 +14,11 @@ public class MobsEmiPlugin extends ModuleEmiPlugin {
 
 	public MobsEmiPlugin() {
 		super(Modules.MOBS, PLUGIN_ID);
+	}
+
+	@Override
+	protected void initializeContent(EmiInitRegistry registry) {
+		MobsContent.initialize(registry);
 	}
 
 	@Override

@@ -18,6 +18,8 @@ import dev.emi.remastered.loot.client.ClientResourceData;
 import dev.emi.remastered.loot.util.*;
 import dev.emi.remastered.loot.util.stack.EntityEmiStack;
 import dev.emi.remastered.loot.util.stack.MobLootEmiStack;
+import dev.emi.remastered.mobs.emi.MobEmiStack;
+import dev.emi.remastered.module.Modules;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
@@ -72,6 +74,8 @@ public class MobLootRecipe implements EmiRecipe, SourceLabels {
         outputStacks = list;
 
         this.egg = data.spawnEggItem != null ? EmiStack.of(data.spawnEggItem) : null;
+        // the mob stack of the mobs module is an input too: a mob whose spawn egg is not in the index is found through it
+        this.mobStack = data.entity != null && Modules.MOBS.isEnabled() ? MobEmiStack.of(data.entity.getType()) : EmiStack.EMPTY;
         this.lootStack = new MobLootEmiStack(lootId);
         this.name = data.name;
         this.type = data.entity != null ? data.entity.getType() : null;
@@ -79,6 +83,7 @@ public class MobLootRecipe implements EmiRecipe, SourceLabels {
 
     private final Identifier lootId;
     private final EmiStack inputStack;
+    private final EmiStack mobStack;
     private final List<EmiStack> outputStacks;
     private final TrimmedTitle name;
     private final EntityType<?> type;
@@ -143,7 +148,10 @@ public class MobLootRecipe implements EmiRecipe, SourceLabels {
 
     @Override
     public List<EmiIngredient> getInputs() {
-        return egg != null ? List.of(egg) : Collections.emptyList();
+        if (egg != null) {
+            return mobStack.isEmpty() ? List.of(egg) : List.of(egg, mobStack);
+        }
+        return mobStack.isEmpty() ? Collections.emptyList() : List.of(mobStack);
     }
 
     @Override
