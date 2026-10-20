@@ -11,10 +11,12 @@ import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.runtime.EmiLog;
 import dev.emi.remastered.module.Modules;
+import dev.emi.remastered.ores.OresSettings;
 import dev.emi.remastered.ores.emi.stack.BiomeEmiStack;
 import dev.emi.remastered.world.World;
 import dev.emi.remastered.world.WorldSettings;
 import dev.emi.remastered.world.client.ClientWorldData;
+import dev.emi.remastered.world.data.BiomeIndexRule;
 import dev.emi.remastered.world.data.StructureRow;
 import dev.emi.remastered.world.data.WorldSnapshot;
 import net.minecraft.item.Items;
@@ -63,8 +65,8 @@ public final class WorldEmiRegistration {
 					World.LOGGER.error("Could not create the biome page of {}, skipping it", entry.getKey(), e);
 				}
 			}
-			if (!Modules.ORES.isEnabled()) {
-				// the ores module adds the biomes to the index otherwise (setting ores.add-biomes-to-index)
+			if (BiomeIndexRule.worldAdds(true, WorldSettings.biomesInIndex, Modules.ORES.isEnabled(), OresSettings.addBiomesToIndex)) {
+				// otherwise the ores module has added them already (setting ores.add-biomes-to-index), never twice
 				sorted.forEach(entry -> registry.addEmiStack(BiomeEmiStack.of(entry.getValue())));
 			}
 		}

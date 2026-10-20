@@ -5,6 +5,7 @@ import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.remastered.loot.EMILoot;
+import dev.emi.remastered.loot.LootSettings;
 import dev.emi.remastered.loot.client.ClientArchaeologyLootTable;
 import dev.emi.remastered.loot.client.ClientBlockLootTable;
 import dev.emi.remastered.loot.client.ClientChestLootTable;
@@ -177,7 +178,10 @@ public class LootEmiRegistration {
     }
 
     public static void register(EmiRegistry registry) {
-        registry.addCategory(TRIAL_CATEGORY);
+        if (LootSettings.splitChestLootByTrial) {
+            // without the split no recipe belongs to it, and an empty tab would be listed
+            registry.addCategory(TRIAL_CATEGORY);
+        }
         registry.addCategory(CHEST_CATEGORY);
         registry.addCategory(BLOCK_CATEGORY);
         registry.addCategory(MOB_CATEGORY);

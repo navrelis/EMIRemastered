@@ -58,7 +58,7 @@
 
   "config.emi.group.ores": "Ores",
   "config.emi.ores.add_biomes_to_index": "Add Biomes to Index",
-  "config.emi.tooltip.ores.add_biomes_to_index": "Whether all biomes should be added to the EMI index. Applies after an EMI reload.",
+  "config.emi.tooltip.ores.add_biomes_to_index": "Whether all biomes should be added to the EMI index. Applies after an EMI reload.\nIf this is off, the world module adds them instead (World: Biomes in Index).",
   "config.emi.ores.show_height_values_for_current_dimension_by_default": "Current Dimension Heights by Default",
   "config.emi.tooltip.ores.show_height_values_for_current_dimension_by_default": "Whether ore distribution graphs show height values resolved for the current dimension by default, instead of relative to the world bottom and top. Holding SHIFT inverts this.",
   "config.emi.ores.compact_biome_list": "Compact Biome Lists",
