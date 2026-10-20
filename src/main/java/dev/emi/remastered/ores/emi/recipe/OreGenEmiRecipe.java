@@ -125,6 +125,23 @@ public class OreGenEmiRecipe extends AbstractPlacedFeatureEmiRecipe {
 		this.heightProvider = heightProvider;
 	}
 
+	private volatile List<String> oreLabels;
+
+	/** Source search ({@code ~}): the dimensions and id of the feature, and the names of the ore blocks it places. */
+	@Override
+	public List<String> sourceLabels() {
+		List<String> labels = oreLabels;
+		if (labels == null) {
+			labels = new ArrayList<>(super.sourceLabels());
+			for (EmiStack output : outputs) {
+				labels.add(output.getName().getString());
+			}
+			labels = List.copyOf(labels);
+			oreLabels = labels;
+		}
+		return labels;
+	}
+
 	@Override
 	protected HeightProvider heightProvider() {
 		return heightProvider;

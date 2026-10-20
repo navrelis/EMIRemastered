@@ -1,0 +1,23 @@
+{
+  "description": "X-SEARCH async: the structure lookup is delayed by 20 s (dev-only emi.devtour.lookupDelayMs). the query bastion remnant (only the structure name has it, not the table id) finds nothing at first; when the chest structures arrive the source index is rebuilt in the background and the open search is repeated without retyping.",
+  "systemProperties": { "emi.devtour.lookupDelayMs": "20000" },
+  "warmupTicks": 20,
+  "settleTicks": 15,
+  "stepTimeoutSeconds": 40,
+  "worldJoinTimeoutSeconds": 180,
+  "timeoutSeconds": 300,
+  "steps": [
+    { "type": "resize", "w": 1280, "h": 720 },
+    { "type": "set_gui_scale", "n": 2 },
+    { "type": "emi_wait_loaded" },
+    { "type": "open_inventory" },
+    { "type": "emi_search", "text": "~\"bastion remnant\"" },
+    { "type": "screenshot", "name": "before" },
+    { "type": "note", "text": "waiting for the delayed structure lookup; the search text stays in the box" },
+    { "type": "wait", "ticks": 600 },
+    { "type": "screenshot", "name": "after-without-retyping" },
+    { "type": "emi_search", "text": "~\"bastion remnant\"" },
+    { "type": "emi_search", "text": "" },
+    { "type": "close_screen" }
+  ]
+}

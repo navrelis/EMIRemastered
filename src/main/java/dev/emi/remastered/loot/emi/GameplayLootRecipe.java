@@ -7,6 +7,8 @@ import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.SlotWidget;
 import dev.emi.emi.api.widget.WidgetHolder;
+import dev.emi.remastered.info.search.SourceLabels;
+import dev.emi.remastered.info.search.SourceText;
 import dev.emi.remastered.loot.EMILoot;
 import dev.emi.remastered.loot.client.ClientBuiltPool;
 import dev.emi.remastered.loot.client.ClientGameplayLootTable;
@@ -31,7 +33,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
-public class GameplayLootRecipe implements EmiRecipe {
+public class GameplayLootRecipe implements EmiRecipe, SourceLabels {
 
     public GameplayLootRecipe(GameplayLootRecipeData data) {
         this.loot = data.loot;
@@ -72,6 +74,19 @@ public class GameplayLootRecipe implements EmiRecipe {
         }
 
 
+    }
+
+    private volatile List<String> searchLabels;
+
+    /** Source search ({@code ~}): the name and id of the loot table (fishing, bartering, gifts...). */
+    @Override
+    public List<String> sourceLabels() {
+        List<String> labels = searchLabels;
+        if (labels == null) {
+            labels = List.of(inputStack.getName().getString(), loot.id.getPath(), SourceText.spaced(loot.id.getPath()));
+            searchLabels = labels;
+        }
+        return labels;
     }
 
     /** Every pool the recipe shows, for the Item Info sections. */
