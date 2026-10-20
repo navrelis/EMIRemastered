@@ -1,6 +1,6 @@
 # Plan
 
-Usage tally (work units: short = 1, long = 2): Opus 35 (LOOT-ASYNC x2, PACK-REAL x2, PACK-REAL2 x2, F1, F2, Q3 x6, A1 x2, FX1 x4, FOCUS1 x4 = two delegations, PACK-CLI x2, LOGO x2) / Sonnet 121 (session 7: POLISH x2, DOC4 x1) -> Opus 22 % (sessions 4+5 re-delegations counted again)
+Usage tally (work units: short = 1, long = 2): Opus 43 (session 8 lead: X-PERF x2, X-HUB x2, X-PERF2 x2, PACK-REAL3 x2; LOOT-ASYNC x2, PACK-REAL x2, PACK-REAL2 x2, F1, F2, Q3 x6, A1 x2, FX1 x4, FOCUS1 x4 = two delegations, PACK-CLI x2, LOGO x2) / Sonnet 129 (session 8 lead: X-SOURCES x2, X-SEARCH x2, X-UX x2, DOC5 x1, key map x1; session 7: POLISH x2, DOC4 x1) -> Opus 25 % (follow-up session's X-PAD/X-SUMMARY/X-PARALLEL/X-CACHE tallied there) (sessions 4+5 re-delegations counted again)
 
 Status: open / in progress / in review / done. `||` = can run in parallel.
 
@@ -89,3 +89,20 @@ Pack install under game lock, end-to-end check, report, push.
 - Jar swap: done 2026-10-19 21:1x (owner's client closed; 8 jars in mods_backup/, EMIRemastered jar in mods/, lock created and removed). Owner changed the decision (2026-10-19 ~21:30, 'no you do all'): the lead's team launches the real pack (PACK-REAL). Newest jar (33d82605 build) installed before the launch.
 - Session 7 (2026-10-19 23:30): jar of c6861cb4 (LOOT-ASYNC + TRADE-ROW) installed under game lock for PACK-REAL2; after POLISH merge the final jar is copied again (copy only).
 - Final (2026-10-19 23:48): head 561b05ae built (381 tests green), jar 829b63e1 installed in the pack under game lock; report `.knowledge/report.md`. Status: DONE. Optional later: KB13, Item Info right padding (EntryImpl), lookup summary count, parallel template reads, T1-29, R6.
+
+## Phase 5 Owner extras (session 8, 2026-10-20)
+Owner: "1. do that (structure cache) 2. sure (extra sources) 3. sure (search by source)", "one keybind + tabs, U reroutes, look good", "optimisations?".
+| ID | Task | Model | Status |
+|---|---|---|---|
+| X-PAD / X-SUMMARY | Item Info right padding / lookup summary count (follow-up session) | Sonnet short | done (merged) |
+| X-PARALLEL | Parallel structure template reads (follow-up session) | Opus long | in progress (follow-up session) |
+| X-CACHE | Structure lookup disk cache, fingerprinted (follow-up session, after X-PARALLEL) | Opus/Sonnet | open |
+| X-SEARCH | `~` source search + `~nosource`, SourceLabels API, index at bake (async since X-PERF2), late chest structures refresh | Sonnet long | done (merged a736e2cc; tours ok, ~1.5 % bake) |
+| X-SOURCES | Other Sources category from `assets/*/emi_sources` resource files, 4 vanilla code-only built-ins, plugin `emi_info` (entrypoint, mixin removed after review) | Sonnet long | done (merged 8612fb91) |
+| X-PERF | Merge Enchantments shared columns + lazy index; mob loot data prestart | Opus long | done (merged fa32dad4; dev emi_enchanting 348->52 ms join with ME, emi_loot 436->49; identical dumps) |
+| X-HUB | Item view tab bar Info / Recipes / Uses on recipe + Item Info screens, primary view, R/U fallback to Info, hint on | Opus long | done (merged 92b825dc after 1 visual correction; pack mixin injection points listed, all intact) |
+| X-UX | Mob stacks (emi_mobs:mob) for egg-less mobs, trial tab only when split, biome stacks rule, world Item Info provider | Sonnet long | done (merged a141b16b after 1 correction: namespaced serializer) |
+| DOC5 | CHANGELOG/README keys table/MODULES/DEVTOUR/KB21 | Sonnet short | done (merged cdc2531f; placeholder for perf2 + cache) |
+| X-PERF2 | Identical faster suffix-array build (parallel), source index async, EmiHidden fast path; skipped: remainders cache, professions cache, item groups (unsafe) | Opus long | done (merged 7dad04db; search bake -45..-75 %, 58 queries identical) |
+| PACK-REAL3 | Real pack with jar 7c8a9a56: reload times, new mixins vs ali/CQA/hollowhorizon | Opus long | in progress |
+| DOC6 | CHANGELOG perf2 + cache, report update | Sonnet short | open (after X-CACHE) |
