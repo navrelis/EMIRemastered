@@ -12,11 +12,11 @@ EMI Remastered is EMI (mod id `emi`) plus seven built-in modules. Each former ad
 | `professions` | `dev.emi.remastered.professions` | `Professions` | `emiprofessions` | yes (profession pages and trades; Item Info provider for trades that sell or buy a stack, setting `professions.item-info`) |
 | `letsdo` | `dev.emi.remastered.letsdo` | `LetsDo` | `emi_letsdo_compat` | yes |
 | `distraction_free` | `dev.emi.remastered.distractionfree` | `DistractionFree` | `distraction_free_recipes` | no (EMI core screen code) |
-| `info` | `dev.emi.remastered.info` | `Info` | `emi_info` | yes (`emi_info`, Other Sources category from `emi_sources` resource files, `docs/SOURCES.md`; new module: Item Info screen, provider API in `docs/INFO_PROVIDERS.md`) |
-| `mobs` | `dev.emi.remastered.mobs` | `Mobs` | `emi_mobs` | yes (mob pages with attributes, spawn biomes and drops; has a server part) |
+| `info` | `dev.emi.remastered.info` | `Info` | `emi_info` | yes (`emi_info`, Other Sources category from `emi_sources` resource files, `docs/SOURCES.md`; new module: Item Info screen, item view tab bar (settings `info.tab-bar`, `info.primary-view`), `~` source search (`docs/SEARCH.md`), provider API in `docs/INFO_PROVIDERS.md`) |
+| `mobs` | `dev.emi.remastered.mobs` | `Mobs` | `emi_mobs` | yes (mob pages with attributes, spawn biomes and drops, mob stacks for mobs without an indexed spawn egg, setting `mobs.eggless-in-index`; has a server part) |
 | `tools` | `dev.emi.remastered.tools` | `Tools` | `emi_remastered_tools` | no (pack-developer tools: tag browser, copy recipe) |
 | `stats` | `dev.emi.remastered.stats` | `Stats` | `emi_stats` | yes (Food category; Food/Tool/Weapon/Armour sections on the Item Info page via the provider API; client only) |
-| `world` | `dev.emi.remastered.world` | `World` | `emi_world` | yes (Biome and Structure categories: climate, tags, dimensions, mobs, ores, structures, spacing, chest loot links; has a server part, payload `emi_world:structures`) |
+| `world` | `dev.emi.remastered.world` | `World` | `emi_world` | yes (Biome and Structure categories: climate, tags, dimensions, mobs, ores, structures, spacing, chest loot links, biome stacks in the index unless the ores module adds them, setting `world.biomes-in-index`, Item Info provider for biome and structure stacks; has a server part, payload `emi_world:structures`) |
 
 ## Files of a module
 
