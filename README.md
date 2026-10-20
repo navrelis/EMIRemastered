@@ -18,6 +18,32 @@ for Minecraft 1.21.1** instead of eight jars.
 | Minecraft / loader | 1.21.1, Fabric Loader 0.16.14 or newer, Fabric API, Java 21 |
 | Sides | client and server (the server part is optional, see [Multiplayer](#multiplayer)) |
 
+## Keys
+
+Hover a stack (in EMI's index, a recipe, your inventory or an Item Info page) and press the key. Every key can be
+changed in EMI's config screen (groups Binds, Item Info and Tools).
+
+| To open | Key |
+|---|---|
+| Recipes of a stack (the "Recipes" tab; "Info" instead when `info.primary-view` is Info or the stack has no recipes) | **R** or left click |
+| What a stack is used for (the "Uses" tab; "Info" when it has no uses) | **U** or right click |
+| Item Info of a stack (how to get it, what it is used for, details) | **I** |
+| Mob Info, Biome or Structure page | **R** on the spawn egg, mob, biome or structure stack |
+| Tag browser (over a tag or an item: that tag, or the tags of the item) | **T** |
+| Copy the hovered recipe as text (**Shift**: as JSON) on EMI's recipe screen | **Ctrl+C** |
+| All recipes | **Ctrl+Y** |
+| Search by source, for example `~stronghold` or `~nosource` | `~` in the search bar, see [Search by source](#search-by-source-) |
+| Favourite a stack | **A** |
+| Back to the previous EMI page | **Backspace** |
+| Show or hide EMI | **Ctrl+O** |
+| Focus the search bar | **Ctrl+F** |
+| EMI config screen | the **EMI** button next to the index; the **Plugins** button there opens the plugin manager |
+| Pin or unpin distraction-free recipes | unbound by default, set `distraction_free.pin-bind` |
+| Export lists for pack developers | the chat command `/emiexport`, see [below](#emiexport-for-pack-developers) |
+
+On the recipe screen and the Item Info screen of a stack a tab bar **Info | Recipes | Uses** switches between the three
+views in place; Backspace leaves the view.
+
 ## What is inside
 
 EMI 1.1.24 plus:
@@ -55,18 +81,18 @@ packs and saved favourites that refer to `emi_loot`, `emiffect`, `emi_ores` and 
 
 | Module (`modules.<id>`) | What it adds |
 |---|---|
-| `loot` (EMI Loot) | Categories for chest loot, block drops, mob drops, gameplay drops (fishing, gifts, bartering) and archaeology loot, optionally trial chamber loot as its own category. Drop chances with conditions shown as icons (or tooltip lines or hidden), grouped identical drops, the structures a chest is found in, hints for drops that depend on Looting, Fortune, Silk Touch, fire or a player kill, and a note when Lootr is installed (every player gets their own loot). |
+| `loot` (EMI Loot) | Categories for chest loot, block drops, mob drops, gameplay drops (fishing, gifts, bartering) and archaeology loot, optionally trial chamber loot as its own category (`loot.split-chest-loot-by-trial`; the category is only listed when that is on). Drop chances with conditions shown as icons (or tooltip lines or hidden), grouped identical drops, the structures a chest is found in, hints for drops that depend on Looting, Fortune, Silk Touch, fire or a player kill, and a note when Lootr is installed (every player gets their own loot). |
 | `ores` (EMI Ores) | Ore and geode generation pages: height graph, biomes (compact icon list with "+N more", whole dimensions summed up as "all biomes"), the player's current height, the best height highlighted, modded dimensions, and every biome as a searchable stack in the index. A "World generation" section on the Item Info page of ores. |
 | `effects` (EMIffect) | Every status effect as a stack in the index with a page: description, attribute modifiers, and where it comes from (potions with their splash, lingering and tipped arrow variants, food, hand-written sources such as mobs, beacon, conduit and totem, and cures). Item Info shows the effects an item applies. |
 | `enchanting` (EMI Enchanting) | An "Enchantment Info" page per enchantment: real maximum level (including level caps changed by other mods), the enchantments it cannot be combined with, the items it applies to, and where it can be found (enchanting table, loot, librarian trades, villager and mob equipment, treasure, curse). Enchanted books above the vanilla maximum open the page too. The Item Info screen lists the enchantments of an item and those that fit it. |
 | `professions` (EMI Professions) | A page per villager profession with its workstations and the villager model, plus the real trades of every profession by level and of the wandering trader, including trades added by other mods. The Item Info page of an item lists who sells or buys it. |
 | `letsdo` (Let's Do EMI Compat) | Recipe pages for Let's Do mods that have no EMI support of their own: grape mashing (Vinery), cake cutting (Bakery), fondue, cheese forming, cooking cauldron and woodcutting (Meadow), cauldron and kettle brewing (Herbal Brews), mini fridge and tiki bar mixing (Beach Party). Categories that a mod's own EMI plugin already adds (Vinery, Bakery, Farm & Charm) are not duplicated. A mod whose classes changed only loses its own page, not the rest. |
 | `distraction_free` (Distraction Free Recipes) | Hides EMI's index and recipe sidebars until you search. A "Show Recipes" / "Hide Recipes" button, a pin key (unbound by default), a configurable fade, separate switches for the inventory, the crafting table and other container screens, an exception list of screen classes, and EMI's recipe screens keep their sidebars. |
-| `info` (Item Info) | Hover any stack and press **I** to open the Item Info screen: **How to Get** (recipes grouped by category, loot, world generation, trades, ...), **Used For**, and **Details** (fuel burn time, composting chance, advancements that use the item as their icon, EMI info pages, item tags). Items nothing in EMI produces are marked "No Known Source". The page is built from providers that all modules and other mods' EMI plugins can feed, see [docs/INFO_PROVIDERS.md](docs/INFO_PROVIDERS.md). Also provides `/emiexport` (see below). |
-| `mobs` | A "Mob Info" page for every living mob: health, armour, toughness, attack damage, speed, knockback resistance, follow range, size, the biomes it spawns in with spawn weight and group size, and a link to its drops (with the loot module). Spawn data comes from the server. |
+| `info` (Item Info) | Hover any stack and press **I** to open the Item Info screen: **How to Get** (recipes grouped by category, loot, world generation, trades, ...), **Used For**, and **Details** (fuel burn time, composting chance, advancements that use the item as their icon, EMI info pages, item tags). Items nothing in EMI produces are marked "No Known Source". The page is built from providers that all modules and other mods' EMI plugins can feed, see [docs/INFO_PROVIDERS.md](docs/INFO_PROVIDERS.md). A tab bar **Info | Recipes | Uses** joins EMI's recipe screen and the Item Info screen of a stack (settings `info.tab-bar` and `info.primary-view`). Also provides the `~` search by source ([below](#search-by-source-)), the **Other Sources** category for sources given in code ([docs/SOURCES.md](docs/SOURCES.md)) and `/emiexport` (see below). |
+| `mobs` | A "Mob Info" page for every living mob: health, armour, toughness, attack damage, speed, knockback resistance, follow range, size, the biomes it spawns in with spawn weight and group size, and a link to its drops (with the loot module). Spawn data comes from the server. Mobs whose spawn egg is missing or not in the index (ender dragon, wither, giant, illusioner, armor stand, ...) are stacks in the index drawn as the mob, so you can search them and open their page with R (`mobs.eggless-in-index`). |
 | `tools` | **T** opens the tag browser: all tags of items, blocks, fluids and entity types with search and member lists; over a tag ingredient it opens at that tag, over an item it lists the tags the item is in. **Ctrl+C** over a recipe on EMI's recipe screen copies it as readable text or as JSON (the vanilla recipe JSON where EMI knows it); Shift switches to the other format. |
 | `stats` | A "Food" category with a page per food (hunger, saturation, eating time, effects, leftovers), and Food, Tool, Weapon and Armour sections on the Item Info page (mining speed, durability, repair material, attack damage and speed, damage per second, armour, toughness). Client only. |
-| `world` | "Biome" pages (temperature, downfall, precipitation, tags, dimensions, spawning mobs, structures, ores) and "Structure" pages (dimensions, biomes, generation step, structure set weight, spacing and separation, concentric rings for strongholds, links to the chest loot). Structures are searchable in the index. |
+| `world` | "Biome" pages (temperature, downfall, precipitation, tags, dimensions, spawning mobs, structures, ores) and "Structure" pages (dimensions, biomes, generation step, structure set weight, spacing and separation, concentric rings for strongholds, links to the chest loot). Structures are searchable in the index, and so are biomes (`world.biomes-in-index`; added by this module whenever the ores module does not add them, never twice). The Item Info screen of a biome or structure stack has a Details section with a link to its page. |
 
 ### One config screen
 
@@ -81,6 +107,34 @@ it off. Closing the screen after a change saves it and starts an EMI reload. Thi
 duplicates, for example another mod's loot tab when you prefer the loot module's.
 
 The English and German texts are included.
+
+## Search by source (`~`)
+
+`~text` in EMI's search bar finds stacks by where they come from, the same way `@` finds a mod and `#` a tag:
+
+| Query | Finds |
+|---|---|
+| `~stronghold` | everything found in stronghold chests |
+| `~cleric` | everything a cleric sells |
+| `~"ore generation"` | the ore blocks that generate in the world |
+| `~nosource` | stacks marked "No Known Source" on the Item Info screen (creative-only or unobtainable) |
+| `-~crafting` | everything that cannot be crafted |
+| `~/desert\|ancient/` | desert pyramid or ancient city chest loot (regular expression) |
+| `~nether ~chest` | chest loot found in the Nether (space is AND, `\|` is OR) |
+
+The labels come from the recipe categories and, for chest, mob, block and gameplay loot, trades and ore generation, from
+the loot table, mob, block, profession, structure and dimension names. Mods can add labels to their own recipes with
+`dev.emi.remastered.info.search.SourceLabels`. Part of the `info` module. Syntax, label rules and notes:
+[docs/SEARCH.md](docs/SEARCH.md).
+
+## Other Sources (`emi_sources`)
+
+Some items are handed out in code (a mob head from a charged creeper's explosion, a mod's reward in an event handler),
+so no loot table or recipe shows them. A pack developer or mod author lists such sources in
+`assets/<namespace>/emi_sources/*.json` of a resource pack or mod; EMI shows them as the category **Other Sources**, under
+"How to Get" on the Item Info page, and the item no longer counts as "No Known Source". Built in: turtle scute, armadillo
+scute, dragon's breath and the dragon egg. Switch: `info.extra-sources`; plugin id `emi_info`. File format and errors:
+[docs/SOURCES.md](docs/SOURCES.md).
 
 ## `/emiexport` for pack developers
 
@@ -114,6 +168,13 @@ recipes, 12,000 items and 4,000 tags, compared with EMI 1.1.24 in the same harne
 The baked state (index, recipes, lookups, tags, search results) was compared section by section with a hash and is
 identical to stock EMI. Numbers on your pack will differ; they depend on the recipes and the plugins. The effects index
 alone went from about 1.1 s (EMIffect 2.1.5, cold) to 63-93 ms on the dev world.
+
+In packs with Merge Enchantments (every enchantment accepts every item) the enchanting plugin builds the item list of
+enchantments that share the same item set once, and the mob loot data is started while the plugins initialise. Dev
+benchmark estimates for the test pack: the enchanting plugin about 2.3 s to 0.3 s, the mob loot plugin about 2.0 s to
+0.15 s on the first join, together about 3.8 s less of a 23 s join reload.
+<!-- DOC5: perf2 + structure cache pending -->
+
 
 ## Compatibility
 
@@ -172,6 +233,8 @@ screenshot tour (`src/devtour`), which is never part of the jar.
 | [docs/MODULES.md](docs/MODULES.md) | the module contract: files, lifecycle, settings, plugin ids |
 | [docs/INFO_PROVIDERS.md](docs/INFO_PROVIDERS.md) | Item Info provider API |
 | [docs/EXPORT.md](docs/EXPORT.md) | `/emiexport` |
+| [docs/SEARCH.md](docs/SEARCH.md) | the `~` search by source |
+| [docs/SOURCES.md](docs/SOURCES.md) | `emi_sources` files and the Other Sources category |
 | [docs/KNOWN_BUGS.md](docs/KNOWN_BUGS.md) | bug survey of EMI and the add-ons and what this mod fixes |
 | [docs/DEVTOUR.md](docs/DEVTOUR.md) | dev screenshot tour and reload benchmark |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | contributing |

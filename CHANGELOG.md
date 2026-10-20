@@ -34,6 +34,26 @@ provides their ids, and a leftover jar stops the game at start-up. Credits and l
 * Provider API for other mods and plugins (`dev.emi.remastered.info.api`, `docs/INFO_PROVIDERS.md`).
 * `/emiexport <recipes|items|sources|nosource|tags|all> [json|csv]` writes recipes, the item index, the sources of every
   stack, the stacks nothing produces and all tags to `emi_export/` for pack developers (`docs/EXPORT.md`).
+* **Item view tabs**: EMI's recipe screen and the Item Info screen of a stack share a tab bar **Info | Recipes | Uses**
+  with the number of recipes and uses on the tabs. **R** (and left click) opens the tab set by the setting
+  `info.primary-view` (Recipes by default, or Info), **U** (right click) opens Uses, **I** opens Info. Tabs switch in
+  place, so Back leaves the view instead of stepping through the tabs. R or U on a stack without recipes or without
+  uses opens Info instead of an empty screen. The bar also shows when another mod opens the recipes or uses of a stack,
+  and it is left out on views without one stack (all recipes, a category, a tag, a recipe tree pick). Settings
+  `info.tab-bar` (default on; off gives EMI's plain behaviour) and `info.primary-view`. The "Item Info" key hint in
+  item tooltips (`info.tooltip-hint`) is now on by default for new configs.
+* **Search by source**: `~text` in EMI's search bar finds stacks by where they come from: `~stronghold` (stronghold
+  chests), `~cleric` (what a cleric sells), `~"ore generation"`, `~/desert|ancient/` (regular expression),
+  `~nosource` (the "No Known Source" stacks), `-~crafting` (everything that cannot be crafted), and `a ~b | ~c d` as with
+  EMI's other prefixes. The labels are the recipe categories and, for loot, mob, block, trade and ore recipes, the loot
+  table, mob, block, villager profession, structure and dimension names. Other mods' recipes can add labels by
+  implementing `dev.emi.remastered.info.search.SourceLabels`. Syntax and examples: `docs/SEARCH.md`.
+* **Other Sources**: a category for item sources that are given in code and have no loot table or recipe. A pack or a
+  mod declares them in `assets/<namespace>/emi_sources/*.json` (item, a sentence, optional stacks, chance and
+  `requires_mod`; `docs/SOURCES.md`). EMI shows them as recipes, so they appear in the recipe screen, under "How to Get"
+  on the Item Info page, in `/emiexport sources`, and the item loses its "No Known Source" marker. Built in: turtle
+  scute, armadillo scute, dragon's breath and the dragon egg. Setting `info.extra-sources` (default on); the plugin
+  manager lists the feature as plugin `emi_info`.
 
 **Loot**
 * Structures a chest is found in (read from the structure templates on a background thread), condition icons, hints for
@@ -69,10 +89,17 @@ provides their ids, and a leftover jar stops the game at start-up. Credits and l
 
 **New modules**
 * `mobs`: a Mob Info page for every mob with health, armour, attack damage, speed, spawn biomes with weight and group size
-  (data from the server), and a link to its drops.
+  (data from the server), and a link to its drops. Mobs whose spawn egg is missing or not in the index (ender dragon,
+  wither, giant, illusioner, armor stand, ...) are mob stacks in the index, drawn as the mob's portrait: you can search
+  them by name, R opens their Mob Info page, U lists Mob Info and Mob Drops, and the Item Info screen opens for them.
+  Mob stacks can be favourites and survive a restart. Setting `mobs.eggless-in-index` (default on, needs an EMI reload).
 * `stats`: a Food category, and Food, Tool, Weapon and Armour sections on the Item Info page.
 * `world`: Biome pages (climate, tags, dimensions, mobs, structures, ores) and Structure pages (dimensions, biomes,
-  generation step, spacing, stronghold rings, chest loot links); structures are searchable.
+  generation step, spacing, stronghold rings, chest loot links); structures are searchable. The Item Info screen of a
+  biome or structure stack has a Details section (temperature, downfall, dimensions; generation step, number of biomes)
+  with a link to its page. Biome stacks are added to the index by the world module (setting `world.biomes-in-index`,
+  default on) whenever the ores module does not add them (`ores.add-biomes-to-index`); a biome is never in the index
+  twice.
 * `tools`: tag browser (**T**) and copy recipe as text or JSON (**Ctrl+C**, Shift for the other format).
 
 **Misc**
@@ -145,6 +172,13 @@ provides their ids, and a leftover jar stops the game at start-up. Credits and l
 * Mobs: the mob page shows the wither skeleton's real attack damage (it is set when the mob spawns), and no speed for
   flying mobs such as the bat and the ghast, where the walking speed was wrong.
 * Stats: pages keep a right margin for right-aligned numbers.
+* Item Info: right-aligned details (counts, chances, trade amounts), example slots and bar values keep 3 px to the edge of
+  the scroll area instead of touching it.
+* Loot: the "Trial Chamber Loot" category is only registered when `loot.split-chest-loot-by-trial` is on; with the
+  setting off (the default) the recipe screen listed an empty tab.
+* Loot: the log line of the structure lookup counts the chest loot pages that are really sent to clients ("Chest loot
+  pages with a known structure: N of M") and is written once per build on the server thread, together with the number
+  of loot tables by path, which is a different set.
 
 ### Performance
 * Warm reload on a bench pack with about 92,000 recipes: 5761 ms to 2445 ms in the paired run, about 40 % faster pooled
@@ -153,13 +187,22 @@ provides their ids, and a leftover jar stops the game at start-up. Credits and l
 * The baked state (index, recipes, lookups, tags, search) is identical to stock EMI, checked section by section.
 * Joining a world no longer waits for the chest structure lookup of the loot module (about 24 s in a large
   pack); it runs on a background thread and the result is sent to players when it is ready.
+* Packs with Merge Enchantments (every enchantment accepts every item): the enchantments that share the same item set
+  build their item columns once, and the item index for enchantments is built on first use. The enchanting plugin
+  (`emi_enchanting`) went from about 2.3 s to an estimated 0.3 s in the test pack.
+* The mob loot recipe data (`emi_loot`) is started while the plugins initialise instead of when the loot plugin
+  registers: about 2.0 s to an estimated 0.15 s on the first join of the test pack.
+* Together an estimated 3.8 s less of a 23 s join reload in the test pack. All three figures are estimates from
+  dev benchmarks, not measured on a player's pack.
+<!-- DOC5: perf2 + structure cache pending -->
 * Method: `docs/DEVTOUR.md`, "EMI reload benchmark".
 
 ### Known limits
 * At GUI scale 3 in a 1280x720 window only the "Modules" jump button of the config screen fits next to EMI's own jumps.
 * Sodium's optimised vertex path is not used for batched unlit items.
-* Drops that mods give in code instead of a loot table are not shown, and ore features of custom configured feature types
-  (for example Mekanism) are not shown.
+* Drops that mods give in code instead of a loot table are not read from the mod. A pack or a mod can declare them in an
+  `emi_sources` resource file (`docs/SOURCES.md`), and the Other Sources category shows them. Ore features of custom
+  configured feature types (for example Mekanism) are not shown.
 * Enchanted books far above the listed range (more than 5 levels over the maximum, or above level 10) do not open the
   enchantment page.
 * All known bugs: `docs/KNOWN_BUGS.md`.
