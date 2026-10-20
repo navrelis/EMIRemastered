@@ -16,6 +16,9 @@ import dev.emi.emi.runtime.EmiLog;
 import dev.emi.emi.screen.widget.SizedButtonWidget;
 import dev.emi.remastered.info.api.InfoElement;
 import dev.emi.remastered.info.api.InfoSection;
+import dev.emi.remastered.info.client.hub.Hub;
+import dev.emi.remastered.info.client.hub.HubBar;
+import dev.emi.remastered.info.client.hub.HubTabWidget;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -45,6 +48,7 @@ public class InfoScreen extends Screen {
 	private boolean dragging;
 	private SlotWidget headerSlot;
 	private int lastMouseX, lastMouseY;
+	private List<HubTabWidget> tabs = List.of();
 
 	private record Row(InfoElement element, int x, int y, int width, int height) {
 	}
@@ -62,6 +66,15 @@ public class InfoScreen extends Screen {
 		panelH = Math.min(height - 4, MathHelper.clamp(height - 16, 80, 480));
 		panelX = (width - panelW) / 2;
 		panelY = (height - panelH) / 2;
+		Hub.Context hub = Hub.of(this);
+		tabs = List.of();
+		if (hub != null && Hub.fits(height)) {
+			// the tab bar stands where it stands on the recipe screen, the panel starts below it
+			panelY = Hub.plateTop(height);
+			panelH = Math.max(HEADER + 24, Math.min(480, height - 8 - panelY));
+			tabs = HubBar.create(hub, width / 2, panelY);
+			tabs.forEach(this::addDrawableChild);
+		}
 		viewX = panelX + 6;
 		viewY = panelY + HEADER;
 		viewW = panelW - 12;
@@ -191,6 +204,9 @@ public class InfoScreen extends Screen {
 		renderScrollbar(raw, mouseX, mouseY);
 
 		super.render(raw, mouseX, mouseY, delta);
+		if (HubBar.renderTooltip(this, raw, tabs, mouseX, mouseY)) {
+			return;
+		}
 
 		List<TooltipComponent> tooltip = List.of();
 		if (headerSlot.getBounds().contains(mouseX, mouseY)) {
