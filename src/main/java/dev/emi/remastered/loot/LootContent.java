@@ -56,6 +56,15 @@ public class LootContent {
 		ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(new ClientResourceData.EntityOffsetsReloadListener());
 	}
 
+	/** EMI plugin initialize step, every reload: starts the slow part of the recipe data early. */
+	public static void initializeEmi() {
+		try {
+			LootEmiRegistration.prestart();
+		} catch (Throwable t) {
+			EMILoot.LOGGER.error("Could not start the mob loot recipe data early; it is built while the plugin registers", t);
+		}
+	}
+
 	public static void register(EmiRegistry registry) {
 		LootEmiRegistration.register(registry);
 	}

@@ -30,10 +30,12 @@ import net.minecraft.util.Identifier;
  * {@code config/emi_bench.properties} exists in the game dir (written and removed by scripts/perf/run_bench.py):
  * {@code items=<plain items>}, {@code tools=<swords + pickaxes>}, {@code armor=<armor pieces>}. Ids:
  * {@code emi_bench:item_NNNNN}, {@code emi_bench:sword_NNNNN}, {@code emi_bench:pickaxe_NNNNN},
- * {@code emi_bench:armor_NNNNN}.
+ * {@code emi_bench:armor_NNNNN}. {@code mergeEnchantments=true} makes every enchantment accept every item
+ * ({@link dev.emi.remastered.devtour.mixin.EnchantmentBenchMixin}), like Merge Enchantments in the owner's pack.
  */
 public final class BenchMod implements ModInitializer {
 	private static final Logger LOG = LoggerFactory.getLogger("EmiDevBench");
+	public static volatile boolean mergeEnchantments;
 	private static final ToolMaterial[] TOOL_MATERIALS = {ToolMaterials.WOOD, ToolMaterials.STONE, ToolMaterials.IRON,
 		ToolMaterials.GOLD, ToolMaterials.DIAMOND, ToolMaterials.NETHERITE};
 	private static final ArmorItem.Type[] ARMOR_TYPES = {ArmorItem.Type.HELMET, ArmorItem.Type.CHESTPLATE,
@@ -61,6 +63,7 @@ public final class BenchMod implements ModInitializer {
 		int items = Integer.parseInt(p.getProperty("items", "0").trim());
 		int tools = Integer.parseInt(p.getProperty("tools", "0").trim());
 		int armor = Integer.parseInt(p.getProperty("armor", "0").trim());
+		mergeEnchantments = Boolean.parseBoolean(p.getProperty("mergeEnchantments", "false").trim());
 		for (int i = 0; i < items; i++) {
 			register(String.format("item_%05d", i), new Item(new Item.Settings()));
 		}
@@ -79,7 +82,8 @@ public final class BenchMod implements ModInitializer {
 			register(String.format("armor_%05d", i), new ArmorItem(i % 3 == 0 ? ArmorMaterials.IRON : i % 3 == 1 ? ArmorMaterials.DIAMOND : ArmorMaterials.LEATHER,
 				type, new Item.Settings().maxDamage(type.getMaxDamage(15))));
 		}
-		LOG.info("registered {} plain items, {} tools and {} armor pieces for the EMI reload benchmark", items, tools, armor);
+		LOG.info("registered {} plain items, {} tools and {} armor pieces for the EMI reload benchmark (merge enchantments: {})",
+			items, tools, armor, mergeEnchantments);
 	}
 
 	private static void register(String path, Item item) {

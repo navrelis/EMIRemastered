@@ -302,7 +302,10 @@ project runs):
   the real devworld is restored afterwards), generates the load datapack (`gen_datapack.py`, pack mode: ~92k EMI
   recipes, ~12k items, 4k tags) and sets `dev-mode`/`log-untranslated-tags` false like the pack. `--stock` runs a copy
   of the project in `build/stk` whose `dev.emi.emi` sources come from the merge base with `remastered` (the
-  "before"). `--vanilla`: no datapack, no extra items. `--repair-check`: only empties
+  "before"). `--merge-enchantments` (pack mode): every enchantment accepts every item (`mergeEnchantments=true` in
+  `emi_bench.properties`, dev mixin `EnchantmentBenchMixin`), like Merge Enchantments with `combineEnchantments: true`
+  in the owner's pack (datapack enchantments cannot be used: they make the world experimental and quick play stops at
+  the warning screen). `--vanilla`: no datapack, no extra items. `--repair-check`: only empties
   `#minecraft:stone_tool_materials` (KB4). `--boost` (off by default) raises only the bench's own game JVM to
   AboveNormal priority; use it only when the start-up hangs at "Datafixer Bootstrap" because of CPU starvation, since the
   owner may be playing at the same time. Results go to `build/emi_perf/<label>/` (`bench.jsonl`, `dump-final/`,

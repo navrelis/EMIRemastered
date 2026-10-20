@@ -136,7 +136,7 @@ def sync_stock(base_ref):
             shutil.copyfile(src, os.path.join(STOCK, "run", f))
 
 
-def prepare_world(game, mode, gen_args):
+def prepare_world(game, mode, gen_args, merge_enchantments=False):
     if not os.path.isdir(TEMPLATE):
         world = os.path.join(ROOT, "run", "saves", "devworld")
         if not os.path.isfile(os.path.join(world, "level.dat")):
@@ -161,6 +161,8 @@ def prepare_world(game, mode, gen_args):
         os.makedirs(os.path.dirname(game.bench_props), exist_ok=True)
         with open(game.bench_props, "w", encoding="utf-8", newline="\n") as f:
             f.write(f"items={PACK['items']}\ntools={PACK['tools']}\narmor={PACK['armor']}\n")
+            if merge_enchantments:
+                f.write("mergeEnchantments=true\n")
     subprocess.run(gen + gen_args, check=True)
 
 
@@ -214,6 +216,8 @@ def main():
     mode.add_argument("--vanilla", action="store_true", help="no generated datapack and no extra items")
     mode.add_argument("--repair-check", action="store_true", help="only empty #minecraft:stone_tool_materials")
     ap.add_argument("--profile", action="store_true", help="run the perf-profile tour (JFR of 3 warm reloads)")
+    ap.add_argument("--merge-enchantments", action="store_true",
+                    help="pack mode: every enchantment accepts every item, like Merge Enchantments (combineEnchantments) in the owner's pack")
     ap.add_argument("--boost", action="store_true",
                     help="raise OUR game JVM (by PID) to AboveNormal priority. Off by default: only meant for a start-up "
                          "that hangs at 'Datafixer Bootstrap' under CPU starvation; the owner may be playing at the same time")
@@ -234,7 +238,7 @@ def main():
     gradle_log_path = os.path.join(OUT, a.label + ".gradle.txt")
     ok = False
     try:
-        prepare_world(game, run_mode, a.gen_args)
+        prepare_world(game, run_mode, a.gen_args, a.merge_enchantments)
         pack_like_config(game)
         ensure_muted(game)
         start = time.time()
@@ -263,6 +267,7 @@ def main():
     os.makedirs(dest, exist_ok=True)
     with open(os.path.join(dest, "bench-info.txt"), "w", encoding="utf-8") as f:
         f.write(f"label={a.label}\nbuild={'stock' if a.stock else 'this tree'}\nmode={run_mode}\ntour={tour}\n"
+                f"merge_enchantments={a.merge_enchantments}\n"
                 f"project={game.root}\nhead={git('rev-parse', 'HEAD').strip()}\n")
     log = os.path.join(game.run, "logs", "latest.log")
     if os.path.isfile(log):

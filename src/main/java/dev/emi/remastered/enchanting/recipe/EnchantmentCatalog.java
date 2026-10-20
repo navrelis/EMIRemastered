@@ -1,6 +1,7 @@
 package dev.emi.remastered.enchanting.recipe;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +12,7 @@ import dev.emi.emi.runtime.EmiReloadLog;
 import dev.emi.remastered.enchanting.EnchantingSettings;
 import dev.emi.remastered.enchanting.logic.IncompatibilityMatrix;
 import dev.emi.remastered.enchanting.logic.LevelCap;
+import dev.emi.remastered.enchanting.logic.SharedColumns;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentLevelEntry;
 import net.minecraft.item.EnchantedBookItem;
@@ -45,6 +47,12 @@ public final class EnchantmentCatalog {
 			}
 		}
 		EmiStack[] itemStacks = new EmiStack[items.size()];
+		SharedColumns<EmiStack> columns = new SharedColumns<>(EnchantmentInfo.ITEM_COLUMNS, i -> {
+			if (itemStacks[i] == null) {
+				itemStacks[i] = EmiStack.of(items.get(i).getItem());
+			}
+			return itemStacks[i];
+		});
 
 		Map<RegistryEntry<Enchantment>, List<EmiStack>> books = new HashMap<>();
 		for (RegistryEntry.Reference<Enchantment> entry : entries) {
@@ -70,7 +78,7 @@ public final class EnchantmentCatalog {
 		for (RegistryEntry.Reference<Enchantment> entry : listed) {
 			List<EmiStack> entryBooks = books.get(entry);
 			try {
-				List<List<EmiStack>> validItems = validItems(entry, items, itemStacks);
+				List<List<EmiStack>> validItems = validItems(entry, items, columns);
 				List<EnchantmentInfo.Exclusion> exclusions = new ArrayList<>();
 				for (RegistryEntry.Reference<Enchantment> other : matrix.incompatibleWith(entry)) {
 					exclusions.add(new EnchantmentInfo.Exclusion(other, EmiIngredient.of(books.get(other))));
@@ -118,32 +126,24 @@ public final class EnchantmentCatalog {
 		return books;
 	}
 
-	private static List<List<EmiStack>> validItems(RegistryEntry<Enchantment> entry, List<ItemStack> items, EmiStack[] itemStacks) {
-		List<List<EmiStack>> columns = new ArrayList<>();
-		for (int i = 0; i < EnchantmentInfo.ITEM_COLUMNS; i++) {
-			columns.add(new ArrayList<>());
-		}
+	/** The items the enchantment applies to, spread over the item columns; shared by enchantments that accept the same items. */
+	private static List<List<EmiStack>> validItems(RegistryEntry<Enchantment> entry, List<ItemStack> items, SharedColumns<EmiStack> columns) {
 		Enchantment enchantment = entry.value();
+		BitSet accepted = new BitSet(items.size());
 		boolean reported = false;
-		int counter = 0;
 		for (int i = 0; i < items.size(); i++) {
 			try {
-				if (!enchantment.isAcceptableItem(items.get(i))) {
-					continue;
+				if (enchantment.isAcceptableItem(items.get(i))) {
+					accepted.set(i);
 				}
 			} catch (Throwable t) {
 				if (!reported) {
 					reported = true;
 					warn(entry, "test an item (" + items.get(i).getItem() + ")", t);
 				}
-				continue;
 			}
-			if (itemStacks[i] == null) {
-				itemStacks[i] = EmiStack.of(items.get(i).getItem());
-			}
-			columns.get(counter++ % EnchantmentInfo.ITEM_COLUMNS).add(itemStacks[i]);
 		}
-		return columns;
+		return columns.columnsOf(accepted);
 	}
 
 	private static void warn(RegistryEntry<Enchantment> entry, String action, Throwable t) {
