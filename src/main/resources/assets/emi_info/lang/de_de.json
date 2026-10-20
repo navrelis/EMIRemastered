@@ -62,5 +62,14 @@
   "emi_info.error": "Anbieter %s ist fehlgeschlagen: %s",
   "emi_info.tooltip.open": "Klicken zum Anzeigen",
   "emi_info.tooltip.not_a_source": "Verwandelt diesen Gegenstand nur in sich selbst (keine Quelle)",
-  "emi_info.tooltip.hint": "Gegenstandsinfo: %s"
+  "emi_info.tooltip.hint": "Gegenstandsinfo: %s",
+  "config.emi.info.extra_sources": "Weitere Quellen",
+  "config.emi.tooltip.info.extra_sources": "Fügt die Kategorie Weitere Quellen hinzu: Quellen, die Mods im Code vergeben und die Ressourcenpakete in emi_sources-Dateien angeben (siehe docs/SOURCES.md).\nBenötigt ein EMI-Neuladen.",
+  "emi.category.emi_info.other_sources": "Weitere Quellen",
+  "emi_info.sources.chance": "Chance: %s",
+  "emi_info.sources.more": "+%s weitere",
+  "emi_sources.minecraft.turtle_scute": "Fällt einmalig, wenn eine junge Schildkröte erwachsen wird (benötigt die Spielregel doMobLoot).",
+  "emi_sources.minecraft.armadillo_scute": "Gürteltiere werfen ihn von Zeit zu Zeit ab; beim Bürsten eines Gürteltiers erhält man ebenfalls einen.",
+  "emi_sources.minecraft.dragon_breath": "Eine Glasflasche an der Wolke aus dem Atem des Enderdrachen füllen.",
+  "emi_sources.minecraft.dragon_egg": "Erscheint auf dem Ausgangsportal, wenn der Enderdrache in einer Welt zum ersten Mal stirbt."
 }

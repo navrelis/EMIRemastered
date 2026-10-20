@@ -35,6 +35,10 @@ public final class InfoSettings {
 	@ConfigValue("info.show-advancements")
 	public static boolean showAdvancements = true;
 
+	@Comment("Adds the Other Sources category from the emi_sources resource files.")
+	@ConfigValue("info.extra-sources")
+	public static boolean extraSources = true;
+
 	private InfoSettings() {
 	}
 }
