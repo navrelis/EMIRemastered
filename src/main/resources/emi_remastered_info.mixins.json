@@ -6,8 +6,12 @@
   "mixins": [],
   "client": [
     "ClientAdvancementManagerAccessor",
+    "EmiApiHubMixin",
     "EmiApiMixin",
-    "EmiScreenManagerMixin"
+    "EmiHistoryAccessor",
+    "EmiScreenManagerHubMixin",
+    "EmiScreenManagerMixin",
+    "RecipeScreenHubMixin"
   ],
   "server": [],
   "injectors": {
