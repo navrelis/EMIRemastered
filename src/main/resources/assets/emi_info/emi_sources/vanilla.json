@@ -1,0 +1,27 @@
+{
+  "sources": [
+    {
+      "id": "minecraft:turtle_scute",
+      "output": "minecraft:turtle_scute",
+      "from": ["minecraft:turtle_spawn_egg"],
+      "text": "emi_sources.minecraft.turtle_scute"
+    },
+    {
+      "id": "minecraft:armadillo_scute",
+      "output": "minecraft:armadillo_scute",
+      "from": ["minecraft:armadillo_spawn_egg", "minecraft:brush"],
+      "text": "emi_sources.minecraft.armadillo_scute"
+    },
+    {
+      "id": "minecraft:dragon_breath",
+      "output": "minecraft:dragon_breath",
+      "from": ["minecraft:glass_bottle"],
+      "text": "emi_sources.minecraft.dragon_breath"
+    },
+    {
+      "id": "minecraft:dragon_egg",
+      "output": "minecraft:dragon_egg",
+      "text": "emi_sources.minecraft.dragon_egg"
+    }
+  ]
+}

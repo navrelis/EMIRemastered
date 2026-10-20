@@ -1,0 +1,22 @@
+{
+  "sources": [
+    {
+      "id": "emi_devtour:command_block_test",
+      "output": "minecraft:command_block",
+      "from": ["minecraft:redstone_block", "#minecraft:logs", "minecraft:piglin_spawn_egg"],
+      "text": "Dev tour entry with a literal text that is far too long for three lines in the page, so it has to be cut with dots and the whole sentence has to show in the tooltip when the mouse rests on it. Nothing in the game hands this out.",
+      "chance": 0.025
+    },
+    {
+      "id": "emi_devtour:broken_entry",
+      "output": "emi_devtour:does_not_exist",
+      "text": "This entry is invalid on purpose: its output item does not exist."
+    },
+    {
+      "id": "emi_devtour:barrier_test",
+      "output": "minecraft:barrier",
+      "count": 2,
+      "text": "Short literal text without source stacks."
+    }
+  ]
+}
