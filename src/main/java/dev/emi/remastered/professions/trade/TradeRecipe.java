@@ -9,6 +9,7 @@ import dev.emi.emi.api.render.EmiTexture;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
+import dev.emi.remastered.info.search.SourceLabels;
 import dev.emi.remastered.professions.ProfessionsCategories;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -20,7 +21,7 @@ import net.minecraft.util.Identifier;
 /**
  * A single villager or wandering trader trade: one or two items bought, one item sold, the workstation as catalyst.
  */
-public class TradeRecipe implements EmiRecipe {
+public class TradeRecipe implements EmiRecipe, SourceLabels {
 	private static final int WIDTH = 124;
 	private final TradeEntry entry;
 
@@ -30,6 +31,12 @@ public class TradeRecipe implements EmiRecipe {
 
 	public TradeEntry getEntry() {
 		return entry;
+	}
+
+	/** Source search ({@code ~}): the profession (or the wandering trader) and the level or pool of the trade. */
+	@Override
+	public List<String> sourceLabels() {
+		return List.of(entry.owner().getString(), entry.levelText().getString());
 	}
 
 	@Override
