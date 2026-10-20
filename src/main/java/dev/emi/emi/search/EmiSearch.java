@@ -23,6 +23,7 @@ import dev.emi.emi.runtime.EmiLog;
 import dev.emi.emi.runtime.EmiReloadLog;
 import dev.emi.emi.screen.EmiScreenManager;
 import dev.emi.remastered.info.search.SourceIndex;
+import dev.emi.remastered.search.SuffixArrays;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.search.SuffixArray;
 import net.minecraft.component.DataComponentTypes;
@@ -132,16 +133,15 @@ public class EmiSearch {
 				}
 			}
 		}
-		names.build();
-		tooltips.build();
-		mods.build();
-		aliases.build();
+		// EMI Remastered: source labels for the `~` query (info module), after the recipes exist; built in the background
+		SourceIndex.bake(bakedStacks);
+		// EMI Remastered: vanilla's result, built faster and at the same time (X-PERF2)
+		SuffixArrays.buildAll(names, tooltips, mods, aliases);
 		EmiSearch.names = names;
 		EmiSearch.tooltips = tooltips;
 		EmiSearch.mods = mods;
 		EmiSearch.aliases = aliases;
 		EmiSearch.bakedStacks = bakedStacks;
-		SourceIndex.bake(bakedStacks); // EMI Remastered: source labels for the `~` query (info module), after the recipes exist
 	}
 
 	public static void update() {

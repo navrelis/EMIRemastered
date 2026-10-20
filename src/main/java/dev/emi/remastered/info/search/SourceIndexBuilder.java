@@ -29,11 +29,19 @@ final class SourceIndexBuilder {
 	/** What the Item Info screen leaves out of "Produced by": information, tag, ingredient, resolution and fuel pages. */
 	private static volatile Set<EmiRecipeCategory> excluded;
 
-	private final EmiRecipeManager manager = EmiApi.getRecipeManager();
+	private final EmiRecipeManager manager;
 	private final Map<EmiRecipeCategory, List<String>> categoryLabels = new IdentityHashMap<>();
 	private final Set<String> labels = new LinkedHashSet<>();
 	private int labelCount;
 	private boolean noSource;
+
+	SourceIndexBuilder() {
+		this(EmiApi.getRecipeManager());
+	}
+
+	SourceIndexBuilder(EmiRecipeManager manager) {
+		this.manager = manager;
+	}
 
 	private static Set<EmiRecipeCategory> excluded() {
 		Set<EmiRecipeCategory> set = excluded;

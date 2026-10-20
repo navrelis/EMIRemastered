@@ -6,6 +6,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.jetbrains.annotations.Nullable;
+
+import dev.emi.emi.api.EmiApi;
+import dev.emi.emi.api.recipe.EmiRecipeManager;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.runtime.EmiLog;
 import dev.emi.emi.screen.EmiScreenManager;
@@ -13,14 +17,15 @@ import dev.emi.remastered.info.InfoModule;
 import net.minecraft.client.MinecraftClient;
 
 /**
- * Source labels of every baked stack, for the {@code ~} search query. Built once per EMI reload at search bake time
- * ({@link #bake}) and published as an immutable snapshot through a volatile field, so the search thread only reads.
- * Labels that arrive later (the structures of chest loot) are added by {@link #refreshAsync}, which rebuilds the
- * snapshot on a background thread. With the {@code info} module off the snapshot is inactive and {@code ~} queries match
- * nothing. Client only.
+ * Source labels of every baked stack, for the {@code ~} search query. Built once per EMI reload from the recipe
+ * manager of the search bake ({@link #bake}) on a background thread, and published as an immutable snapshot through a
+ * volatile field, so the search thread only reads. Until the snapshot of a reload is ready, queries compute the labels
+ * of a stack from that same recipe manager (same result, slower). Labels that arrive later (the structures of chest
+ * loot) are added by {@link #refreshAsync}, which rebuilds the snapshot on a background thread. With the {@code info}
+ * module off the snapshot is inactive and {@code ~} queries match nothing. Client only.
  */
 public final class SourceIndex {
-	private static final Snapshot INACTIVE = new Snapshot(false, Map.of(), Set.of(), Set.of());
+	private static final Snapshot INACTIVE = new Snapshot(false, Map.of(), Set.of(), Set.of(), null);
 	private static volatile Snapshot current = INACTIVE;
 	private static final AtomicLong generation = new AtomicLong();
 
@@ -33,17 +38,51 @@ public final class SourceIndex {
 	 * @param labels   joined lower case labels per stack (identity of the baked stack); stacks without labels are absent
 	 * @param noSource baked item and fluid stacks that nothing produces
 	 * @param stacks   the baked stacks the snapshot was built for, to rebuild it
+	 * @param building the recipe manager the snapshot is being built from while {@code labels} and {@code noSource} are
+	 *                 not filled yet, null when ready
 	 */
-	public record Snapshot(boolean active, Map<EmiStack, String> labels, Set<EmiStack> noSource, Set<EmiStack> stacks) {
+	public record Snapshot(boolean active, Map<EmiStack, String> labels, Set<EmiStack> noSource, Set<EmiStack> stacks,
+			@Nullable EmiRecipeManager building) {
 
 		public String labelsOf(EmiStack stack) {
+			if (building != null) {
+				return live(stack).labels();
+			}
 			String joined = labels.get(stack);
 			return joined == null ? "" : joined;
 		}
 
 		public boolean isNoSource(EmiStack stack) {
+			if (building != null) {
+				return live(stack).noSource();
+			}
 			return noSource.contains(stack);
 		}
+
+		/** Whether a plain {@code ~} query matches the stack (one computation while the snapshot is being built). */
+		boolean matches(EmiStack stack, String needle, boolean noSourceKeyword) {
+			if (!active) {
+				return false;
+			}
+			if (building != null) {
+				Live live = live(stack);
+				return SourceMatch.matches(live.labels(), live.noSource(), needle, noSourceKeyword);
+			}
+			return SourceMatch.matches(labelsOf(stack), isNoSource(stack), needle, noSourceKeyword);
+		}
+
+		/** What the finished snapshot will hold for the stack (a stack that fails to index has no labels). */
+		private Live live(EmiStack stack) {
+			SourceIndexBuilder builder = new SourceIndexBuilder(building);
+			try {
+				return new Live(builder.compute(stack), builder.noSource());
+			} catch (RuntimeException e) {
+				return new Live("", false);
+			}
+		}
+	}
+
+	private record Live(String labels, boolean noSource) {
 	}
 
 	public static Snapshot current() {
@@ -60,7 +99,10 @@ public final class SourceIndex {
 		return SourceMatch.matches(labels, builder.noSource(), needle, noSourceKeyword);
 	}
 
-	/** Called by {@code EmiSearch.bake} on the reload thread with the stacks it baked. Never throws. */
+	/**
+	 * Called by {@code EmiSearch.bake} on the reload thread with the stacks it baked: starts the build on a background
+	 * thread (EMI Remastered X-PERF2: it was part of the search bake). Never throws.
+	 */
 	public static void bake(Set<EmiStack> bakedStacks) {
 		long id = generation.incrementAndGet();
 		if (!InfoModule.enabled) {
@@ -68,7 +110,9 @@ public final class SourceIndex {
 			return;
 		}
 		try {
-			publish(id, build(bakedStacks));
+			EmiRecipeManager manager = EmiApi.getRecipeManager();
+			current = new Snapshot(true, Map.of(), Set.of(), bakedStacks, manager);
+			start(id, bakedStacks, manager, false);
 		} catch (Throwable e) {
 			EmiLog.error("EMI could not build the source index for the search", e);
 			current = INACTIVE;
@@ -84,14 +128,22 @@ public final class SourceIndex {
 		if (!base.active()) {
 			return;
 		}
-		long id = generation.incrementAndGet();
+		start(generation.incrementAndGet(), base.stacks(), EmiApi.getRecipeManager(), true);
+	}
+
+	private static void start(long id, Set<EmiStack> stacks, EmiRecipeManager manager, boolean refresh) {
 		Thread thread = new Thread(() -> {
 			try {
-				if (publish(id, build(base.stacks()))) {
+				if (publish(id, build(stacks, manager))) {
 					MinecraftClient.getInstance().execute(SourceIndex::searchAgain);
 				}
 			} catch (Throwable e) {
-				EmiLog.error("EMI could not refresh the source index for the search", e);
+				if (refresh) {
+					EmiLog.error("EMI could not refresh the source index for the search", e);
+				} else {
+					EmiLog.error("EMI could not build the source index for the search", e);
+					publish(id, INACTIVE);
+				}
 			}
 		}, "EMI Source Index");
 		thread.setDaemon(true);
@@ -113,9 +165,9 @@ public final class SourceIndex {
 		return true;
 	}
 
-	private static Snapshot build(Set<EmiStack> stacks) {
+	private static Snapshot build(Set<EmiStack> stacks, EmiRecipeManager manager) {
 		long start = System.nanoTime();
-		SourceIndexBuilder builder = new SourceIndexBuilder();
+		SourceIndexBuilder builder = new SourceIndexBuilder(manager);
 		Map<EmiStack, String> labels = new IdentityHashMap<>(stacks.size() * 2);
 		Set<EmiStack> noSource = Collections.newSetFromMap(new IdentityHashMap<>());
 		for (EmiStack stack : stacks) {
@@ -133,7 +185,7 @@ public final class SourceIndex {
 				noSource.add(stack);
 			}
 		}
-		Snapshot snapshot = new Snapshot(true, labels, noSource, stacks);
+		Snapshot snapshot = new Snapshot(true, labels, noSource, stacks, null);
 		EmiLog.info("Source search index: " + stacks.size() + " stacks, " + labels.size() + " with sources, "
 			+ builder.labelCount() + " labels, " + noSource.size() + " without source, "
 			+ (System.nanoTime() - start) / 1_000_000 + "ms");
