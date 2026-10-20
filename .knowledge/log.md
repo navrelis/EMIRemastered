@@ -119,3 +119,6 @@
 2026-10-19 | DOC4 review (lead) | accepted, committed on wip/doc4; merge after POLISH (mobs speed wording may change)
 2026-10-19 | PACK-REAL2 review (lead) | accepted: LOOT-ASYNC verified in real pack (join 4 s); cleanup verified; cosmetic: summary log counts 433/789 chestTables while 563 tables delivered (report only)
 2026-10-19 | POLISH review (lead) | accepted, merged; DOC4 merged; build 381 tests green; final jar 829b63e1 installed (lock); report written
+2026-10-20 | session 8 (follow-ups): worktrees x-pad, x-summary, x-parallel from remastered 63649db5; delegated X-PAD (Sonnet short), X-SUMMARY (Sonnet short), X-PARALLEL (Opus long, precision: concurrency in the server-side lookup, D20)
+2026-10-20 | X-SUMMARY review (lead) | accepted: summary via Build.whenReady on the server thread (no race with reload refilling chestSenders, stale/failed builds skipped), counts chest senders = encode's set + by-path numbers; dev server 'pages 50 of 59 (by path 53 of 56)', 50 = non-empty dev lines; 382 tests green; committed on wip/x-summary
+2026-10-20 | X-PAD review (lead) | accepted: RIGHT_PAD 3 in EntryImpl (detail + slots via layout right) and BarElement values; 381 tests green, x-pad tour 31/31; lead viewed golden apple scroll-end shot (x2/x1/100% inset); committed on wip/x-pad
