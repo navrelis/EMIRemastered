@@ -33,6 +33,8 @@ public final class Elements {
 	public static final int LINK_HOVER = 0x2F6BFF;
 	public static final int HOVER_FILL = 0x50FFFFFF;
 	public static final int LINE_HEIGHT = 10;
+	/** Gap between right-aligned texts and the edge of the scroll area. */
+	static final int RIGHT_PAD = 3;
 
 	private Elements() {
 	}
@@ -253,7 +255,7 @@ public final class Elements {
 		@Override
 		public void render(DrawContext draw, int width, int mouseX, int mouseY, float delta) {
 			TextRenderer font = font();
-			int valueWidth = value == null ? 0 : font.getWidth(value) + 4;
+			int valueWidth = value == null ? 0 : font.getWidth(value) + 4 + RIGHT_PAD;
 			int labelWidth = Math.min(font.getWidth(label), width * 2 / 5);
 			draw.drawText(font, trim(label, labelWidth), 0, 2, TEXT, false);
 			int barX = labelWidth + 4;
