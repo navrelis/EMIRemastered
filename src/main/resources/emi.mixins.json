@@ -17,6 +17,7 @@
     "accessor.ShovelItemAccessor",
     "accessor.SmithingTransformRecipeAccessor",
     "accessor.SmithingTrimRecipeAccessor",
+    "accessor.SuffixArrayAccessor",
     "jei.PluginCallerMixin",
     "AbstractInventoryScreenMixin",
     "CraftingResultSlotMixin",

@@ -18,8 +18,7 @@ public class SourceQuery extends Query {
 
 	@Override
 	public boolean matches(EmiStack stack) {
-		SourceIndex.Snapshot snapshot = SourceIndex.current();
-		return snapshot.active() && SourceMatch.matches(snapshot.labelsOf(stack), snapshot.isNoSource(stack), needle, noSourceKeyword);
+		return SourceIndex.current().matches(stack, needle, noSourceKeyword);
 	}
 
 	@Override

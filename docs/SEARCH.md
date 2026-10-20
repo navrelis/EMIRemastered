@@ -58,9 +58,10 @@ Third-party recipes get the category labels; a mod can implement `SourceLabels` 
 ## Notes
 
 * `~village` also finds everything the villagers sell (the category is called "Villager Trades").
-* The labels are built once per EMI reload at the end of the search bake (log line `Source search index: ...`). Chest
-  structures arrive from the server after joining; the index is rebuilt in the background then and a running `~`
-  search is repeated.
+* The labels are built once per EMI reload, in the background after the search bake (log line
+  `Source search index: ...`); until they are ready a `~` query works out the labels of each stack itself (same
+  results, slower). Chest structures arrive from the server after joining; the index is rebuilt in the background
+  then and a running `~` search is repeated.
 * Switching the `info` module on while playing needs an EMI reload before `~` finds anything.
 * `~nosource` ignores the setting `info.show-no-source` and sources that other mods add to the Item Info screen through
   its provider API (those only exist when a page is built).

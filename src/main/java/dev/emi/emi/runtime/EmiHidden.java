@@ -109,7 +109,8 @@ public class EmiHidden {
 					continue outer;
 				}
 			}
-			boolean filtered = disabledFilterLookup.computeIfAbsent("" + s.getId(), id -> {
+			// EMI Remastered: without filters nothing is filtered, so skip building the id string of every stack (X-PERF2)
+			boolean filtered = !disabledFilters.isEmpty() && disabledFilterLookup.computeIfAbsent("" + s.getId(), id -> {
 				for (IndexStackData.Filter filter : disabledFilters) {
 					if (filter.filter().test(id)) {
 						return true;
