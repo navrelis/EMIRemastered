@@ -52,6 +52,7 @@ Tours for single fixes and features (also in `src/devtour/resources/tour/`):
 * `kb7.json`: recipe tree remainder counts of synthetic favourites (KB7). The dev-only helper `src/devtour/java/dev/emi/remastered/devtour/Kb7Tour.java` (`call` steps `goalActivatorRail` and `report`) sets the activator rail as the recipe tree goal and notes per recipe the batches and the remaining amount with the old formula and with the fix. The stick recipe makes 4 per batch, so the stick of the redstone torch is served by the remainder: the stick favourite must show 3 with an empty inventory, 2 of 3 with one stick (`/give`) and be gone with three.
 * `loot-van.json`: chests that vanilla places in code get their structure from a built-in list by structure type (`CodePlacedLoot`): the chest loot page of the dune armor trim template (desert pyramid) and nether wart (nether fortress) with the "Found in" line, and the Item Info "Chests in Structures" section of both.
 * `loot-async.json`: the structure lookup finishes after the player joined (delayed by 20 s with `emi.devtour.lookupDelayMs` through `systemProperties`). The desert pyramid chest page ("Found in"), the dune armor trim template Item Info ("Chests in Structures") and the desert pyramid structure page (loot links) are shown before and after the delay, then the chest page and the structure page before and after the rebuilt lookup of a `/reload`. Nothing waits for the lookup and there is no EMI reload: the structures arrive in `emi_loot:chest_structures`, the structure loot links in `emi_world:structure_loot`.
+* `x-sources.json`: the category Other Sources from `emi_sources` resource files (`docs/SOURCES.md`): the dev-only test file `src/devtour/resources/assets/emi_devtour/emi_sources/test.json` (command block with `from` stacks, long text with tooltip and chance, barrier without `from`, one invalid entry that logs a WARN) and the built-in `vanilla.json` (turtle scute, dragon egg). R pages, uses of the piglin spawn egg, Item Info "How to Get" (also the piglin head, covered by the loot module, and bedrock as "No Known Source" control), then the plugin manager: `emi_info` off removes the category, on brings it back.
 
 ## How it works
 
@@ -301,7 +302,10 @@ project runs):
   the real devworld is restored afterwards), generates the load datapack (`gen_datapack.py`, pack mode: ~92k EMI
   recipes, ~12k items, 4k tags) and sets `dev-mode`/`log-untranslated-tags` false like the pack. `--stock` runs a copy
   of the project in `build/stk` whose `dev.emi.emi` sources come from the merge base with `remastered` (the
-  "before"). `--vanilla`: no datapack, no extra items. `--repair-check`: only empties
+  "before"). `--merge-enchantments` (pack mode): every enchantment accepts every item (`mergeEnchantments=true` in
+  `emi_bench.properties`, dev mixin `EnchantmentBenchMixin`), like Merge Enchantments with `combineEnchantments: true`
+  in the owner's pack (datapack enchantments cannot be used: they make the world experimental and quick play stops at
+  the warning screen). `--vanilla`: no datapack, no extra items. `--repair-check`: only empties
   `#minecraft:stone_tool_materials` (KB4). `--boost` (off by default) raises only the bench's own game JVM to
   AboveNormal priority; use it only when the start-up hangs at "Datafixer Bootstrap" because of CPU starvation, since the
   owner may be playing at the same time. Results go to `build/emi_perf/<label>/` (`bench.jsonl`, `dump-final/`,

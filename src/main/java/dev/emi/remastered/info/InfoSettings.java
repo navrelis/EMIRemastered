@@ -45,6 +45,10 @@ public final class InfoSettings {
 	@ConfigValue("info.primary-view")
 	public static HubPrimaryView primaryView = HubPrimaryView.RECIPES;
 
+	@Comment("Adds the Other Sources category from the emi_sources resource files.")
+	@ConfigValue("info.extra-sources")
+	public static boolean extraSources = true;
+
 	private InfoSettings() {
 	}
 }

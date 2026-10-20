@@ -1,7 +1,9 @@
 package dev.emi.remastered.enchanting.recipe;
 
 import java.util.ArrayList;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -38,6 +40,15 @@ public class EnchantmentRecipe implements EmiRecipe {
 	private PagedWidgets pages;
 
 	public EnchantmentRecipe(EnchantmentInfo info) {
+		this(info, new IdentityHashMap<>());
+	}
+
+	/**
+	 * @param columnIngredients ingredients of the item columns built so far, shared by the recipes of one reload: the
+	 * enchantments that accept the same items have the same column lists (see {@link EnchantmentCatalog}), so each
+	 * column becomes an EMI ingredient once
+	 */
+	public EnchantmentRecipe(EnchantmentInfo info, Map<List<EmiStack>, EmiIngredient> columnIngredients) {
 		this.info = info;
 		this.books = allBooks(info);
 		// One input per own book: EMI sorts a "uses" lookup by the size of the smallest input holding the stack, so
@@ -48,7 +59,7 @@ public class EnchantmentRecipe implements EmiRecipe {
 		if (EnchantingSettings.showForItems) {
 			for (List<EmiStack> column : info.validItems()) {
 				if (!column.isEmpty()) {
-					inputs.add(EmiIngredient.of(column));
+					inputs.add(columnIngredients.computeIfAbsent(column, EmiIngredient::of));
 				}
 			}
 		}

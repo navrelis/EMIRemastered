@@ -9,6 +9,8 @@ import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.SlotWidget;
 import dev.emi.emi.api.widget.WidgetHolder;
+import dev.emi.remastered.info.search.SourceLabels;
+import dev.emi.remastered.info.search.SourceText;
 import dev.emi.remastered.loot.EMILoot;
 import dev.emi.remastered.loot.client.ClientBuiltPool;
 import dev.emi.remastered.loot.client.ClientMobLootTable;
@@ -40,7 +42,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-public class MobLootRecipe implements EmiRecipe {
+public class MobLootRecipe implements EmiRecipe, SourceLabels {
 
     //private final static Map<EntityType<?>, Integer> needsElevating;
     private static final Identifier ARROW_ID = Identifier.of(EMILoot.MOD_ID, "textures/gui/downturn_arrow.png");
@@ -98,6 +100,26 @@ public class MobLootRecipe implements EmiRecipe {
         Optional<ClientBuiltPool> opt = rowBuilderList.get(rowBuilderList.size() - 1).addAndTrim(newPool);
         if (opt.isEmpty()) return;
         addWidgetBuilders(opt.get(), true);
+    }
+
+    private volatile List<String> searchLabels;
+
+    /** Source search ({@code ~}): the mob's name and the loot table id. */
+    @Override
+    public List<String> sourceLabels() {
+        List<String> labels = searchLabels;
+        if (labels == null) {
+            labels = new ArrayList<>();
+            labels.add(lootId.getPath());
+            labels.add(SourceText.spaced(lootId.getPath()));
+            if (type != null) {
+                labels.add(type.getName().getString());
+                labels.add(Registries.ENTITY_TYPE.getId(type).getPath());
+            }
+            labels = List.copyOf(labels);
+            searchLabels = labels;
+        }
+        return labels;
     }
 
     /** Every pool the recipe shows, for the Item Info sections. */
