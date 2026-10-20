@@ -6,7 +6,8 @@ import dev.emi.remastered.module.Module;
 
 /**
  * Module {@code info}: the Item Info screen ("How to get" / "Used for" overview of a stack) and its provider API
- * ({@link dev.emi.remastered.info.api.ItemInfoRegistry}), task A1. No EMI plugin: the screen reads EMI's recipe index.
+ * ({@link dev.emi.remastered.info.api.ItemInfoRegistry}), task A1. The screen reads EMI's recipe index. The only EMI
+ * plugin is {@link InfoEmiPlugin} (category "Other Sources" from {@code emi_sources} resource files, docs/SOURCES.md).
  * Settings: {@link InfoSettings} (group {@code info}); lang files in {@code assets/emi_info/lang/}.
  */
 public final class InfoModule extends Module {

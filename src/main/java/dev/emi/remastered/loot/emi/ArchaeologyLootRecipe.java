@@ -8,6 +8,8 @@ import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.SlotWidget;
 import dev.emi.emi.api.widget.WidgetHolder;
+import dev.emi.remastered.info.search.SourceLabels;
+import dev.emi.remastered.info.search.SourceText;
 import dev.emi.remastered.loot.EMILoot;
 import dev.emi.remastered.loot.client.ClientArchaeologyLootTable;
 import dev.emi.remastered.loot.util.stack.ArchaeologyLootEmiStack;
@@ -32,7 +34,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static dev.emi.remastered.loot.util.FloatTrimmer.trimFloatString;
 
-public class ArchaeologyLootRecipe implements EmiRecipe {
+public class ArchaeologyLootRecipe implements EmiRecipe, SourceLabels {
 
 	public ArchaeologyLootRecipe(ArchaeologyLootRecipeData data) {
 		this.loot = data.loot;
@@ -65,6 +67,19 @@ public class ArchaeologyLootRecipe implements EmiRecipe {
 	private boolean isGuaranteedNonChance = false;
 	private final ArchaeologyLootEmiStack inputStack;
 	private final float columns = 8f;
+
+	private volatile List<String> searchLabels;
+
+	/** Source search ({@code ~}): the name and id of the loot table (the suspicious sand and gravel pools). */
+	@Override
+	public List<String> sourceLabels() {
+		List<String> labels = searchLabels;
+		if (labels == null) {
+			labels = List.of(inputStack.getName().getString(), loot.id.getPath(), SourceText.spaced(loot.id.getPath()));
+			searchLabels = labels;
+		}
+		return labels;
+	}
 
 	@Override
 	public EmiRecipeCategory getCategory() {

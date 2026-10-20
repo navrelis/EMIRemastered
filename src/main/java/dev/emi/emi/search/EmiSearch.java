@@ -22,6 +22,7 @@ import dev.emi.emi.registry.EmiStackList;
 import dev.emi.emi.runtime.EmiLog;
 import dev.emi.emi.runtime.EmiReloadLog;
 import dev.emi.emi.screen.EmiScreenManager;
+import dev.emi.remastered.info.search.SourceIndex;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.search.SuffixArray;
 import net.minecraft.component.DataComponentTypes;
@@ -35,7 +36,7 @@ import net.minecraft.util.Identifier;
 
 public class EmiSearch {
 	public static final Pattern TOKENS = Pattern.compile(
-		"-?[@#$]?" // Any query can be negated or prefixed with type
+		"-?[@#$~]?" // Any query can be negated or prefixed with type (EMI Remastered: `~` is the source type)
 		+ "(" // Query contents
 			+ "\\/(\\\\.|[^\\\\\\/])+\\/" // Any regex contents, for example `/some thing/`
 			+ "|"
@@ -140,6 +141,7 @@ public class EmiSearch {
 		EmiSearch.mods = mods;
 		EmiSearch.aliases = aliases;
 		EmiSearch.bakedStacks = bakedStacks;
+		SourceIndex.bake(bakedStacks); // EMI Remastered: source labels for the `~` query (info module), after the recipes exist
 	}
 
 	public static void update() {

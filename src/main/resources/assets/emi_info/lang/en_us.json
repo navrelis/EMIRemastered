@@ -62,5 +62,14 @@
   "emi_info.error": "Provider %s failed: %s",
   "emi_info.tooltip.open": "Click to show",
   "emi_info.tooltip.not_a_source": "Only turns this item into itself (not a source)",
-  "emi_info.tooltip.hint": "Item Info: %s"
+  "emi_info.tooltip.hint": "Item Info: %s",
+  "config.emi.info.extra_sources": "Other Sources",
+  "config.emi.tooltip.info.extra_sources": "Adds the Other Sources category: sources that mods hand out in code, declared by emi_sources files in resource packs (see docs/SOURCES.md).\nNeeds an EMI reload.",
+  "emi.category.emi_info.other_sources": "Other Sources",
+  "emi_info.sources.chance": "Chance: %s",
+  "emi_info.sources.more": "+%s more",
+  "emi_sources.minecraft.turtle_scute": "Dropped once when a baby turtle grows up (needs the game rule doMobLoot).",
+  "emi_sources.minecraft.armadillo_scute": "Shed by armadillos from time to time; brushing an armadillo gives one as well.",
+  "emi_sources.minecraft.dragon_breath": "Fill a glass bottle from the lingering cloud of the Ender Dragon's breath.",
+  "emi_sources.minecraft.dragon_egg": "Appears on top of the exit portal when the Ender Dragon dies for the first time in a world."
 }

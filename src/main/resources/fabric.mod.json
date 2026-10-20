@@ -50,7 +50,8 @@
       "dev.emi.remastered.letsdo.LetsDoEmiPlugin",
       "dev.emi.remastered.mobs.MobsEmiPlugin",
       "dev.emi.remastered.stats.StatsEmiPlugin",
-      "dev.emi.remastered.world.WorldEmiPlugin"
+      "dev.emi.remastered.world.WorldEmiPlugin",
+      "dev.emi.remastered.info.InfoEmiPlugin"
     ],
     "modmenu": [
       "dev.emi.emi.compat.EmiModMenu"

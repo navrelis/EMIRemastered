@@ -8,6 +8,8 @@ import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.TextWidget;
 import dev.emi.emi.api.widget.WidgetHolder;
+import dev.emi.remastered.info.search.SourceLabels;
+import dev.emi.remastered.info.search.SourceText;
 import dev.emi.remastered.ores.OresSettings;
 import dev.emi.remastered.ores.display.BiomeSummary;
 import dev.emi.remastered.ores.display.HeightModel;
@@ -45,7 +47,7 @@ import net.minecraft.world.gen.heightprovider.HeightProvider;
 import net.minecraft.world.gen.heightprovider.TrapezoidHeightProvider;
 import net.minecraft.world.gen.heightprovider.UniformHeightProvider;
 
-public abstract class AbstractPlacedFeatureEmiRecipe implements EmiRecipe {
+public abstract class AbstractPlacedFeatureEmiRecipe implements EmiRecipe, SourceLabels {
 	private static final int GRAPH_WIDTH = 32;
 	private static final int GRAPH_HEIGHT = 16;
 	/** Icons per row of the biome list, the recipe is 160 wide. */
@@ -88,6 +90,27 @@ public abstract class AbstractPlacedFeatureEmiRecipe implements EmiRecipe {
 			List<EmiStack> shown = split.shown().stream().map(id -> BiomeEmiStack.of(registry.get(id))).toList();
 			bandSections.add(new BandSection(named, shown, split.hidden()));
 		}
+	}
+
+	private volatile List<String> searchLabels;
+
+	/** Source search ({@code ~}): the dimensions the feature generates in and its id. */
+	@Override
+	public List<String> sourceLabels() {
+		List<String> labels = searchLabels;
+		if (labels == null) {
+			labels = new ArrayList<>();
+			labels.add(featureId.getPath());
+			labels.add(SourceText.spaced(featureId.getPath()));
+			for (BandSection section : bandSections) {
+				if (section.data().dimension() != null) {
+					labels.add(OresTexts.dimensionName(section.data().dimension()).getString());
+				}
+			}
+			labels = List.copyOf(labels);
+			searchLabels = labels;
+		}
+		return labels;
 	}
 
 	/** The height provider of the feature's height range modifier, null if it has none. */
