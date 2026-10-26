@@ -25,6 +25,8 @@
   "config.emi.tooltip.loot.direct_drops_archaeology": "Whether archaeology loot tables include manually added 'direct drops'.",
   "config.emi.loot.chest_structures": "Send Chest Structures",
   "config.emi.tooltip.loot.chest_structures": "Whether chest loot is sent together with the structures it is found in and their dimensions, which the chest pages show as \"Found in\".\nThis is read where the loot tables are parsed (the integrated server in single player).",
+  "config.emi.loot.structure_cache": "Cache Chest Structures",
+  "config.emi.tooltip.loot.structure_cache": "Whether the structures that chest loot is found in are kept in a cache file, so that later starts with the same mods and data packs show them almost at once instead of reading every structure again. Any change to the mods, data packs or structures makes the next start look them up again and replace the file.\nThe file is emi_remastered/cache/structure-lookup.dat in the game directory. This is read where the loot tables are parsed (the integrated server in single player).",
   "config.emi.loot.skipped_keys": "Skipped Condition Keys",
   "config.emi.tooltip.loot.skipped_keys": "Comma separated keys of the conditions and functions that are not shown because they say nothing useful. Remove a key to show it. The available keys are the 'emi_loot.*' translation keys of the conditions, e.g. emi_loot.function.limit_count. 'emi_loot.no_conditions' only matters in the tooltip and plain condition styles.\nThis is read where the loot tables are parsed (the integrated server in single player).",
   "config.emi.loot.condition_style": "Condition Style",
