@@ -130,6 +130,6 @@ Owner: "1. do that (structure cache) 2. sure (extra sources) 3. sure (search by 
 | MAP2 | Pack coverage audit of EMI Remastered textures vs Nytheria pack | Sonnet short | done (emi textures byte-identical to 1.1.24; pack gaps: empty-sidebar icon, corner alpha; restyle recipe pins old emi_loot jar) |
 | TC | Colour remap hook (D29): TextColors class, reload listener, funnels, raw sites, tests, docs/THEMING.md, version 2.1.0, CHANGELOG | Sonnet long | done (498 tests green; funnels TextWidget + EmiDrawContext, 13 raw sites; tooltips untouched) |
 | PK1 | Nytheria pack 2.2.0: text_colors.json (D30), widgets/background fixes (D31), recipe jar, version/changelog/page | Sonnet long | done (Nytheria repo a980b89 on v2.2.0; 69 py tests; 1 correction: lighter hues >= 4.4:1; owner greys kept) |
-| VER | Dev client screenshots with and without the pack (hidden, muted) | Sonnet long | in progress |
+| VER | Dev client screenshots with and without the pack (hidden, muted) | Sonnet long | done (tour theme.json 143/143 both runs; remap log "20 colours mapped"; lead viewed info, mob, biome pairs; run/options.txt restored) |
 | DOC7 | CF file changelog 2.1.0 (works as first release), DESCRIPTION theming line + version | Sonnet short | done (accepted first pass) |
 | REL2 | Mod 2.0.1 + pack 2.2.0: build, install in instance, push, CF upload | lead | open |
