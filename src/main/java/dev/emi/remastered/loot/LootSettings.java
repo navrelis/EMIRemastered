@@ -69,6 +69,10 @@ public class LootSettings {
 	@ConfigValue("loot.chest-structures")
 	public static boolean chestStructures = true;
 
+	@Comment("Whether the structures of chest loot tables are kept in a cache file (emi_remastered/cache in the game directory), so later starts with the same mods and data packs find them at once.")
+	@ConfigValue("loot.structure-cache")
+	public static boolean structureCache = true;
+
 	@ConfigGroupEnd
 	@Comment("Comma separated condition keys that are not shown because they say nothing useful. "
 		+ "Remove a key to show it. 'emi_loot.no_conditions' only matters in the tooltip and plain condition styles.")

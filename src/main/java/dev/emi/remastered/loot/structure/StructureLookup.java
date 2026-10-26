@@ -45,6 +45,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.InputStream;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -74,6 +75,12 @@ import java.util.function.Function;
  * now, {@link Build#whenReady} runs code on the server thread once the build of the current data is done. Every build
  * has a generation; a data pack reload or a server stop ({@link #invalidate}) makes it stale, and the results and
  * callbacks of a stale build are dropped. A build also stops as soon as its server begins to stop.
+ * <p>
+ * The walks of the jigsaw structures (the part that reads the templates) are kept in a cache file in the game
+ * directory ({@link LookupCache}, setting {@code loot.structure-cache}). A later build whose fingerprint matches takes
+ * them from the file instead of reading the templates and computes the rest (dimensions, chests placed in code, tables
+ * reached through other tables) from the live data like a build that walks; it follows the same stale and abandon
+ * rules. Only a complete build that was not abandoned writes the file.
  */
 public final class StructureLookup {
 	private static final int MAX_POOLS_PER_STRUCTURE = 600;
@@ -90,10 +97,12 @@ public final class StructureLookup {
 	private final Map<Identifier, List<Identifier>> structureDimensions = new LinkedHashMap<>();
 	private final Map<Identifier, Set<Identifier>> structuresByTable = new HashMap<>();
 	private final Map<Identifier, List<StructureRef>> resolved = new HashMap<>();
+	/** Jigsaw walks of this build that ended with an exception; such a build is not saved in the cache. Build thread only. */
+	private int failedWalks;
 
 	/** Everything a build reads, captured on the server thread. Registries are frozen and resources immutable by then. */
 	private record Context(Registry<Structure> structures, Registry<StructurePool> pools, ResourceManager resources,
-		ReloadableRegistries.Lookup loot, Map<Identifier, Set<RegistryEntry<Biome>>> biomes, List<Identifier> chestTables) {
+		ReloadableRegistries.Lookup loot, Map<Identifier, Set<RegistryEntry<Biome>>> biomes, List<Identifier> chestTables, boolean useCache) {
 	}
 
 	/** One build of the lookup for one server and one data generation. */
@@ -227,27 +236,63 @@ public final class StructureLookup {
 		ReloadableRegistries.Lookup loot = server.getReloadableRegistries();
 		List<Identifier> chestTables = loot.getIds(RegistryKeys.LOOT_TABLE).stream().filter(id -> id.getPath().startsWith("chests/")).sorted().toList();
 		return new Context(server.getRegistryManager().get(RegistryKeys.STRUCTURE), server.getRegistryManager().get(RegistryKeys.TEMPLATE_POOL),
-			server.getResourceManager(), loot, biomes, chestTables);
+			server.getResourceManager(), loot, biomes, chestTables, LootSettings.structureCache);
 	}
 
+	/**
+	 * The build: with {@code loot.structure-cache} on, the walks come from the cache file when its fingerprint matches
+	 * ({@link LookupCache}); otherwise the structures are walked and a complete build that was not abandoned replaces
+	 * the file. Either way the rest of the lookup is computed from the live data, and a stale build publishes nothing.
+	 */
 	private static void run(Context context, BooleanSupplier abandoned, CompletableFuture<StructureLookup> future) {
 		StructureLookup lookup = new StructureLookup();
 		long start = System.currentTimeMillis();
+		LookupCache.Prepared cache = null;
+		boolean fromCache = false;
+		boolean complete = false;
+		Map<String, List<String>> walked = null;
 		try {
 			devDelay();
-			lookup.scan(context, abandoned);
+			if (context.useCache() && !abandoned.getAsBoolean()) {
+				cache = LookupCache.prepare(context.structures(), context.pools(), context.resources());
+			}
+			if (cache != null && cache.walks() != null && !abandoned.getAsBoolean()) {
+				fromCache = lookup.replay(context, cache.walks());
+				if (!fromCache) {
+					EMILoot.LOGGER.info("Structure lookup cache: the cache file does not match the structures, looking them up");
+					lookup = new StructureLookup();
+				}
+			}
+			if (!fromCache) {
+				walked = cache != null && cache.writable() ? new LinkedHashMap<>() : null;
+				complete = lookup.scan(context, abandoned, walked);
+			}
 		} catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
 		} catch (Throwable e) {
+			complete = false;
 			EMILoot.LOGGER.error("Could not look up the structures of chest loot tables, chest pages will not show where a chest is found", e);
 		}
 		if (abandoned.getAsBoolean()) {
-			// the data changed or the server stops while this build ran: never hand out its results
+			// the data changed or the server stops while this build ran: never hand out (or save) its results
 			future.complete(EMPTY);
 			return;
 		}
-		EMILoot.LOGGER.info("Looked up {} structures and the loot tables of their pieces in {}ms", lookup.structureDimensions.size(), System.currentTimeMillis() - start);
+		if (fromCache) {
+			EMILoot.LOGGER.info("Loaded {} structures and the loot tables of their pieces from the cache in {}ms ({})", lookup.structureDimensions.size(),
+				System.currentTimeMillis() - start, cache.timings());
+		} else {
+			EMILoot.LOGGER.info("Looked up {} structures and the loot tables of their pieces in {}ms", lookup.structureDimensions.size(), System.currentTimeMillis() - start);
+		}
 		future.complete(lookup);
+		if (walked != null && !abandoned.getAsBoolean()) {
+			String notSaved = StructureCache.notSavedReason(complete, lookup.failedWalks);
+			if (notSaved == null) {
+				LookupCache.write(cache, walked);
+			} else {
+				EMILoot.LOGGER.info("Structure lookup cache not saved: {}", notSaved);
+			}
+		}
 	}
 
 	/**
@@ -300,9 +345,13 @@ public final class StructureLookup {
 	 * pack), so the walks of the jigsaw structures run on {@link StructureWalks} workers, each template read once
 	 * whichever walk needs it first ({@link StructureWalks.OnceCache}). This thread merges the results in the order of
 	 * the registry's entries, as if the structures had been walked one after another: the same structures per table in
-	 * the same order, the same warnings. Leaves the lookup incomplete once the build is abandoned.
+	 * the same order, the same warnings. Leaves the lookup incomplete once the build is abandoned. {@code walked} (when
+	 * not null) gets the loot tables of every jigsaw structure whose walk succeeded, for the cache; failed walks are
+	 * counted in {@link #failedWalks}.
+	 *
+	 * @return whether every structure was merged
 	 */
-	private void scan(Context context, BooleanSupplier abandoned) {
+	private boolean scan(Context context, BooleanSupplier abandoned, @Nullable Map<String, List<String>> walked) {
 		List<Map.Entry<RegistryKey<Structure>, Structure>> entries = new ArrayList<>(context.structures().getEntrySet());
 		boolean complete;
 		try (StructureWalks walks = new StructureWalks(StructureWalks.defaultThreads(), abandoned)) {
@@ -310,25 +359,68 @@ public final class StructureLookup {
 			complete = walks.<Map.Entry<RegistryKey<Structure>, Structure>, Set<Identifier>>walkInOrder(entries,
 				entry -> entry.getValue() instanceof JigsawStructure jigsaw ? () -> lootTablesOf(jigsaw, context.pools(), templates::get, walks::aborted) : null,
 				(entry, tables, failure) -> {
-					Identifier id = entry.getKey().getValue();
-					Structure structure = entry.getValue();
-					structureDimensions.put(id, dimensionsOf(structure, context.biomes()));
-					for (RegistryKey<LootTable> table : CodePlacedLoot.forType(structure.getType())) {
-						if (context.chestTables().contains(table.getValue())) {
-							structuresByTable.computeIfAbsent(table.getValue(), t -> new LinkedHashSet<>()).add(id);
-						}
-					}
 					if (failure != null) {
-						EMILoot.LOGGER.warn("Could not read the pieces of structure {}: {}", id, failure.toString());
-					} else if (tables != null) {
-						for (Identifier table : tables) {
-							structuresByTable.computeIfAbsent(table, t -> new LinkedHashSet<>()).add(id);
-						}
+						failedWalks++;
+					} else if (walked != null && tables != null) {
+						walked.put(entry.getKey().getValue().toString(), tables.stream().map(Identifier::toString).toList());
 					}
+					merge(context, entry.getKey().getValue(), entry.getValue(), tables, failure == null ? null : failure.toString());
 				});
 		}
 		if (complete) {
 			propagateToReferencedTables(context.loot());
+		}
+		return complete;
+	}
+
+	/**
+	 * Builds the lookup with the walks of the jigsaw structures from the cache instead of walking them, merged in the
+	 * order of the registry's entries like {@link #scan}. The file only holds builds whose walks all succeeded, so there
+	 * are no failures to replay. False, with the lookup untouched, when a jigsaw structure has no walk in the cache or a
+	 * table id is not valid.
+	 */
+	private boolean replay(Context context, Map<String, List<String>> cached) {
+		List<Map.Entry<RegistryKey<Structure>, Structure>> entries = new ArrayList<>(context.structures().getEntrySet());
+		Map<Identifier, List<Identifier>> tablesById = new HashMap<>();
+		for (Map.Entry<RegistryKey<Structure>, Structure> entry : entries) {
+			if (entry.getValue() instanceof JigsawStructure) {
+				List<String> walk = cached.get(entry.getKey().getValue().toString());
+				if (walk == null) {
+					return false;
+				}
+				List<Identifier> tables = new ArrayList<>(walk.size());
+				for (String table : walk) {
+					Identifier id = Identifier.tryParse(table);
+					if (id == null) {
+						return false;
+					}
+					tables.add(id);
+				}
+				tablesById.put(entry.getKey().getValue(), tables);
+			}
+		}
+		for (Map.Entry<RegistryKey<Structure>, Structure> entry : entries) {
+			Identifier id = entry.getKey().getValue();
+			merge(context, id, entry.getValue(), tablesById.get(id), null);
+		}
+		propagateToReferencedTables(context.loot());
+		return true;
+	}
+
+	/** Adds one structure: its dimensions, the chests its type places in code, and the loot tables its walk found. */
+	private void merge(Context context, Identifier id, Structure structure, @Nullable Collection<Identifier> tables, @Nullable String failure) {
+		structureDimensions.put(id, dimensionsOf(structure, context.biomes()));
+		for (RegistryKey<LootTable> table : CodePlacedLoot.forType(structure.getType())) {
+			if (context.chestTables().contains(table.getValue())) {
+				structuresByTable.computeIfAbsent(table.getValue(), t -> new LinkedHashSet<>()).add(id);
+			}
+		}
+		if (failure != null) {
+			EMILoot.LOGGER.warn("Could not read the pieces of structure {}: {}", id, failure);
+		} else if (tables != null) {
+			for (Identifier table : tables) {
+				structuresByTable.computeIfAbsent(table, t -> new LinkedHashSet<>()).add(id);
+			}
 		}
 	}
 

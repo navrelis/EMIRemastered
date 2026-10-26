@@ -12,6 +12,7 @@
     "ConditionalLootFunctionAccessor",
     "CopyNameLootFunctionAccessor",
     "DataPackContentsMixin",
+    "DirectoryResourcePackAccessor",
     "EnchantmentsPredicateAccessor",
     "ExplorationMapLootFunctionAccessor",
     "FilteredLootFunctionAccessor",
@@ -26,6 +27,7 @@
     "LootTableAccessor",
     "LootTableEntryAccessor",
     "ModifyContentsLootFunctionAccessor",
+    "OverlayResourcePackAccessor",
     "ReferenceLootFunctionAccessor",
     "ReloadableRegistriesMixin",
     "SetAttributesLootFunctionAccessor",
@@ -46,7 +48,9 @@
     "SetStewEffectLootFunctionAccessor",
     "SinglePoolElementAccessor",
     "TagEntryAccessor",
-    "VariantPredicateAccessor"
+    "VariantPredicateAccessor",
+    "ZipFileWrapperAccessor",
+    "ZipResourcePackMixin"
   ],
   "client": [],
   "server": [],
