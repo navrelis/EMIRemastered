@@ -6,6 +6,7 @@ import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.runtime.EmiDrawContext;
+import dev.emi.remastered.theme.TextColors;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -66,11 +67,11 @@ public final class HubTabWidget extends ClickableWidget {
 		}
 		int textY = top + (HubRules.TAB_HEIGHT - 8) / 2;
 		if (label != null) {
-			raw.drawText(font, label, x, textY, active ? TEXT : TEXT_DISABLED, false);
+			raw.drawText(font, TextColors.map(label), x, textY, TextColors.map(active ? TEXT : TEXT_DISABLED), false);
 			x += font.getWidth(label);
 		}
 		if (count > 0) {
-			raw.drawText(font, String.valueOf(count), x + HubBar.COUNT_GAP, textY, COUNT, false);
+			raw.drawText(font, String.valueOf(count), x + HubBar.COUNT_GAP, textY, TextColors.map(COUNT), false);
 		}
 	}
 

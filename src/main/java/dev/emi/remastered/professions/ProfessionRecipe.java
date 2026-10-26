@@ -10,6 +10,7 @@ import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
 import dev.emi.remastered.professions.trade.TradeIds;
+import dev.emi.remastered.theme.TextColors;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.Screen;
@@ -96,7 +97,7 @@ public class ProfessionRecipe implements EmiRecipe {
 				float scale = (WIDTH - 2) / (float) width;
 				matrices.scale(scale, scale, 1.0F);
 			}
-			context.drawText(font, text, 0, 0, 8, false);
+			context.drawText(font, text, 0, 0, TextColors.map(8), false);
 			matrices.pop();
 		});
 		addBody(widgets, HEADER_HEIGHT);

@@ -8,6 +8,7 @@ import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
 import dev.emi.emi.runtime.EmiDrawContext;
+import dev.emi.remastered.theme.TextColors;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
@@ -100,7 +101,7 @@ public class EmiInfoRecipe implements EmiRecipe {
 					return;
 				}
 				OrderedText text = manager.lines.get(l);
-				context.drawText(text, 0, y - y + i * CLIENT.textRenderer.fontHeight, 0);
+				context.drawText(TextColors.map(text), 0, y - y + i * CLIENT.textRenderer.fontHeight, TextColors.map(0)); // EMI Remastered: text colour remap (TextColors)
 			}
 		});
 	}

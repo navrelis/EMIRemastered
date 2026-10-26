@@ -11,6 +11,7 @@ import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
 import dev.emi.remastered.info.search.SourceLabels;
 import dev.emi.remastered.professions.ProfessionsCategories;
+import dev.emi.remastered.theme.TextColors;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.util.math.MatrixStack;
@@ -99,7 +100,7 @@ public class TradeRecipe implements EmiRecipe, SourceLabels {
 				float scale = WIDTH / (float) width;
 				matrices.scale(scale, scale, 1.0F);
 			}
-			context.drawText(font, title, 0, 0, 8, false);
+			context.drawText(font, TextColors.map(title), 0, 0, TextColors.map(8), false);
 			matrices.pop();
 		});
 

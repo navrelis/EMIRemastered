@@ -20,6 +20,7 @@ import dev.emi.remastered.stats.client.FoodFacts.EffectFact;
 import dev.emi.remastered.stats.core.StatsMath;
 import dev.emi.remastered.stats.core.StatsMath.Mod;
 import dev.emi.remastered.stats.core.StatsMath.Op;
+import dev.emi.remastered.theme.TextColors;
 import net.minecraft.block.Block;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -360,8 +361,8 @@ public final class StatsInfoProvider implements ItemInfoProvider {
 		@Override
 		public void render(DrawContext draw, int width, int mouseX, int mouseY, float delta) {
 			HungerIcons.drawShanks(draw, 0, 1, nutrition);
-			draw.drawText(MinecraftClient.getInstance().textRenderer, EmiPort.translatable("emi_stats.food.hunger", StatsText.number(nutrition)),
-				HungerIcons.WIDTH + 6, 2, TEXT, false);
+			draw.drawText(MinecraftClient.getInstance().textRenderer, TextColors.map(EmiPort.translatable("emi_stats.food.hunger", StatsText.number(nutrition))),
+				HungerIcons.WIDTH + 6, 2, TextColors.map(TEXT), false);
 		}
 
 		@Override

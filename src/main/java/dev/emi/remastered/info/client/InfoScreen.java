@@ -19,6 +19,7 @@ import dev.emi.remastered.info.api.InfoSection;
 import dev.emi.remastered.info.client.hub.Hub;
 import dev.emi.remastered.info.client.hub.HubBar;
 import dev.emi.remastered.info.client.hub.HubTabWidget;
+import dev.emi.remastered.theme.TextColors;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -173,10 +174,10 @@ public class InfoScreen extends Screen {
 		headerSlot.render(raw, mouseX, mouseY, delta);
 		int textX = panelX + 38;
 		int textW = panelX + panelW - 22 - textX;
-		raw.drawText(textRenderer, Elements.trim(stack.getName(), textW), textX, panelY + 9, Elements.TEXT, false);
+		raw.drawText(textRenderer, TextColors.map(Elements.trim(stack.getName(), textW)), textX, panelY + 9, TextColors.map(Elements.TEXT), false);
 		Text sub = EmiPort.literal(EmiUtil.getModName(stack.getId().getNamespace()), Formatting.BLUE)
 			.append(EmiPort.literal("  " + stack.getId(), Formatting.DARK_GRAY));
-		raw.drawText(textRenderer, Elements.trim(sub, textW), textX, panelY + 21, Elements.MUTED, false);
+		raw.drawText(textRenderer, TextColors.map(Elements.trim(sub, textW)), textX, panelY + 21, TextColors.map(Elements.MUTED), false);
 		raw.fill(viewX, viewY - 3, viewX + viewW, viewY - 2, 0xFF8B8B8B);
 
 		boolean mouseInView = inView(mouseX, mouseY);

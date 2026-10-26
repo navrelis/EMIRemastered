@@ -5,6 +5,7 @@ import java.util.List;
 
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
+import dev.emi.remastered.theme.TextColors;
 import dev.emi.remastered.world.WorldSettings;
 import dev.emi.remastered.world.data.IconLayout;
 import net.minecraft.client.MinecraftClient;
@@ -66,7 +67,7 @@ final class PageParts {
 			Text more = Text.translatable("emi_world.more_icons", layout.hidden());
 			String moreLabel = "+" + layout.hidden();
 			widgets.addDrawable((cell % COLUMNS) * CELL, top + (cell / COLUMNS) * CELL, CELL, CELL,
-				(gui, mouseX, mouseY, delta) -> gui.drawText(font, moreLabel, (CELL - font.getWidth(moreLabel)) / 2, 5, TEXT, false))
+				(gui, mouseX, mouseY, delta) -> gui.drawText(font, moreLabel, (CELL - font.getWidth(moreLabel)) / 2, 5, TextColors.map(TEXT), false))
 				.tooltip((mouseX, mouseY) -> hiddenTooltip(font, more, hidden));
 		}
 		return y + sectionHeight(icons.size());

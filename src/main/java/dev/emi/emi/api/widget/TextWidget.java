@@ -1,6 +1,7 @@
 package dev.emi.emi.api.widget;
 
 import dev.emi.emi.runtime.EmiDrawContext;
+import dev.emi.remastered.theme.TextColors;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.OrderedText;
@@ -48,9 +49,9 @@ public class TextWidget extends Widget {
 		int yOff = verticalAlignment.offset(CLIENT.textRenderer.fontHeight);
 		context.matrices().translate(xOff, yOff, 300);
 		if (shadow) {
-			context.drawTextWithShadow(text, x, y, color);
+			context.drawTextWithShadow(TextColors.map(text), x, y, TextColors.map(color)); // EMI Remastered: text colour remap (TextColors)
 		} else {
-			context.drawText(text, x, y, color);
+			context.drawText(TextColors.map(text), x, y, TextColors.map(color)); // EMI Remastered: text colour remap (TextColors)
 		}
 		context.pop();
 	}

@@ -1,3 +1,9 @@
+## 2.1.0+1.21.1 (2026-10-26)
+
+### New
+* Resource packs can recolour EMI panel text via `assets/emi_remastered/text_colors.json` (see `docs/THEMING.md`); no
+  visual change without such a pack.
+
 ## 2.0.0+1.21.1 (2026-10-26)
 
 EMI Remastered: EMI 1.1.24 and seven add-ons merged into one Fabric 1.21.1 mod (mod id `emi`, jar

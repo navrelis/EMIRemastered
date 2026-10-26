@@ -58,3 +58,11 @@ Owner statement (2026-10-19): he asked the authors for permission to use and cha
 - Owner (2026-10-19): never start Minecraft with sound.
 - Owner (2026-10-19, session 5): Phase 4 = once the owner has closed the game, lead backs up the 8 jars to mods_backup/ and installs the new jar; the OWNER launches the pack; lead then reads latest.log and reload times.
 - Owner (2026-10-19 ~21:30): 'no you do all' - the lead's team launches the real pack itself for the Phase 4 check (supersedes 'owner launches'). Safeguards: muted, test copy of a world, offline name, options.txt/emi.json backed up and restored, game lock.
+
+## Session 11 (2026-10-26): Nytheria colours / readable text
+Owner: grey text on the blue panels (Nytheria GUI pack) is hard to read; make it white. Facts: the mod ships the original grey EMI textures; the blue comes from the pack `Mandala's GUI x Nytheria` (F:\Coding\Nytherias GUI, CF project 1540564), which overrides emi/emi_loot textures. Text colours are drawn in code, so a pack cannot change them alone.
+Owner answers:
+- Fix: resource-pack-overridable text colours in the mod; without a pack the mod looks unchanged; the Nytheria pack sets the colours.
+- Colours on Nytheria blue: main text #FFFFFF, secondary text (ids, hints) #9FA5A6; deliberately coloured text (red, gold, green) unchanged.
+- Release: new mod version installed in the NytheriaDevelopment instance AND uploaded to CurseForge; new pack version installed in the instance and uploaded to CurseForge (1540564). Both repos pushed.
+- The Nytheria GUI repo may be edited this session (pack update for EMI Remastered textures + colour file).

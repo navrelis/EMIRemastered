@@ -5,6 +5,7 @@ import java.util.List;
 
 import dev.emi.remastered.module.Module;
 import dev.emi.remastered.module.Modules;
+import dev.emi.remastered.theme.TextColors;
 import net.fabricmc.api.ClientModInitializer;
 
 /**
@@ -15,6 +16,7 @@ public class EmiRemasteredClient implements ClientModInitializer {
 
 	@Override
 	public void onInitializeClient() {
+		TextColors.register();
 		List<String> enabled = new ArrayList<>();
 		List<String> disabled = new ArrayList<>();
 		for (Module module : Modules.all()) {

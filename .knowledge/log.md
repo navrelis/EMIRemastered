@@ -151,3 +151,7 @@
 2026-10-26 | Housekeeping: 60 merged worktrees deregistered; deleting their leftover folders was blocked by the permission classifier (gitignored, local only)
 2026-10-26 | GIT1 (lead): renamed remastered -> mc/1.21.1 on GitHub + default branch; local branches cleaned; deleting old main blocked by permission classifier (left for owner)
 2026-10-26 | GIT1: owner OK -> old main deleted (GitHub + local); repo has only mc/1.21.1. Worktree folder deletion still blocked; command given to owner
+2026-10-26 | Session 11: owner asked for readable (white) text on Nytheria blue + update/upload mod and pack. MAP1, MAP2 (Sonnet short, read-only) delegated in parallel
+2026-10-26 | MAP1, MAP2 reviews | accepted (reports read; design D29-D31). TC (Sonnet long, EMI repo) and PK1 (Sonnet long, Nytheria repo) delegated in parallel
+2026-10-26 | PK1 review | accepted after 1 correction (hue colours lightened to >= 4.4:1 on #326089; owner's #9FA5A6 kept at 2.65:1); pixel diff verified (124 + 93 px), previews viewed, 69 tests, zip c2537870; committed a980b89 in Nytheria repo (branch v2.2.0)
+2026-10-26 | TC review | accepted first pass (full diff read; build 498 tests 0 failures; jar 2.1.0 has theme classes + empty text_colors.json)

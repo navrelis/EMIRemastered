@@ -23,6 +23,7 @@ import dev.emi.remastered.ores.emi.stack.BiomeEmiStack;
 import dev.emi.remastered.ores.mixin.accessor.TrapezoidHeightAccessor;
 import dev.emi.remastered.ores.mixin.accessor.UniformHeightAccessor;
 import dev.emi.remastered.ores.sync.OresSnapshot;
+import dev.emi.remastered.theme.TextColors;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
@@ -197,7 +198,7 @@ public abstract class AbstractPlacedFeatureEmiRecipe implements EmiRecipe, Sourc
 		Text label = Text.translatable("emi_ores.biomes.more", hidden.size());
 		widgets.addDrawable(x, y, width, 18, (gui, mouseX, mouseY, delta) -> {
 			String text = font.trimToWidth(label.getString(), width - 2);
-			gui.drawText(font, text, 2, 5, 0x404040, false);
+			gui.drawText(font, text, 2, 5, TextColors.map(0x404040), false);
 		}).tooltip((mouseX, mouseY) -> moreTooltip(font, hidden, excluded));
 	}
 
@@ -305,7 +306,7 @@ public abstract class AbstractPlacedFeatureEmiRecipe implements EmiRecipe, Sourc
 				case CENTER -> -textHeight / 2;
 				case END -> -textHeight;
 			};
-			gui.drawText(font, text, textX, textY, 0, false);
+			gui.drawText(font, text, textX, textY, TextColors.map(0), false);
 		});
 	}
 
@@ -345,7 +346,7 @@ public abstract class AbstractPlacedFeatureEmiRecipe implements EmiRecipe, Sourc
 		for (int i = 0; i < lines.size(); i++) {
 			Text line = lines.get(i);
 			String shown = font.trimToWidth(line.getString(), CAPTION_WIDTH);
-			widgets.addDrawable(x, y + i * 10, CAPTION_WIDTH, 9, (gui, mouseX, mouseY, delta) -> gui.drawText(font, shown, 0, 0, 0x404040, false))
+			widgets.addDrawable(x, y + i * 10, CAPTION_WIDTH, 9, (gui, mouseX, mouseY, delta) -> gui.drawText(font, shown, 0, 0, TextColors.map(0x404040), false))
 				.tooltip((mouseX, mouseY) -> List.of(TooltipComponent.of(line.asOrderedText())));
 		}
 	}

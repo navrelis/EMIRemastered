@@ -13,8 +13,8 @@ for Minecraft 1.21.1** instead of eight jars.
 | | |
 |---|---|
 | Name / mod id | EMI Remastered / `emi` |
-| Version | `2.0.0+1.21.1` |
-| Jar | `EMIRemastered-1.21.1-2.0.0-Fabric.jar` |
+| Version | `2.1.0+1.21.1` |
+| Jar | `EMIRemastered-1.21.1-2.1.0-Fabric.jar` |
 | Minecraft / loader | 1.21.1, Fabric Loader 0.16.14 or newer, Fabric API, Java 21 |
 | Sides | client and server (the server part is optional, see [Multiplayer](#multiplayer)) |
 
@@ -61,7 +61,7 @@ All authors, repositories, exact commits and licences are in [CREDITS.md](CREDIT
 ## Installation
 
 1. Install Minecraft 1.21.1 with Fabric Loader and Fabric API.
-2. Put `EMIRemastered-1.21.1-2.0.0-Fabric.jar` into `mods/`.
+2. Put `EMIRemastered-1.21.1-2.1.0-Fabric.jar` into `mods/`.
 3. **Remove the jars it replaces:** EMI, Distraction Free Recipes, EMIffect, EMI Professions, EMI Enchanting, EMI Ores,
    Let's Do EMI Compat and EMI Loot. EMI Remastered declares the mod ids of the seven add-ons (`emi_loot`,
    `emi_ores`, `emiffect`, `emi_enchanting`, `emiprofessions`, `emi_letsdo_compat`, `distraction_free_recipes`) as
@@ -242,7 +242,7 @@ To add a module to this project, see [docs/MODULES.md](docs/MODULES.md).
 gradlew build
 ```
 
-Java 21. The jar is `build/libs/EMIRemastered-1.21.1-2.0.0-Fabric.jar`. `gradlew build` also compiles the dev-only
+Java 21. The jar is `build/libs/EMIRemastered-1.21.1-2.1.0-Fabric.jar`. `gradlew build` also compiles the dev-only
 screenshot tour (`src/devtour`), which is never part of the jar.
 
 ## Documentation
@@ -256,6 +256,7 @@ screenshot tour (`src/devtour`), which is never part of the jar.
 | [docs/EXPORT.md](docs/EXPORT.md) | `/emiexport` |
 | [docs/SEARCH.md](docs/SEARCH.md) | the `~` search by source |
 | [docs/SOURCES.md](docs/SOURCES.md) | `emi_sources` files and the Other Sources category |
+| [docs/THEMING.md](docs/THEMING.md) | recolouring EMI panel text from a resource pack (`text_colors.json`) |
 | [docs/KNOWN_BUGS.md](docs/KNOWN_BUGS.md) | bug survey of EMI and the add-ons and what this mod fixes |
 | [docs/DEVTOUR.md](docs/DEVTOUR.md) | dev screenshot tour and reload benchmark |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | contributing |

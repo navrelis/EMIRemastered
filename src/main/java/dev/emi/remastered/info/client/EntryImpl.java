@@ -12,6 +12,7 @@ import dev.emi.remastered.info.InfoSettings;
 import dev.emi.remastered.info.api.InfoElement;
 import dev.emi.remastered.info.api.InfoEntry;
 import dev.emi.remastered.info.api.InfoLink;
+import dev.emi.remastered.theme.TextColors;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
@@ -101,9 +102,9 @@ final class EntryImpl implements InfoEntry, InfoElement {
 			draw.fill(0, 0, width, HEIGHT, Elements.HOVER_FILL);
 		}
 		icon.render(draw, 1, 1, delta);
-		draw.drawText(Elements.font(), Elements.trim(label, labelWidth), 20, 5, Elements.TEXT, false);
+		draw.drawText(Elements.font(), TextColors.map(Elements.trim(label, labelWidth)), 20, 5, TextColors.map(Elements.TEXT), false);
 		if (detail != null) {
-			draw.drawText(Elements.font(), detail, width - RIGHT_PAD - Elements.font().getWidth(detail), 5, Elements.MUTED, false);
+			draw.drawText(Elements.font(), TextColors.map(detail), width - RIGHT_PAD - Elements.font().getWidth(detail), 5, TextColors.map(Elements.MUTED), false);
 		}
 		grid.render(draw, mouseX, mouseY, delta);
 	}

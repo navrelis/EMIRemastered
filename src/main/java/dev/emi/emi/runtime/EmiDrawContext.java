@@ -4,6 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.stack.EmiIngredient;
+import dev.emi.remastered.theme.TextColors;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
@@ -66,11 +67,11 @@ public class EmiDrawContext {
 	}
 
 	public void drawText(Text text, int x, int y, int color) {
-		context.drawText(client.textRenderer, text, x, y, color, false);
+		context.drawText(client.textRenderer, TextColors.map(text), x, y, TextColors.map(color), false); // EMI Remastered: text colour remap (TextColors)
 	}
 
 	public void drawText(OrderedText text, int x, int y, int color) {
-		context.drawText(client.textRenderer, text, x, y, color, false);
+		context.drawText(client.textRenderer, TextColors.map(text), x, y, TextColors.map(color), false); // EMI Remastered: text colour remap (TextColors)
 	}
 
 	public void drawTextWithShadow(Text text, int x, int y) {
@@ -78,11 +79,11 @@ public class EmiDrawContext {
 	}
 
 	public void drawTextWithShadow(Text text, int x, int y, int color) {
-		context.drawText(client.textRenderer, text, x, y, color, true);
+		context.drawText(client.textRenderer, TextColors.map(text), x, y, TextColors.map(color), true); // EMI Remastered: text colour remap (TextColors)
 	}
 
 	public void drawTextWithShadow(OrderedText text, int x, int y, int color) {
-		context.drawText(client.textRenderer, text, x, y, color, true);
+		context.drawText(client.textRenderer, TextColors.map(text), x, y, TextColors.map(color), true); // EMI Remastered: text colour remap (TextColors)
 	}
 
 	public void drawCenteredText(Text text, int x, int y) {
@@ -90,7 +91,7 @@ public class EmiDrawContext {
 	}
 
 	public void drawCenteredText(Text text, int x, int y, int color) {
-		context.drawText(client.textRenderer, text, x - client.textRenderer.getWidth(text) / 2, y, color, false);
+		context.drawText(client.textRenderer, TextColors.map(text), x - client.textRenderer.getWidth(text) / 2, y, TextColors.map(color), false); // EMI Remastered: text colour remap (TextColors)
 	}
 
 	public void drawCenteredTextWithShadow(Text text, int x, int y) {
@@ -98,7 +99,7 @@ public class EmiDrawContext {
 	}
 
 	public void drawCenteredTextWithShadow(Text text, int x, int y, int color) {
-		context.drawCenteredTextWithShadow(client.textRenderer, text.asOrderedText(), x, y, color);
+		context.drawCenteredTextWithShadow(client.textRenderer, TextColors.map(text), x, y, TextColors.map(color)); // EMI Remastered: text colour remap (TextColors)
 	}
 
 	public void enableDepthTest() {

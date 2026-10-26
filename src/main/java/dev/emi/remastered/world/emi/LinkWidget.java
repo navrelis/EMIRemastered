@@ -4,6 +4,7 @@ import java.util.List;
 
 import dev.emi.emi.api.widget.Bounds;
 import dev.emi.emi.api.widget.Widget;
+import dev.emi.remastered.theme.TextColors;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -45,7 +46,7 @@ public class LinkWidget extends Widget {
 	public void render(DrawContext draw, int mouseX, int mouseY, float delta) {
 		TextRenderer font = MinecraftClient.getInstance().textRenderer;
 		int color = !enabled ? COLOR_DISABLED : getBounds().contains(mouseX, mouseY) ? COLOR_HOVER : COLOR;
-		draw.drawText(font, text, x, y, color, false);
+		draw.drawText(font, TextColors.map(text), x, y, TextColors.map(color), false);
 	}
 
 	@Override

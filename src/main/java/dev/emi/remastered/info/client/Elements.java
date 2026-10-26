@@ -13,6 +13,7 @@ import dev.emi.emi.api.widget.SlotWidget;
 import dev.emi.emi.runtime.EmiDrawContext;
 import dev.emi.remastered.info.api.InfoElement;
 import dev.emi.remastered.info.api.InfoLink;
+import dev.emi.remastered.theme.TextColors;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -160,7 +161,7 @@ public final class Elements {
 			List<OrderedText> list = hovered ? hoverLines : lines;
 			int color = link == null ? TEXT : hovered ? LINK_HOVER : LINK;
 			for (int i = 0; i < list.size(); i++) {
-				draw.drawText(font(), list.get(i), 0, i * LINE_HEIGHT + 1, color, false);
+				draw.drawText(font(), TextColors.map(list.get(i)), 0, i * LINE_HEIGHT + 1, TextColors.map(color), false);
 			}
 		}
 
@@ -212,7 +213,7 @@ public final class Elements {
 		public void render(DrawContext draw, int width, int mouseX, int mouseY, float delta) {
 			layout(width);
 			if (label != null) {
-				draw.drawText(font(), trim(label, width), 0, 1, TEXT, false);
+				draw.drawText(font(), TextColors.map(trim(label, width)), 0, 1, TextColors.map(TEXT), false);
 			}
 			grid.render(draw, mouseX, mouseY, delta);
 		}
@@ -257,7 +258,7 @@ public final class Elements {
 			TextRenderer font = font();
 			int valueWidth = value == null ? 0 : font.getWidth(value) + 4 + RIGHT_PAD;
 			int labelWidth = Math.min(font.getWidth(label), width * 2 / 5);
-			draw.drawText(font, trim(label, labelWidth), 0, 2, TEXT, false);
+			draw.drawText(font, TextColors.map(trim(label, labelWidth)), 0, 2, TextColors.map(TEXT), false);
 			int barX = labelWidth + 4;
 			int barW = width - barX - valueWidth;
 			if (barW > 4) {
@@ -269,7 +270,7 @@ public final class Elements {
 				}
 			}
 			if (value != null) {
-				draw.drawText(font, value, width - valueWidth + 4, 2, TEXT, false);
+				draw.drawText(font, TextColors.map(value), width - valueWidth + 4, 2, TextColors.map(TEXT), false);
 			}
 		}
 	}
@@ -293,7 +294,7 @@ public final class Elements {
 			context.resetColor();
 			EmiRenderHelper.drawNinePatch(context, EmiRenderHelper.BACKGROUND, 0, 1, width, 12, 0, 16, 3, 6);
 			OrderedText line = trim(text, width - 6);
-			draw.drawTextWithShadow(font(), line, (width - font().getWidth(line)) / 2, 3, 0xFFFFFF);
+			draw.drawTextWithShadow(font(), TextColors.map(line), (width - font().getWidth(line)) / 2, 3, TextColors.map(0xFFFFFF));
 		}
 	}
 
@@ -319,7 +320,7 @@ public final class Elements {
 				icon.render(draw, 0, 1, delta);
 				x = 20;
 			}
-			draw.drawText(font(), trim(title, width - x), x, 5, TEXT, false);
+			draw.drawText(font(), TextColors.map(trim(title, width - x)), x, 5, TextColors.map(TEXT), false);
 		}
 
 		@Override
