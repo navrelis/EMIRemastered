@@ -139,3 +139,5 @@
 2026-10-26 | DOC6a review | accepted after 1 follow-up (2 more wrong mob lists), merged, build green
 2026-10-26 | X-CACHE review | design accepted (walk-only cache, D26 updated); 1 correction: do not save builds with failed walks
 2026-10-26 | X-CACHE correction accepted, merged 04479dc3, build 483 green, pushed; PACK-REAL3 re-run (Opus long) delegated with jar a388815d
+2026-10-26 | jar a388815d installed in pack under lock (lead); PACK-REAL3 (Opus long) delegated: miss + hit launches, mixins, timings, run4 folder
+2026-10-26 | PACK-REAL3 review | accepted; lead verified lock gone, 4 hashes equal, instance git status identical (29 lines, owner added 4 mods), no test save/cache left; game window became foreground 12x in launch A (watcher minimised it, no input); DOC6b (Sonnet short) delegated

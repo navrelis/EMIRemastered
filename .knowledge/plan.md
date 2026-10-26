@@ -1,6 +1,6 @@
 # Plan
 
-Usage tally (work units: short = 1, long = 2): Opus 49 (session 9: X-PARALLEL finish x2, X-CACHE x2, PACK-REAL3 rerun x2; session 8 lead: X-PERF x2, X-HUB x2, X-PERF2 x2, PACK-REAL3 x2; LOOT-ASYNC x2, PACK-REAL x2, PACK-REAL2 x2, F1, F2, Q3 x6, A1 x2, FX1 x4, FOCUS1 x4 = two delegations, PACK-CLI x2, LOGO x2) / Sonnet 130 (session 9: DOC6a x1; session 8 lead: X-SOURCES x2, X-SEARCH x2, X-UX x2, DOC5 x1, key map x1; session 7: POLISH x2, DOC4 x1) -> Opus 25 % (follow-up session's X-PAD/X-SUMMARY/X-PARALLEL/X-CACHE tallied there) (sessions 4+5 re-delegations counted again)
+Usage tally (work units: short = 1, long = 2): Opus 49 (session 9: X-PARALLEL finish x2, X-CACHE x2, PACK-REAL3 rerun x2; session 8 lead: X-PERF x2, X-HUB x2, X-PERF2 x2, PACK-REAL3 x2; LOOT-ASYNC x2, PACK-REAL x2, PACK-REAL2 x2, F1, F2, Q3 x6, A1 x2, FX1 x4, FOCUS1 x4 = two delegations, PACK-CLI x2, LOGO x2) / Sonnet 131 (session 9: DOC6a x1, DOC6b x1; session 8 lead: X-SOURCES x2, X-SEARCH x2, X-UX x2, DOC5 x1, key map x1; session 7: POLISH x2, DOC4 x1) -> Opus 25 % (follow-up session's X-PAD/X-SUMMARY/X-PARALLEL/X-CACHE tallied there) (sessions 4+5 re-delegations counted again)
 
 Status: open / in progress / in review / done. `||` = can run in parallel.
 
@@ -104,6 +104,6 @@ Owner: "1. do that (structure cache) 2. sure (extra sources) 3. sure (search by 
 | X-UX | Mob stacks (emi_mobs:mob) for egg-less mobs, trial tab only when split, biome stacks rule, world Item Info provider | Sonnet long | done (merged a141b16b after 1 correction: namespaced serializer) |
 | DOC5 | CHANGELOG/README keys table/MODULES/DEVTOUR/KB21 | Sonnet short | done (merged cdc2531f; placeholder for perf2 + cache) |
 | X-PERF2 | Identical faster suffix-array build (parallel), source index async, EmiHidden fast path; skipped: remainders cache, professions cache, item groups (unsafe) | Opus long | done (merged 7dad04db; search bake -45..-75 %, 58 queries identical) |
-| PACK-REAL3 | Real pack with jar a388815d (04479dc3): reload times, new mixins vs ali/CQA/hollowhorizon, cache miss then hit | Opus long | in progress (session 9 re-run) |
+| PACK-REAL3 | Real pack with jar a388815d (04479dc3): reload times, new mixins vs ali/CQA/hollowhorizon, cache miss then hit | Opus long | done (run4 2026-10-26: 2 launches miss/hit, reload 23.0 -> 18.1 s, enchanting 2261 -> 134 ms, loot 2036 -> 151 ms, lookup 1.6 s / cache hit 0.6 s before join, 563 of 1196, 39 plugins 0 errors, all own + 5 third-party EMI mixins applied, 0 EMI WARN/ERROR; instance restored hash-equal, git status identical, lock removed) |
 | DOC6a | CHANGELOG/README perf2 + parallel entries, mobs eggless tooltip fix | Sonnet short | done (merged; 1 follow-up: same list in MobsSettings @Comment + javadoc) |
-| DOC6b | CHANGELOG/README structure cache + real-pack numbers | Sonnet short | open (after X-CACHE, PACK-REAL3) |
+| DOC6b | CHANGELOG/README structure cache + real-pack numbers | Sonnet short | in progress |
