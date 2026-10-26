@@ -145,3 +145,7 @@
 2026-10-26 | Owner: release package. LOGO2 (Opus long, precision override like D17: owner-facing visual quality) || DESC2 (Sonnet short) delegated
 2026-10-26 | DESC2 review | accepted after 1 correction (checklist logo line, repo verified public), merged
 2026-10-26 | LOGO2 review | accepted (lead viewed icon, banner, 32/64 px previews; verified integer scale, 17 colours, alpha 0/255, deterministic); merged; release jar bf778e43 (diff vs pack-checked a388815d: icon.png + fabric.mod.json only) installed in pack under lock
+2026-10-26 | /handoff (auto, context limit): nothing running, all committed+pushed (1e2aede5); see F:\Coding\EMI_Remastered\handoff-2026-10-26-1f25f1b8.md
+2026-10-26 | Session 10: owner asked for changelog, clean repo under mc/1.21.1, jar ready. CL1 (Sonnet short) delegated
+2026-10-26 | CL1 review | accepted first pass (numbers checked against CHANGELOG), merged 27a2a082
+2026-10-26 | Housekeeping: 60 merged worktrees deregistered; deleting their leftover folders was blocked by the permission classifier (gitignored, local only)

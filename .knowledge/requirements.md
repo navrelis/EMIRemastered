@@ -22,7 +22,7 @@ Owner statement (2026-10-19): he asked the authors for permission to use and cha
 3. Dependencies/config: "do whatever is the best".
 4. Duplicates with other mods: "do whatever is the best".
 5. Mod on client and server: yes.
-6. Repo `navrelis/EMIRemastered`, public, built on EMI history; work branch `remastered`, `main` = upstream base: yes.
+6. Repo `navrelis/EMIRemastered`, public, built on EMI history; work branch `remastered`, `main` = upstream base: yes. Session 10: owner wants one clean default branch `mc/1.21.1`, unneeded branches deleted.
 7. At the end swap the 8 jars in the pack for the one jar (old jars to `mods_backup/`, game lock respected). No CurseForge upload without OK: yes.
 8. Language: lead's choice -> English + German.
 9. Features: ALL of tier A (A1-A12) and tier B, and more than specified. More subagents than the usual limit are allowed.
