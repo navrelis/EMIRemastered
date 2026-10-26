@@ -1,7 +1,7 @@
 # Report: EMI Remastered 2.0.0+1.21.1
 
 Final state 2026-10-26 (session 9), branch `remastered` (navrelis/EMIRemastered), pushed. One jar
-`EMIRemastered-1.21.1-2.0.0-Fabric.jar` (sha256 a388815d...) replaces the 8 old jars in the Nytheria pack (old jars in
+`EMIRemastered-1.21.1-2.0.0-Fabric.jar` (sha256 bf778e43..., code identical to the pack-checked a388815d; only icon and summary differ) replaces the 8 old jars in the Nytheria pack (old jars in
 `<pack>/mods_backup/`) and is installed there; it is the exact jar checked in the real pack on 2026-10-26 (PACK-REAL3).
 Build incl. 483 JUnit tests green. Sessions 8-9 (owner extras) are summarised in section 8; sections 1-7 describe 2.0.0
 as of session 7, with numbers updated where newer measurements exist.
@@ -14,7 +14,7 @@ as of session 7, with numbers updated where newer measurements exist.
 | Bugs fixed | EMI core: reload after world gone (KB1), unreadable saved entries kept, unknown stack types one WARN (FX-SER), category-less recipe, repair recipe error, fill-max overflow (KB9), tag search, favourites remainders (KB7) and more. Let's Do compat crash on every reload (Vinery 1.5.5 / Meadow renames) fixed. Module fixes listed in `CHANGELOG.md` "Fixes". |
 | Faster | Warm reload -40..58 % on a 92k-recipe bench, plugin phase -49..66 %, join -21 %, ~60 MB less heap (Q3). Real pack (2026-10-26): EMI join reload 18.1 s (30.0 s with the old jars, 23.0 s on 2026-10-19), emi_enchanting 134 ms (was 2261), emi_loot 151 ms (was 5631 with the old add-on), emiffect 133 ms (was 1077); login -> joined 2.3 s (was ~24 s before LOOT-ASYNC); chest structure lookup 1.6 s (0.6 s from the cache) instead of 10-45 s. |
 | Many info features (A1-A12, tier B, more) | Item Info screen (I) with How to Get / Used For / Details + provider API; enchantment max level, incompatibilities, sources; effect sources; villager trades per profession and level; food, fuel, compost, tool/weapon/armour stats; mob pages; loot structure/dimension filters, condition icons, Lootr note; ores in modded dimensions, Y-range highlight; distraction-free extras; one config screen with module switches and plugin manager; biome and structure pages; tag browser (T); copy recipe as text/JSON (Ctrl+C); advancement links; `/emiexport`. Details: `CHANGELOG.md`, `docs/MODULES.md`, `docs/INFO_PROVIDERS.md`. |
-| Owner session-6 additions: verify with the pack, description + summary, pixel-art logo | Pack verified (above). `docs/DESCRIPTION.md` (summary EN 187 chars, DE 181, tagline, CurseForge/Modrinth text), `fabric.mod.json` description. Logo: `scripts/logo/make_logo.py` (deterministic), `docs/logo/icon.png`, `icon-400.png`, `banner.png`, mod icon `src/main/resources/icon.png`. |
+| Owner session-6 additions: verify with the pack, description + summary, pixel-art logo | Pack verified (above). `docs/DESCRIPTION.md` (summary EN 187 chars, DE 181, tagline, CurseForge/Modrinth text), `fabric.mod.json` description. Logo: `scripts/logo/make_logo.py` (deterministic), `docs/logo/icon.png`, `icon-native.png` (40x40), `banner.png`, mod icon `src/main/resources/icon.png`. |
 | Translations | English + German for all new strings. |
 | No Graphify | Respected (no graph built or updated). |
 | No CurseForge upload without OK | Nothing uploaded. |

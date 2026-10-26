@@ -142,3 +142,6 @@
 2026-10-26 | jar a388815d installed in pack under lock (lead); PACK-REAL3 (Opus long) delegated: miss + hit launches, mixins, timings, run4 folder
 2026-10-26 | PACK-REAL3 review | accepted; lead verified lock gone, 4 hashes equal, instance git status identical (29 lines, owner added 4 mods), no test save/cache left; game window became foreground 12x in launch A (watcher minimised it, no input); DOC6b (Sonnet short) delegated
 2026-10-26 | DOC6b review | accepted (before-join phrased as measured result), merged; final build 483 green, jar a388815d = installed + pack-checked; report section 8 written; session 9 done
+2026-10-26 | Owner: release package. LOGO2 (Opus long, precision override like D17: owner-facing visual quality) || DESC2 (Sonnet short) delegated
+2026-10-26 | DESC2 review | accepted after 1 correction (checklist logo line, repo verified public), merged
+2026-10-26 | LOGO2 review | accepted (lead viewed icon, banner, 32/64 px previews; verified integer scale, 17 colours, alpha 0/255, deterministic); merged; release jar bf778e43 (diff vs pack-checked a388815d: icon.png + fabric.mod.json only) installed in pack under lock

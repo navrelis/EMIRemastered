@@ -1,6 +1,6 @@
 # Plan
 
-Usage tally (work units: short = 1, long = 2): Opus 49 (session 9: X-PARALLEL finish x2, X-CACHE x2, PACK-REAL3 rerun x2; session 8 lead: X-PERF x2, X-HUB x2, X-PERF2 x2, PACK-REAL3 x2; LOOT-ASYNC x2, PACK-REAL x2, PACK-REAL2 x2, F1, F2, Q3 x6, A1 x2, FX1 x4, FOCUS1 x4 = two delegations, PACK-CLI x2, LOGO x2) / Sonnet 131 (session 9: DOC6a x1, DOC6b x1; session 8 lead: X-SOURCES x2, X-SEARCH x2, X-UX x2, DOC5 x1, key map x1; session 7: POLISH x2, DOC4 x1) -> Opus 25 % (follow-up session's X-PAD/X-SUMMARY/X-PARALLEL/X-CACHE tallied there) (sessions 4+5 re-delegations counted again)
+Usage tally (work units: short = 1, long = 2): Opus 51 (session 9: LOGO2 x2, X-PARALLEL finish x2, X-CACHE x2, PACK-REAL3 rerun x2; session 8 lead: X-PERF x2, X-HUB x2, X-PERF2 x2, PACK-REAL3 x2; LOOT-ASYNC x2, PACK-REAL x2, PACK-REAL2 x2, F1, F2, Q3 x6, A1 x2, FX1 x4, FOCUS1 x4 = two delegations, PACK-CLI x2, LOGO x2) / Sonnet 132 (session 9: DOC6a x1, DOC6b x1, DESC2 x1; session 8 lead: X-SOURCES x2, X-SEARCH x2, X-UX x2, DOC5 x1, key map x1; session 7: POLISH x2, DOC4 x1) -> Opus 25 % (follow-up session's X-PAD/X-SUMMARY/X-PARALLEL/X-CACHE tallied there) (sessions 4+5 re-delegations counted again)
 
 Status: open / in progress / in review / done. `||` = can run in parallel.
 
@@ -108,3 +108,10 @@ Owner: "1. do that (structure cache) 2. sure (extra sources) 3. sure (search by 
 | DOC6a | CHANGELOG/README perf2 + parallel entries, mobs eggless tooltip fix | Sonnet short | done (merged; 1 follow-up: same list in MobsSettings @Comment + javadoc) |
 | DOC6b | CHANGELOG/README structure cache + real-pack numbers | Sonnet short | done (merged; estimate bullets replaced by measured numbers) |
 - Session 9 (2026-10-26): Phase 5 DONE. Head built (483 tests), jar a388815d installed and checked in the real pack (PACK-REAL3); report section 8.
+
+## Phase 6 Release package (session 9, owner: "summary, description and logo ... as well as jar file", "true pixelart logo")
+| ID | Task | Model | Status |
+|---|---|---|---|
+| LOGO2 | True pixel-art icon (CurseForge >= 400 px, integer scale), banner, mod icon; deterministic generator | Opus long | done (merged; 40x40 grid, 17 colours, icon 400 x10, mod icon 160 x4, banner 1440x360 x6; lead verified block uniformity, alpha, determinism, viewed icon/banner/small previews) |
+| DESC2 | docs/DESCRIPTION.md up to date (session 8-9 features, real-pack numbers), CF limits, upload checklist | Sonnet short | done (merged; 1 correction: logo line) |
+| REL | Rebuild jar with new icon, hand jar + logo + text to owner (no upload without OK) | lead | done (jar bf778e43 = a388815d code + new icon + summary; installed in pack; 483 tests) |
