@@ -150,3 +150,4 @@
 2026-10-26 | CL1 review | accepted first pass (numbers checked against CHANGELOG), merged 27a2a082
 2026-10-26 | Housekeeping: 60 merged worktrees deregistered; deleting their leftover folders was blocked by the permission classifier (gitignored, local only)
 2026-10-26 | GIT1 (lead): renamed remastered -> mc/1.21.1 on GitHub + default branch; local branches cleaned; deleting old main blocked by permission classifier (left for owner)
+2026-10-26 | GIT1: owner OK -> old main deleted (GitHub + local); repo has only mc/1.21.1. Worktree folder deletion still blocked; command given to owner

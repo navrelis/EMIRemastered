@@ -120,5 +120,5 @@ Owner: "1. do that (structure cache) 2. sure (extra sources) 3. sure (search by 
 | ID | Task | Model | Status |
 |---|---|---|---|
 | CL1 | `docs/CURSEFORGE_CHANGELOG.md` (paste-ready file changelog from CHANGELOG facts), release date 2026-10-26, doc links to `mc/1.21.1`, permission sentence out of page credits | Sonnet short | done (merged; lead checked numbers against CHANGELOG) |
-| GIT1 | Rename `remastered` -> `mc/1.21.1`, set as GitHub default, delete old `main` and merged local branches/worktrees | lead | done except deleting `main` (blocked by permission classifier; owner deletes it on GitHub or allows it); 61 local branches deleted |
+| GIT1 | Rename `remastered` -> `mc/1.21.1`, set as GitHub default, delete old `main` and merged local branches/worktrees | lead | done (old `main` deleted on GitHub and locally after owner OK; 61 local branches deleted; leftover worktree folders: owner deletes them) |
 | JAR | Release jar unchanged (bf778e43; docs are not in the jar) | lead | done |
