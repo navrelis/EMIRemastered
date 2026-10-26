@@ -1,6 +1,6 @@
 # Report: EMI Remastered 2.0.0+1.21.1
 
-Final state 2026-10-26 (session 9), branch `remastered` (navrelis/EMIRemastered), pushed. One jar
+Final state 2026-10-26 (session 9), branch `mc/1.21.1` (navrelis/EMIRemastered, default branch; renamed from `remastered` in session 10), pushed. One jar
 `EMIRemastered-1.21.1-2.0.0-Fabric.jar` (sha256 bf778e43..., code identical to the pack-checked a388815d; only icon and summary differ) replaces the 8 old jars in the Nytheria pack (old jars in
 `<pack>/mods_backup/`) and is installed there; it is the exact jar checked in the real pack on 2026-10-26 (PACK-REAL3).
 Build incl. 483 JUnit tests green. Sessions 8-9 (owner extras) are summarised in section 8; sections 1-7 describe 2.0.0
@@ -98,3 +98,10 @@ Known limitations added in sessions 8-9:
 - Optional: empty data packs under the old ids `emi_loot`/`emi_letsdo_compat` would silence the one-time "Missing data pack" note of old worlds (not done; harmless).
 - Remaining perf hotspots (not provably safe): `EmiRecipes$Manager` byInput, `EmiShapedRecipe.setRemainders`, item groups on the render thread.
 - Graphify not used (owner: "No Graphify").
+
+## 9. Session 10: clean release (2026-10-26)
+- Jar for CurseForge (1.21.1, Fabric): `build/libs/EMIRemastered-1.21.1-2.0.0-Fabric.jar`, sha256 bf778e43..., unchanged (rebuilt, identical; build incl. 483 tests green). Docs are not part of the jar.
+- Changelog: `docs/CURSEFORGE_CHANGELOG.md` (paste below the first comment line, Markdown editor); full list stays in `CHANGELOG.md` (release date now 2026-10-26). Facts checked against CHANGELOG.md by the lead.
+- `docs/DESCRIPTION.md`: links point to `mc/1.21.1`; the "asked for permission" sentence is removed; the credits line and licences stay (D28, licence and CurseForge policy).
+- GitHub: `remastered` renamed to `mc/1.21.1` (GitHub redirects old links) and made the default branch. Old `main` (upstream EMI 1.1.24, fully contained in mc/1.21.1) still exists: deleting it was blocked by the permission check; delete it in GitHub's Branches page if wanted. All 61 merged local work branches deleted; their worktree folders under `.claude/worktrees/` (gitignored) remain because folder deletion was blocked too.
+- No CurseForge upload done.
