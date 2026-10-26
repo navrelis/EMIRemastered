@@ -132,3 +132,6 @@
 2026-10-20 | DOC5 (Sonnet short) | accepted, merged, pushed
 2026-10-20 | X-PERF2 review | accepted (fallback + self-check + exact-array tests), merged 7dad04db, pushed; jar 7c8a9a56 installed (lock); PACK-REAL3 (Opus long) delegated
 2026-10-20 | /handoff: PACK-REAL3 stopped during loading, lead cleanup done (WM_CLOSE, backups restored hash-equal, test save deleted, traces + bivrik restored, lock removed); see F:\Coding\EMI_Remastered\handoff-2026-10-20-lead-session8.md
+2026-10-26 | session 9 start: leftover dev server gone, no lock; X-PARALLEL WIP committed + remastered merged; lead compared pack dumps before/after as sets: 0 differences (order inside lists is hash order even old vs old); X-PARALLEL finish (Opus long) delegated
+2026-10-26 | pack instance baseline now 26 git-status lines (owner added mods/nytheria-shield-server-1.0.2.jar since session 8); installed jar still 7c8a9a56
+2026-10-26 | X-PARALLEL review | accepted (ordered merge, no interrupts, read-once retry on failure, abort on server stop, 28 new tests); lead build 453 tests green; merged bbd28d2f; X-CACHE (Opus long) delegated, D26

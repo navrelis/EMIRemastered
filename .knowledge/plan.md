@@ -1,6 +1,6 @@
 # Plan
 
-Usage tally (work units: short = 1, long = 2): Opus 43 (session 8 lead: X-PERF x2, X-HUB x2, X-PERF2 x2, PACK-REAL3 x2; LOOT-ASYNC x2, PACK-REAL x2, PACK-REAL2 x2, F1, F2, Q3 x6, A1 x2, FX1 x4, FOCUS1 x4 = two delegations, PACK-CLI x2, LOGO x2) / Sonnet 129 (session 8 lead: X-SOURCES x2, X-SEARCH x2, X-UX x2, DOC5 x1, key map x1; session 7: POLISH x2, DOC4 x1) -> Opus 25 % (follow-up session's X-PAD/X-SUMMARY/X-PARALLEL/X-CACHE tallied there) (sessions 4+5 re-delegations counted again)
+Usage tally (work units: short = 1, long = 2): Opus 47 (session 9: X-PARALLEL finish x2, X-CACHE x2; session 8 lead: X-PERF x2, X-HUB x2, X-PERF2 x2, PACK-REAL3 x2; LOOT-ASYNC x2, PACK-REAL x2, PACK-REAL2 x2, F1, F2, Q3 x6, A1 x2, FX1 x4, FOCUS1 x4 = two delegations, PACK-CLI x2, LOGO x2) / Sonnet 129 (session 8 lead: X-SOURCES x2, X-SEARCH x2, X-UX x2, DOC5 x1, key map x1; session 7: POLISH x2, DOC4 x1) -> Opus 25 % (follow-up session's X-PAD/X-SUMMARY/X-PARALLEL/X-CACHE tallied there) (sessions 4+5 re-delegations counted again)
 
 Status: open / in progress / in review / done. `||` = can run in parallel.
 
@@ -95,8 +95,8 @@ Owner: "1. do that (structure cache) 2. sure (extra sources) 3. sure (search by 
 | ID | Task | Model | Status |
 |---|---|---|---|
 | X-PAD / X-SUMMARY | Item Info right padding / lookup summary count (follow-up session) | Sonnet short | done (merged) |
-| X-PARALLEL | Parallel structure template reads (follow-up session) | Opus long | open (interrupted by handoff, uncommitted in worktree x-parallel; see follow-up session's handoff) |
-| X-CACHE | Structure lookup disk cache, fingerprinted (follow-up session, after X-PARALLEL) | Opus/Sonnet | open |
+| X-PARALLEL | Parallel structure template reads (follow-up session) | Opus long | done (merged bbd28d2f; pack server lookup 10.2 s -> 1.7 s, 433 of 789, 563 of 1196 pages, dumps equal as sets; build abandoned on server stop; 453 tests) |
+| X-CACHE | Structure lookup disk cache, fingerprinted (D26) | Opus long | in progress |
 | X-SEARCH | `~` source search + `~nosource`, SourceLabels API, index at bake (async since X-PERF2), late chest structures refresh | Sonnet long | done (merged a736e2cc; tours ok, ~1.5 % bake) |
 | X-SOURCES | Other Sources category from `assets/*/emi_sources` resource files, 4 vanilla code-only built-ins, plugin `emi_info` (entrypoint, mixin removed after review) | Sonnet long | done (merged 8612fb91) |
 | X-PERF | Merge Enchantments shared columns + lazy index; mob loot data prestart | Opus long | done (merged fa32dad4; dev emi_enchanting 348->52 ms join with ME, emi_loot 436->49; identical dumps) |
