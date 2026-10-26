@@ -105,3 +105,33 @@ Known limitations added in sessions 8-9:
 - `docs/DESCRIPTION.md`: links point to `mc/1.21.1`; the "asked for permission" sentence is removed; the credits line and licences stay (D28, licence and CurseForge policy).
 - GitHub: `remastered` renamed to `mc/1.21.1` (GitHub redirects old links) and made the default branch. Old `main` (upstream EMI 1.1.24, fully contained in mc/1.21.1) deleted after the owner said so; GitHub now has only `mc/1.21.1`. All 61 merged local work branches deleted; their worktree folders under `.claude/worktrees/` (gitignored) remain because folder deletion was blocked too.
 - No CurseForge upload done.
+
+## 9. Session 11 (2026-10-26): readable text on the Nytheria blue, release 2.1.0
+Owner: "text isn't grey on the blue but rather white"; update in the modpack and upload mod + pack.
+
+**Answer to the owner's question:** EMI Remastered ships the original grey EMI 1.1.24 textures (byte-identical); the blue look comes only from the resource pack "Mandala's GUI x Nytheria". Text colours are drawn in code, so a pack alone could not fix them.
+
+**Implemented**
+| Requirement | Result |
+|---|---|
+| Pack-overridable text colours (owner's choice) | `dev.emi.remastered.theme.TextColors` + `TextColorTable`: `assets/emi_remastered/text_colors.json` (`{"replace": {"404040": "FFFFFF"}}`), merged over all packs (higher pack wins per key), reloaded on F3+T. Applied at EMI's text funnels (`TextWidget.render`, `EmiDrawContext` text draws) and 13 raw draw sites; colours baked into Text styles (Formatting.BLACK/DARK_GRAY/...) are remapped too. Tooltips, item counts, config and BoM screens untouched. The mod ships an empty table: no visual change without a pack. Other mods' EMI plugins that draw through `addText` profit too. Docs: `docs/THEMING.md`. |
+| White text on Nytheria blue | Pack 2.2.0 `assets/emi_remastered/text_colors.json`: dark greys/black -> #FFFFFF, mid greys -> #9FA5A6 (owner's choice; 2.6:1, dim but readable), disabled -> #899094, links/dark accent hues -> light versions (>= 4.4:1). |
+| Pack update for EMI Remastered | EMI textures are unchanged, so the existing overrides fit. Fixed two inherited gaps: empty-sidebar icon (was transparent) and rounded panel corners (93 px). `patch_emi_overrides.py` (idempotent, tested); emi_loot restyle recipe reads the EMI Remastered jar. |
+| Release | Mod 2.1.0+1.21.1 (jar sha256 9b61338b...) and pack 2.2.0 (zip c2537870...) installed in NytheriaDevelopment (old files in `mods_backup/`, `resourcepacks_backup/`, `options.txt.bak-2026-10-26-emi210`; options.txt differs by 1 byte, CRLF kept). Pack uploaded to CurseForge 1540564, file id 9338288. Mod upload: waiting for the owner's CurseForge project id (never uploaded with the uploader before). Pushed: EMI `mc/1.21.1`, Nytheria `v2.2.0`. |
+
+**Changed files (mod):** `theme/TextColors.java`, `theme/TextColorTable.java`, `assets/emi_remastered/text_colors.json` (empty), `TextWidget`, `EmiDrawContext`, `EmiInfoRecipe` (marked `// EMI Remastered:`), `EmiRemasteredClient`, info (Elements, EntryImpl, InfoScreen, HubTabWidget), mobs/world LinkWidget, world PageParts, ores AbstractPlacedFeatureEmiRecipe, professions ProfessionRecipe/TradeRecipe, stats StatsInfoProvider; tests `theme/*Test`; `docs/THEMING.md`, `docs/CURSEFORGE_CHANGELOG.md`, `docs/DESCRIPTION.md`, README, CHANGELOG, gradle.properties, build.gradle comment; tour `src/devtour/resources/tour/theme.json`.
+**Changed files (pack repo, commit a980b89):** `NytheriaGUI/assets/emi_remastered/text_colors.json`, EMI `widgets.png`/`background.png`, `scripts/patch_emi_overrides.py` + test, `scripts/restyle_light_gui.py`, VERSION, pack.mcmeta, CHANGELOG, CURSEFORGE_PAGE, README, dist zip.
+
+**Decisions:** D29 (remap table instead of per-site roles), D30 (pack mapping), D31 (pack texture fixes).
+
+**Checks:** `gradlew build` 498 tests 0 failures; pack 69 Python tests OK, zip deterministic (3301 files); audit folder == zip; dev tour `theme` 143/143 with and without the pack (hidden, muted), log "Text colour remap: 20 colours mapped", lead viewed Item Info, mob and biome pairs; pixel diff of the patched PNGs limited to the stated regions.
+
+**Manual test checklist (owner, in the pack)**
+- [ ] Item Info (I), recipe pages, mob/biome/structure pages, enchanting, effects, ores, loot, trades, tag browser (T): text white/light on blue.
+- [ ] Other mods' EMI categories (Let's Do, Farmer's Delight style plugins, etc.): text that used #404040 is now white; check none sits on a light, non-recoloured background.
+- [ ] EMI sidebar "empty" button icon visible; panel corners rounded.
+- [ ] Without the pack (disable it): everything looks as in 2.0.0.
+
+**Model usage (session 11):** Sonnet only: MAP1, MAP2, TC x2, PK1 x2, VER x2, DOC7 = 10 units; Opus 0. No precision overrides. Running tally in plan.md: Opus 51 / Sonnet 142 -> about 26 % Opus.
+
+**Limitations / recommendations:** secondary #9FA5A6 is dim on #326089 (2.6:1); a lighter grey (e.g. #C8CDD0) would read better if the owner wants. Vanilla container titles (#404040) stay dark; that needs Polytone or a similar mod, not EMI. Other mods' EMI pages that draw text themselves (not via `addText`) keep their colours. No Graphify graph (owner's requirement).

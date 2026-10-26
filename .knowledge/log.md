@@ -158,3 +158,5 @@
 2026-10-26 | VER (Sonnet long, dev tour theme.json with/without pack) and DOC7 (Sonnet short) delegated in parallel; pack CF changelog extracted to scratchpad
 2026-10-26 | DOC7 review | accepted first pass (diff read)
 2026-10-26 | VER review | accepted (lead viewed golden apple, wither skeleton, plains sheets; no dark-on-blue text; #9FA5A6 labels dim (2.6:1) but owner's choice)
+2026-10-26 | REL2: both repos pushed (EMI mc/1.21.1, Nytheria v2.2.0); pack 2.2.0 uploaded to CF 1540564, file id 9338288; instance install waits for game lock (other session's tickmender server run, 22:55); mod CF upload waits for owner's project id
+2026-10-26 | REL2: installed mod 2.1.0 + pack 2.2.0 in instance under lock (backups made, options.txt 1 byte changed, CRLF kept); report section 9 written
