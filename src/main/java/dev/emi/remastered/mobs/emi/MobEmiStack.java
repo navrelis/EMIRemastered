@@ -27,7 +27,7 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 
 /**
- * A mob as EMI stack, for the mobs that have no spawn egg (ender dragon, wither, iron golem, ...) and so no item that
+ * A mob as EMI stack, for the mobs that have no spawn egg (ender dragon, wither, giant, illusioner, armor stand, ...) and so no item that
  * leads to their mob page. It is drawn as the mob's portrait and is the output of the page, so that "recipes" of it
  * opens the page and the name finds it in the index. Its own key keeps it apart from every item. Client only.
  */

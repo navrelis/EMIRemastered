@@ -22,7 +22,7 @@ public class MobsSettings {
 	@ConfigValue("mobs.show-drops-link")
 	public static boolean showDropsLink = true;
 
-	@Comment("Add the mobs whose spawn egg is missing or not in the index (ender dragon, wither, iron golem, snow golem, giant, ...) to the EMI index as mob stacks, so that their page can be opened with R and found by name. Needs an EMI reload.")
+	@Comment("Add the mobs whose spawn egg is missing or not in the index (ender dragon, wither, giant, illusioner, armor stand, ...) to the EMI index as mob stacks, so that their page can be opened with R and found by name. Needs an EMI reload.")
 	@ConfigValue("mobs.eggless-in-index")
 	public static boolean egglessInIndex = true;
 
