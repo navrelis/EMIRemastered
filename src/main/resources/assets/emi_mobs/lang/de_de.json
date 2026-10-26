@@ -63,5 +63,5 @@
   "config.emi.mobs.show_drops_link": "Beute-Link",
   "config.emi.tooltip.mobs.show_drops_link": "Zeigt den Link, der die Beute des Mobs öffnet. Braucht das Loot-Modul.",
   "config.emi.mobs.eggless_in_index": "Mobs ohne Ei im Index",
-  "config.emi.tooltip.mobs.eggless_in_index": "Fügt die Mobs, deren Spawn-Ei fehlt oder nicht im Index steht (Enderdrache, Wither, Eisengolem, Schneegolem, Riese, ...), als Mob-Stacks dem EMI-Index hinzu, damit ihre Seite mit R geöffnet und sie per Namen gefunden werden können.\nBenötigt ein EMI-Neuladen."
+  "config.emi.tooltip.mobs.eggless_in_index": "Fügt die Mobs, deren Spawn-Ei fehlt oder nicht im Index steht (Enderdrache, Wither, Riese, Illusioner, Rüstungsständer, ...), als Mob-Stacks dem EMI-Index hinzu, damit ihre Seite mit R geöffnet und sie per Namen gefunden werden können.\nBenötigt ein EMI-Neuladen."
 }
