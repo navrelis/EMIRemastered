@@ -19,9 +19,7 @@ import net.minecraft.loot.entry.LootPoolEntry;
 import net.minecraft.loot.entry.LootTableEntry;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.NbtList;
-import net.minecraft.nbt.NbtSizeTracker;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.ReloadableRegistries;
 import net.minecraft.registry.RegistryKey;
@@ -57,7 +55,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * Finds the structures a chest loot table is found in. For every jigsaw structure the structure templates reachable
@@ -68,11 +68,12 @@ import java.util.function.Consumer;
  * The result per structure also lists the dimensions whose biome source can produce the structure's biomes.
  * <p>
  * Reading every template of every structure can take many seconds in a large pack, so the lookup is built on a daemon
- * background thread that starts when the server has started (and again, lazily, after a data pack reload). The
- * server thread only captures what the build reads and never waits for it: {@link #ready} and
- * {@link #forTableIfReady} answer with what is there now, {@link Build#whenReady} runs code on the server thread once
- * the build of the current data is done. Every build has a generation; a data pack reload or a server stop
- * ({@link #invalidate}) makes it stale, and the results and callbacks of a stale build are dropped.
+ * background thread that starts when the server has started (and again, lazily, after a data pack reload); it spreads
+ * the template reads over a few worker threads of its own ({@link StructureWalks}). The server thread only captures
+ * what the build reads and never waits for it: {@link #ready} and {@link #forTableIfReady} answer with what is there
+ * now, {@link Build#whenReady} runs code on the server thread once the build of the current data is done. Every build
+ * has a generation; a data pack reload or a server stop ({@link #invalidate}) makes it stale, and the results and
+ * callbacks of a stale build are dropped. A build also stops as soon as its server begins to stop.
  */
 public final class StructureLookup {
 	private static final int MAX_POOLS_PER_STRUCTURE = 600;
@@ -82,7 +83,8 @@ public final class StructureLookup {
 	private static final String DEV_DELAY_PROPERTY = "emi.devtour.lookupDelayMs";
 	private static final StructureLookup EMPTY = new StructureLookup();
 
-	private static int generation;
+	/** Written under the class lock; volatile so that {@link #isStale} (asked by the lookup's workers) needs no lock. */
+	private static volatile int generation;
 	private static Build current;
 
 	private final Map<Identifier, List<Identifier>> structureDimensions = new LinkedHashMap<>();
@@ -159,7 +161,8 @@ public final class StructureLookup {
 		current = null;
 	}
 
-	private static synchronized boolean isStale(int gen) {
+	/** Lock free: the lookup's workers ask often, and the server thread takes the class lock in {@link #current}. */
+	private static boolean isStale(int gen) {
 		return gen != generation;
 	}
 
@@ -190,7 +193,9 @@ public final class StructureLookup {
 		Build build = new Build(gen, server, future);
 		try {
 			Context context = capture(server);
-			Thread thread = new Thread(() -> run(context, gen, future), "EMI Loot structure lookup");
+			// a server that stops closes its resource packs right after, invalidate only comes once it stopped
+			BooleanSupplier abandoned = () -> isStale(gen) || !server.isRunning();
+			Thread thread = new Thread(() -> run(context, abandoned, future), "EMI Loot structure lookup");
 			thread.setDaemon(true);
 			thread.start();
 			// on the server thread, so the chest senders are not read while a reload replaces them
@@ -225,19 +230,19 @@ public final class StructureLookup {
 			server.getResourceManager(), loot, biomes, chestTables);
 	}
 
-	private static void run(Context context, int gen, CompletableFuture<StructureLookup> future) {
+	private static void run(Context context, BooleanSupplier abandoned, CompletableFuture<StructureLookup> future) {
 		StructureLookup lookup = new StructureLookup();
 		long start = System.currentTimeMillis();
 		try {
 			devDelay();
-			lookup.scan(context, gen);
+			lookup.scan(context, abandoned);
 		} catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
 		} catch (Throwable e) {
 			EMILoot.LOGGER.error("Could not look up the structures of chest loot tables, chest pages will not show where a chest is found", e);
 		}
-		if (isStale(gen)) {
-			// the data changed while this build ran: never hand out its results
+		if (abandoned.getAsBoolean()) {
+			// the data changed or the server stops while this build ran: never hand out its results
 			future.complete(EMPTY);
 			return;
 		}
@@ -290,31 +295,41 @@ public final class StructureLookup {
 		return result;
 	}
 
-	private void scan(Context context, int gen) {
-		Map<Identifier, TemplateInfo> templates = new HashMap<>();
-		for (Map.Entry<RegistryKey<Structure>, Structure> entry : context.structures().getEntrySet()) {
-			if (isStale(gen)) {
-				return;
-			}
-			Identifier id = entry.getKey().getValue();
-			Structure structure = entry.getValue();
-			structureDimensions.put(id, dimensionsOf(structure, context.biomes()));
-			for (RegistryKey<LootTable> table : CodePlacedLoot.forType(structure.getType())) {
-				if (context.chestTables().contains(table.getValue())) {
-					structuresByTable.computeIfAbsent(table.getValue(), t -> new LinkedHashSet<>()).add(id);
-				}
-			}
-			if (structure instanceof JigsawStructure jigsaw) {
-				try {
-					for (Identifier table : lootTablesOf(jigsaw, context.pools(), context.resources(), templates)) {
-						structuresByTable.computeIfAbsent(table, t -> new LinkedHashSet<>()).add(id);
+	/**
+	 * Reading and decompressing the structure templates is nearly all of the build's time (about ten seconds in a large
+	 * pack), so the walks of the jigsaw structures run on {@link StructureWalks} workers, each template read once
+	 * whichever walk needs it first ({@link StructureWalks.OnceCache}). This thread merges the results in the order of
+	 * the registry's entries, as if the structures had been walked one after another: the same structures per table in
+	 * the same order, the same warnings. Leaves the lookup incomplete once the build is abandoned.
+	 */
+	private void scan(Context context, BooleanSupplier abandoned) {
+		List<Map.Entry<RegistryKey<Structure>, Structure>> entries = new ArrayList<>(context.structures().getEntrySet());
+		boolean complete;
+		try (StructureWalks walks = new StructureWalks(StructureWalks.defaultThreads(), abandoned)) {
+			StructureWalks.OnceCache<Identifier, TemplateInfo> templates = new StructureWalks.OnceCache<>(id -> TemplateInfo.read(context.resources(), id));
+			complete = walks.<Map.Entry<RegistryKey<Structure>, Structure>, Set<Identifier>>walkInOrder(entries,
+				entry -> entry.getValue() instanceof JigsawStructure jigsaw ? () -> lootTablesOf(jigsaw, context.pools(), templates::get, walks::aborted) : null,
+				(entry, tables, failure) -> {
+					Identifier id = entry.getKey().getValue();
+					Structure structure = entry.getValue();
+					structureDimensions.put(id, dimensionsOf(structure, context.biomes()));
+					for (RegistryKey<LootTable> table : CodePlacedLoot.forType(structure.getType())) {
+						if (context.chestTables().contains(table.getValue())) {
+							structuresByTable.computeIfAbsent(table.getValue(), t -> new LinkedHashSet<>()).add(id);
+						}
 					}
-				} catch (Throwable e) {
-					EMILoot.LOGGER.warn("Could not read the pieces of structure {}: {}", id, e.toString());
-				}
-			}
+					if (failure != null) {
+						EMILoot.LOGGER.warn("Could not read the pieces of structure {}: {}", id, failure.toString());
+					} else if (tables != null) {
+						for (Identifier table : tables) {
+							structuresByTable.computeIfAbsent(table, t -> new LinkedHashSet<>()).add(id);
+						}
+					}
+				});
 		}
-		propagateToReferencedTables(context.loot());
+		if (complete) {
+			propagateToReferencedTables(context.loot());
+		}
 	}
 
 	/** A chest whose table points to other tables (trial chamber rewards) is found in the same structures as those tables. */
@@ -376,7 +391,13 @@ public final class StructureLookup {
 		return dimensions;
 	}
 
-	private static Set<Identifier> lootTablesOf(JigsawStructure structure, Registry<StructurePool> pools, ResourceManager resources, Map<Identifier, TemplateInfo> templates) {
+	/**
+	 * The loot tables of one jigsaw structure's templates, in the order the walk meets them. Runs on a lookup worker:
+	 * it only reads frozen registries, creates its own random (a {@link Random#create} random must stay on one thread)
+	 * and gets its templates from the shared {@code templates} cache. Stops early (with a partial result that is
+	 * never published) once {@code aborted} says the build was abandoned or ended.
+	 */
+	private static Set<Identifier> lootTablesOf(JigsawStructure structure, Registry<StructurePool> pools, Function<Identifier, TemplateInfo> templates, BooleanSupplier aborted) {
 		Set<Identifier> tables = new LinkedHashSet<>();
 		Set<Identifier> visitedPools = new HashSet<>();
 		Set<Identifier> visitedTemplates = new HashSet<>();
@@ -384,6 +405,9 @@ public final class StructureLookup {
 		((JigsawStructureAccessor) (Object) structure).emi_loot$getStartPool().getKey().ifPresent(key -> queue.add(key.getValue()));
 		Random random = Random.create(0);
 		while (!queue.isEmpty() && visitedPools.size() < MAX_POOLS_PER_STRUCTURE && visitedTemplates.size() < MAX_TEMPLATES_PER_STRUCTURE) {
+			if (aborted.getAsBoolean()) {
+				return tables;
+			}
 			Identifier poolId = queue.poll();
 			if (!visitedPools.add(poolId)) {
 				continue;
@@ -401,7 +425,7 @@ public final class StructureLookup {
 				if (!visitedTemplates.add(templateId)) {
 					continue;
 				}
-				TemplateInfo info = templates.computeIfAbsent(templateId, id -> TemplateInfo.read(resources, id));
+				TemplateInfo info = templates.apply(templateId);
 				tables.addAll(info.lootTables);
 				queue.addAll(info.pools);
 			}
@@ -431,6 +455,16 @@ public final class StructureLookup {
 			this.pools = pools;
 		}
 
+		/**
+		 * Runs on the lookup's workers, several at a time. It only calls {@link ResourceManager#getResource} and
+		 * {@link Resource#getInputStream}, which are safe from several threads: the resource manager and its pack lists
+		 * do not change after the reload that built them (zip packs are opened by that reload too, when it lists their
+		 * namespaces), and every call opens a stream of its own on a {@link java.util.zip.ZipFile}, a zip file system or
+		 * a directory, all safe for concurrent reads. The game relies on the same: its worldgen threads load structure
+		 * templates through this resource manager at the same time. The file is read with {@link TemplateNbt}, which
+		 * finds what the full {@code NbtIo.readCompressed} finds in a fraction of the time. As before the lookup was
+		 * parallel, a file that cannot be read has no loot tables, while an exception from finding it fails the walk.
+		 */
 		static TemplateInfo read(ResourceManager resources, Identifier templateId) {
 			Identifier file = Identifier.of(templateId.getNamespace(), "structure/" + templateId.getPath() + ".nbt");
 			Optional<Resource> resource = resources.getResource(file);
@@ -438,28 +472,23 @@ public final class StructureLookup {
 				return EMPTY;
 			}
 			try (InputStream in = resource.get().getInputStream()) {
-				return of(NbtIo.readCompressed(in, NbtSizeTracker.ofUnlimitedBytes()));
+				return of(TemplateNbt.read(in));
 			} catch (Exception e) {
 				return EMPTY;
 			}
 		}
 
+		/** What a template read in full holds, for tests: the same as {@link #read} finds in its file. */
 		static TemplateInfo of(NbtCompound root) {
+			return of(TemplateNbt.containerNbt(root));
+		}
+
+		/** The loot tables and pools in the block entity and entity data of a template, in the order of the template. */
+		static TemplateInfo of(List<NbtCompound> parts) {
 			Set<Identifier> tables = new LinkedHashSet<>();
 			Set<Identifier> pools = new LinkedHashSet<>();
-			NbtList blocks = root.getList("blocks", NbtElement.COMPOUND_TYPE);
-			for (int i = 0; i < blocks.size(); i++) {
-				NbtCompound block = blocks.getCompound(i);
-				if (block.contains("nbt", NbtElement.COMPOUND_TYPE)) {
-					scan(block.getCompound("nbt"), tables, pools);
-				}
-			}
-			NbtList entities = root.getList("entities", NbtElement.COMPOUND_TYPE);
-			for (int i = 0; i < entities.size(); i++) {
-				NbtCompound entity = entities.getCompound(i);
-				if (entity.contains("nbt", NbtElement.COMPOUND_TYPE)) {
-					scan(entity.getCompound("nbt"), tables, pools);
-				}
+			for (NbtCompound nbt : parts) {
+				scan(nbt, tables, pools);
 			}
 			return tables.isEmpty() && pools.isEmpty() ? EMPTY : new TemplateInfo(tables, pools);
 		}
