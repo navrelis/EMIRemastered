@@ -135,3 +135,5 @@
 2026-10-26 | session 9 start: leftover dev server gone, no lock; X-PARALLEL WIP committed + remastered merged; lead compared pack dumps before/after as sets: 0 differences (order inside lists is hash order even old vs old); X-PARALLEL finish (Opus long) delegated
 2026-10-26 | pack instance baseline now 26 git-status lines (owner added mods/nytheria-shield-server-1.0.2.jar since session 8); installed jar still 7c8a9a56
 2026-10-26 | X-PARALLEL review | accepted (ordered merge, no interrupts, read-once retry on failure, abort on server stop, 28 new tests); lead build 453 tests green; merged bbd28d2f; X-CACHE (Opus long) delegated, D26
+2026-10-26 | DOC6a (Sonnet short) delegated in parallel with X-CACHE (disjoint files)
+2026-10-26 | DOC6a review | accepted after 1 follow-up (2 more wrong mob lists), merged, build green
