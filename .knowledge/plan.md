@@ -95,7 +95,7 @@ Owner: "1. do that (structure cache) 2. sure (extra sources) 3. sure (search by 
 | ID | Task | Model | Status |
 |---|---|---|---|
 | X-PAD / X-SUMMARY | Item Info right padding / lookup summary count (follow-up session) | Sonnet short | done (merged) |
-| X-PARALLEL | Parallel structure template reads (follow-up session) | Opus long | in progress (follow-up session) |
+| X-PARALLEL | Parallel structure template reads (follow-up session) | Opus long | open (interrupted by handoff, uncommitted in worktree x-parallel; see follow-up session's handoff) |
 | X-CACHE | Structure lookup disk cache, fingerprinted (follow-up session, after X-PARALLEL) | Opus/Sonnet | open |
 | X-SEARCH | `~` source search + `~nosource`, SourceLabels API, index at bake (async since X-PERF2), late chest structures refresh | Sonnet long | done (merged a736e2cc; tours ok, ~1.5 % bake) |
 | X-SOURCES | Other Sources category from `assets/*/emi_sources` resource files, 4 vanilla code-only built-ins, plugin `emi_info` (entrypoint, mixin removed after review) | Sonnet long | done (merged 8612fb91) |
@@ -104,5 +104,5 @@ Owner: "1. do that (structure cache) 2. sure (extra sources) 3. sure (search by 
 | X-UX | Mob stacks (emi_mobs:mob) for egg-less mobs, trial tab only when split, biome stacks rule, world Item Info provider | Sonnet long | done (merged a141b16b after 1 correction: namespaced serializer) |
 | DOC5 | CHANGELOG/README keys table/MODULES/DEVTOUR/KB21 | Sonnet short | done (merged cdc2531f; placeholder for perf2 + cache) |
 | X-PERF2 | Identical faster suffix-array build (parallel), source index async, EmiHidden fast path; skipped: remainders cache, professions cache, item groups (unsafe) | Opus long | done (merged 7dad04db; search bake -45..-75 %, 58 queries identical) |
-| PACK-REAL3 | Real pack with jar 7c8a9a56: reload times, new mixins vs ali/CQA/hollowhorizon | Opus long | in progress |
+| PACK-REAL3 | Real pack with jar 7c8a9a56: reload times, new mixins vs ali/CQA/hollowhorizon | Opus long | open (interrupted by handoff before world; lead completed cleanup, instance restored; re-run after X-CACHE) |
 | DOC6 | CHANGELOG perf2 + cache, report update | Sonnet short | open (after X-CACHE) |
