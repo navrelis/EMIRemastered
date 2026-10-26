@@ -194,7 +194,19 @@ provides their ids, and a leftover jar stops the game at start-up. Credits and l
   registers: about 2.0 s to an estimated 0.15 s on the first join of the test pack.
 * Together an estimated 3.8 s less of a 23 s join reload in the test pack. All three figures are estimates from
   dev benchmarks, not measured on a player's pack.
-<!-- DOC5: perf2 + structure cache pending -->
+* Search bake: the suffix arrays of the item search (names, tooltips, mods, aliases) are built by a faster sort that
+  gives exactly the same arrays, and the four arrays are built at the same time. If the fast build is unavailable, the
+  original build is used, and a check at start-up tests the faster sort against the original. The index for `~` source
+  queries is built in the background, and hiding no longer builds the id of every stack when there are no hide filters.
+  The search bake is 45 to 75 % faster in the dev benchmark and 58 test queries return identical results.
+* Loot: the structure lookup for the "Found in" lines of chests reads the structure templates on a small number of
+  worker threads (at most 4, and two cores stay free for the game), each template once, and merges the results in the
+  order of the structures, so the result is identical. A lean reader takes only the loot tables and jigsaw pools from a
+  template, and the build ends when the server stops or the data packs reload. On a production server with a pack of
+  560 mods it went from 10.2 s to 1.7 s (993 structures; 433 of 789 chest loot tables are placed in a structure and
+  563 of 1196 chest loot pages show a structure, the same as before). It always ran off the server thread, so joining a
+  world was never blocked by it.
+<!-- DOC6: structure cache + real-pack numbers pending -->
 * Method: `docs/DEVTOUR.md`, "EMI reload benchmark".
 
 ### Known limits

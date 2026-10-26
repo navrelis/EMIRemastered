@@ -63,5 +63,5 @@
   "config.emi.mobs.show_drops_link": "Drops Link",
   "config.emi.tooltip.mobs.show_drops_link": "Show the link that opens the drops of the mob. Needs the loot module.",
   "config.emi.mobs.eggless_in_index": "Mobs Without Egg in Index",
-  "config.emi.tooltip.mobs.eggless_in_index": "Adds the mobs whose spawn egg is missing or not in the index (ender dragon, wither, iron golem, snow golem, giant, ...) to the EMI index as mob stacks, so that their page opens with R and they can be found by name.\nNeeds an EMI reload."
+  "config.emi.tooltip.mobs.eggless_in_index": "Adds the mobs whose spawn egg is missing or not in the index (ender dragon, wither, giant, illusioner, armor stand, ...) to the EMI index as mob stacks, so that their page opens with R and they can be found by name.\nNeeds an EMI reload."
 }

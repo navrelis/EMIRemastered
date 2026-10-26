@@ -173,7 +173,11 @@ In packs with Merge Enchantments (every enchantment accepts every item) the ench
 enchantments that share the same item set once, and the mob loot data is started while the plugins initialise. Dev
 benchmark estimates for the test pack: the enchanting plugin about 2.3 s to 0.3 s, the mob loot plugin about 2.0 s to
 0.15 s on the first join, together about 3.8 s less of a 23 s join reload.
-<!-- DOC5: perf2 + structure cache pending -->
+
+The search index of the item list is built 45 to 75 % faster in the dev benchmark (same results; 58 test queries
+returned identical lists). The "Found in" lines of chest loot are looked up in the background on a few worker threads:
+10.2 s to 1.7 s on a production server with a pack of 560 mods, with the same result as before.
+<!-- DOC6: structure cache + real-pack numbers pending -->
 
 
 ## Compatibility
