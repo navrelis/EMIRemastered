@@ -55,7 +55,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * Finds the structures a chest loot table is found in. For every jigsaw structure the structure templates reachable
@@ -66,7 +69,8 @@ import java.util.function.Consumer;
  * The result per structure also lists the dimensions whose biome source can produce the structure's biomes.
  * <p>
  * Reading every template of every structure can take many seconds in a large pack, so the lookup is built on a daemon
- * background thread that starts when the server has started (and again, lazily, after a data pack reload). The
+ * background thread that starts when the server has started (and again, lazily, after a data pack reload); it spreads
+ * the template reads over a few worker threads of its own ({@link StructureWalks}). The
  * server thread only captures what the build reads and never waits for it: {@link #ready} and
  * {@link #forTableIfReady} answer with what is there now, {@link Build#whenReady} runs code on the server thread once
  * the build of the current data is done. Every build has a generation; a data pack reload or a server stop
@@ -80,7 +84,8 @@ public final class StructureLookup {
 	private static final String DEV_DELAY_PROPERTY = "emi.devtour.lookupDelayMs";
 	private static final StructureLookup EMPTY = new StructureLookup();
 
-	private static int generation;
+	/** Written under the class lock; volatile so that {@link #isStale} (asked by the lookup's workers) needs no lock. */
+	private static volatile int generation;
 	private static Build current;
 
 	private final Map<Identifier, List<Identifier>> structureDimensions = new LinkedHashMap<>();
@@ -157,7 +162,8 @@ public final class StructureLookup {
 		current = null;
 	}
 
-	private static synchronized boolean isStale(int gen) {
+	/** Lock free: the lookup's workers ask often, and the server thread takes the class lock in {@link #current}. */
+	private static boolean isStale(int gen) {
 		return gen != generation;
 	}
 
@@ -281,7 +287,122 @@ public final class StructureLookup {
 		return result;
 	}
 
+	/**
+	 * Reading and decompressing the structure templates is nearly all of the build's time (several seconds in a large
+	 * pack), so the walks of the jigsaw structures run on {@link StructureWalks} workers, each template read once
+	 * whichever walk needs it first. This thread merges the results in registry order, as if the structures had been
+	 * walked one after another: the same structures per table in the same order, the same warnings.
+	 */
 	private void scan(Context context, int gen) {
+		// TEMP-XPAR timing
+		long t0 = System.nanoTime();
+		T_GETRES.set(0); T_NBT.set(0); T_OF.set(0); N_READ.set(0);
+		List<Map.Entry<RegistryKey<Structure>, Structure>> entries = new ArrayList<>(context.structures().getEntrySet());
+		try (StructureWalks walks = new StructureWalks(StructureWalks.defaultThreads(), () -> isStale(gen))) {
+			StructureWalks.OnceCache<Identifier, TemplateInfo> templates = new StructureWalks.OnceCache<>(id -> TemplateInfo.read(context.resources(), id));
+			List<CompletableFuture<Set<Identifier>>> walked = new ArrayList<>(entries.size());
+			for (Map.Entry<RegistryKey<Structure>, Structure> entry : entries) {
+				walked.add(entry.getValue() instanceof JigsawStructure jigsaw
+					? walks.submit(() -> lootTablesOf(jigsaw, context.pools(), templates::get, walks::aborted))
+					: null);
+			}
+			for (int i = 0; i < entries.size(); i++) {
+				if (i == entries.size() - 1) LAST_IDS = new ArrayList<>(templates.keys()); // TEMP-XPAR (approx: last walk may still run)
+				if (isStale(gen)) {
+					// TEMP-XPAR
+					long cancelled = walked.stream().filter(f -> f != null && f.isCancelled()).count();
+					EMILoot.LOGGER.info("TEMP-XPAR stale at structure {} of {} after {}ms", i, entries.size(), (System.nanoTime() - t0) / 1_000_000);
+					long staleAt = System.nanoTime();
+					Thread watcher = new Thread(() -> {
+						for (int k = 0; k < 50; k++) {
+							long alive = Thread.getAllStackTraces().keySet().stream().filter(t -> t.getName().startsWith(StructureWalks.THREAD_NAME)).count();
+							if (alive == 0) {
+								EMILoot.LOGGER.info("TEMP-XPAR all workers ended {}ms after the stale check", (System.nanoTime() - staleAt) / 1_000_000);
+								return;
+							}
+							try { Thread.sleep(20); } catch (InterruptedException e) { return; }
+						}
+						EMILoot.LOGGER.info("TEMP-XPAR workers still alive 1s after the stale check");
+					});
+					watcher.setDaemon(true);
+					watcher.start();
+					return;
+				}
+				Identifier id = entries.get(i).getKey().getValue();
+				Structure structure = entries.get(i).getValue();
+				structureDimensions.put(id, dimensionsOf(structure, context.biomes()));
+				for (RegistryKey<LootTable> table : CodePlacedLoot.forType(structure.getType())) {
+					if (context.chestTables().contains(table.getValue())) {
+						structuresByTable.computeIfAbsent(table.getValue(), t -> new LinkedHashSet<>()).add(id);
+					}
+				}
+				CompletableFuture<Set<Identifier>> tables = walked.get(i);
+				if (tables != null) {
+					try {
+						for (Identifier table : tables.join()) {
+							structuresByTable.computeIfAbsent(table, t -> new LinkedHashSet<>()).add(id);
+						}
+					} catch (CompletionException e) {
+						EMILoot.LOGGER.warn("Could not read the pieces of structure {}: {}", id, e.getCause().toString());
+					}
+				}
+			}
+		}
+		propagateToReferencedTables(context.loot());
+		// TEMP-XPAR
+		EMILoot.LOGGER.info("TEMP-XPAR scan {}ms (threads {}), reads {}: getResource {}ms, readCompressed {}ms, TemplateInfo.of {}ms (summed over threads)",
+			(System.nanoTime() - t0) / 1_000_000, StructureWalks.defaultThreads(), N_READ.get(), T_GETRES.get() / 1_000_000, T_NBT.get() / 1_000_000, T_OF.get() / 1_000_000);
+		TempDump.dump(this, context.chestTables(), structureDimensions, structuresByTable);
+		if (Boolean.getBoolean("emi.xpar.bench") && !BENCHING) {
+			BENCHING = true;
+			TempDump.phases(context.resources(), LAST_IDS);
+			String[][] configs = {{"seq", "true", "1", "5"}, {"seq", "false", "1", "5"}, {"par", "true", "4", "5"}, {"par", "false", "4", "5"}, {"par", "false", "4", "4"}, {"par", "false", "2", "5"}, {"par", "false", "6", "5"}};
+			for (int round = 0; round < 3; round++) {
+				StringBuilder sb = new StringBuilder("TEMP-XPAR bench round " + round + ":");
+				for (String[] cfg : configs) {
+					long b0 = System.nanoTime();
+					System.setProperty("emi.xpar.fullread", cfg[1]);
+					if (cfg[0].equals("seq")) {
+						new StructureLookup().scanSequential(context, gen);
+					} else {
+						System.setProperty("emi.xpar.threads", cfg[2]);
+						System.setProperty("emi.xpar.prio", cfg[3]);
+						new StructureLookup().scan(context, gen);
+					}
+					sb.append(" [").append(String.join("/", cfg)).append("]=").append((System.nanoTime() - b0) / 1_000_000).append("ms");
+				}
+				System.clearProperty("emi.xpar.threads");
+				System.clearProperty("emi.xpar.prio");
+				System.clearProperty("emi.xpar.fullread");
+				EMILoot.LOGGER.info(sb.toString());
+			}
+		}
+		if (Boolean.getBoolean("emi.xpar.verify") && !BENCHING) {
+			StructureLookup sequential = new StructureLookup();
+			long s0 = System.nanoTime();
+			System.setProperty("emi.xpar.fullread", "true");
+			sequential.scanSequential(context, gen);
+			System.clearProperty("emi.xpar.fullread");
+			long s1 = System.nanoTime();
+			boolean sameDims = List.copyOf(structureDimensions.entrySet()).equals(List.copyOf(sequential.structureDimensions.entrySet()));
+			boolean sameTables = structuresByTable.keySet().equals(sequential.structuresByTable.keySet());
+			int orderDiffs = 0;
+			for (Identifier k : structuresByTable.keySet()) {
+				if (!List.copyOf(structuresByTable.get(k)).equals(List.copyOf(sequential.structuresByTable.getOrDefault(k, Set.of())))) {
+					orderDiffs++;
+				}
+			}
+			EMILoot.LOGGER.info("TEMP-XPAR verify against sequential (in {}ms, same JVM): dimensions identical+ordered {}, same table keys {}, tables whose ordered structure list differs {}",
+				(s1 - s0) / 1_000_000, sameDims, sameTables, orderDiffs);
+		}
+	}
+
+	static boolean BENCHING;
+	static List<Identifier> LAST_IDS = List.of();
+	// TEMP-XPAR: the old sequential scan, for the in-process comparison only
+	static final java.util.concurrent.atomic.AtomicLong T_GETRES = new java.util.concurrent.atomic.AtomicLong(), T_NBT = new java.util.concurrent.atomic.AtomicLong(), T_OF = new java.util.concurrent.atomic.AtomicLong(), N_READ = new java.util.concurrent.atomic.AtomicLong();
+	private void scanSequential(Context context, int gen) {
+		long tDim = 0, tCode = 0, tWalk = 0, t0 = System.nanoTime();
 		Map<Identifier, TemplateInfo> templates = new HashMap<>();
 		for (Map.Entry<RegistryKey<Structure>, Structure> entry : context.structures().getEntrySet()) {
 			if (isStale(gen)) {
@@ -289,21 +410,25 @@ public final class StructureLookup {
 			}
 			Identifier id = entry.getKey().getValue();
 			Structure structure = entry.getValue();
+			long a = System.nanoTime();
 			structureDimensions.put(id, dimensionsOf(structure, context.biomes()));
+			long b = System.nanoTime();
 			for (RegistryKey<LootTable> table : CodePlacedLoot.forType(structure.getType())) {
 				if (context.chestTables().contains(table.getValue())) {
 					structuresByTable.computeIfAbsent(table.getValue(), t -> new LinkedHashSet<>()).add(id);
 				}
 			}
-			if (structure instanceof JigsawStructure jigsaw) {
+			long c = System.nanoTime();
+			tDim += b - a; tCode += c - b;
+			if (structure instanceof JigsawStructure jigsaw) try {
 				try {
-					for (Identifier table : lootTablesOf(jigsaw, context.pools(), context.resources(), templates)) {
+					for (Identifier table : lootTablesOf(jigsaw, context.pools(), tid -> templates.computeIfAbsent(tid, x -> TemplateInfo.read(context.resources(), x)), () -> false)) {
 						structuresByTable.computeIfAbsent(table, t -> new LinkedHashSet<>()).add(id);
 					}
 				} catch (Throwable e) {
 					EMILoot.LOGGER.warn("Could not read the pieces of structure {}: {}", id, e.toString());
 				}
-			}
+			} finally { tWalk += System.nanoTime() - c; }
 		}
 		propagateToReferencedTables(context.loot());
 	}
@@ -367,7 +492,13 @@ public final class StructureLookup {
 		return dimensions;
 	}
 
-	private static Set<Identifier> lootTablesOf(JigsawStructure structure, Registry<StructurePool> pools, ResourceManager resources, Map<Identifier, TemplateInfo> templates) {
+	/**
+	 * The loot tables of one jigsaw structure's templates, in the order the walk meets them. Runs on a lookup worker:
+	 * it only reads frozen registries, creates its own random (a {@link Random#create} random must stay on one thread)
+	 * and gets its templates from the shared {@code templates} cache. Stops early (with a partial result that is
+	 * never published) once {@code aborted} says the build is stale or ended.
+	 */
+	private static Set<Identifier> lootTablesOf(JigsawStructure structure, Registry<StructurePool> pools, Function<Identifier, TemplateInfo> templates, BooleanSupplier aborted) {
 		Set<Identifier> tables = new LinkedHashSet<>();
 		Set<Identifier> visitedPools = new HashSet<>();
 		Set<Identifier> visitedTemplates = new HashSet<>();
@@ -375,6 +506,9 @@ public final class StructureLookup {
 		((JigsawStructureAccessor) (Object) structure).emi_loot$getStartPool().getKey().ifPresent(key -> queue.add(key.getValue()));
 		Random random = Random.create(0);
 		while (!queue.isEmpty() && visitedPools.size() < MAX_POOLS_PER_STRUCTURE && visitedTemplates.size() < MAX_TEMPLATES_PER_STRUCTURE) {
+			if (aborted.getAsBoolean()) {
+				return tables;
+			}
 			Identifier poolId = queue.poll();
 			if (!visitedPools.add(poolId)) {
 				continue;
@@ -392,7 +526,7 @@ public final class StructureLookup {
 				if (!visitedTemplates.add(templateId)) {
 					continue;
 				}
-				TemplateInfo info = templates.computeIfAbsent(templateId, id -> TemplateInfo.read(resources, id));
+				TemplateInfo info = templates.apply(templateId);
 				tables.addAll(info.lootTables);
 				queue.addAll(info.pools);
 			}
@@ -424,33 +558,43 @@ public final class StructureLookup {
 
 		static TemplateInfo read(ResourceManager resources, Identifier templateId) {
 			Identifier file = Identifier.of(templateId.getNamespace(), "structure/" + templateId.getPath() + ".nbt");
+			long a = System.nanoTime();
+			N_READ.incrementAndGet();
 			Optional<Resource> resource = resources.getResource(file);
+			T_GETRES.addAndGet(System.nanoTime() - a);
 			if (resource.isEmpty()) {
 				return EMPTY;
 			}
 			try (InputStream in = resource.get().getInputStream()) {
-				return of(NbtIo.readCompressed(in, NbtSizeTracker.ofUnlimitedBytes()));
+				long b0 = System.nanoTime();
+				InputStream src = in;
+				if (Boolean.getBoolean("emi.xpar.preread")) {
+					src = new java.io.ByteArrayInputStream(in.readAllBytes());
+				}
+				long b = System.nanoTime();
+				TempDump.RAW.addAndGet(b - b0);
+				List<NbtCompound> parts = Boolean.getBoolean("emi.xpar.fullread") ? TemplateNbt.containerNbt(NbtIo.readCompressed(src, NbtSizeTracker.ofUnlimitedBytes())) : TemplateNbt.read(src);
+				long c = System.nanoTime();
+				T_NBT.addAndGet(c - b);
+				TemplateInfo r = of(parts);
+				T_OF.addAndGet(System.nanoTime() - c);
+				return r;
 			} catch (Exception e) {
 				return EMPTY;
 			}
 		}
 
+		/** What a template read in full holds, for tests: the same as {@link #read} finds in its file. */
 		static TemplateInfo of(NbtCompound root) {
+			return of(TemplateNbt.containerNbt(root));
+		}
+
+		/** The loot tables and pools in the block entity and entity data of a template, in the order of the template. */
+		static TemplateInfo of(List<NbtCompound> parts) {
 			Set<Identifier> tables = new LinkedHashSet<>();
 			Set<Identifier> pools = new LinkedHashSet<>();
-			NbtList blocks = root.getList("blocks", NbtElement.COMPOUND_TYPE);
-			for (int i = 0; i < blocks.size(); i++) {
-				NbtCompound block = blocks.getCompound(i);
-				if (block.contains("nbt", NbtElement.COMPOUND_TYPE)) {
-					scan(block.getCompound("nbt"), tables, pools);
-				}
-			}
-			NbtList entities = root.getList("entities", NbtElement.COMPOUND_TYPE);
-			for (int i = 0; i < entities.size(); i++) {
-				NbtCompound entity = entities.getCompound(i);
-				if (entity.contains("nbt", NbtElement.COMPOUND_TYPE)) {
-					scan(entity.getCompound("nbt"), tables, pools);
-				}
+			for (NbtCompound nbt : parts) {
+				scan(nbt, tables, pools);
 			}
 			return tables.isEmpty() && pools.isEmpty() ? EMPTY : new TemplateInfo(tables, pools);
 		}
