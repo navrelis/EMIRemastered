@@ -88,7 +88,7 @@ Status: open / in progress / in review / done. `||` = can run in parallel.
 Pack install under game lock, end-to-end check, report, push.
 - Jar swap: done 2026-10-19 21:1x (owner's client closed; 8 jars in mods_backup/, EMIRemastered jar in mods/, lock created and removed). Owner changed the decision (2026-10-19 ~21:30, 'no you do all'): the lead's team launches the real pack (PACK-REAL). Newest jar (33d82605 build) installed before the launch.
 - Session 7 (2026-10-19 23:30): jar of c6861cb4 (LOOT-ASYNC + TRADE-ROW) installed under game lock for PACK-REAL2; after POLISH merge the final jar is copied again (copy only).
-- Final (2026-10-19 23:48): head 561b05ae built (381 tests green), jar 829b63e1 installed in the pack under game lock; report `.knowledge/report.md`. Status: DONE. Optional later: KB13, Item Info right padding (EntryImpl), lookup summary count, parallel template reads, T1-29, R6.
+- Final (2026-10-19 23:48): head 561b05ae built (381 tests green), jar 829b63e1 installed in the pack under game lock; report `.knowledge/report.md`. Status: DONE. Optional later: KB13, T1-29, R6.
 
 ## Phase 5 Owner extras (session 8, 2026-10-20)
 Owner: "1. do that (structure cache) 2. sure (extra sources) 3. sure (search by source)", "one keybind + tabs, U reroutes, look good", "optimisations?".
@@ -106,4 +106,5 @@ Owner: "1. do that (structure cache) 2. sure (extra sources) 3. sure (search by 
 | X-PERF2 | Identical faster suffix-array build (parallel), source index async, EmiHidden fast path; skipped: remainders cache, professions cache, item groups (unsafe) | Opus long | done (merged 7dad04db; search bake -45..-75 %, 58 queries identical) |
 | PACK-REAL3 | Real pack with jar a388815d (04479dc3): reload times, new mixins vs ali/CQA/hollowhorizon, cache miss then hit | Opus long | done (run4 2026-10-26: 2 launches miss/hit, reload 23.0 -> 18.1 s, enchanting 2261 -> 134 ms, loot 2036 -> 151 ms, lookup 1.6 s / cache hit 0.6 s before join, 563 of 1196, 39 plugins 0 errors, all own + 5 third-party EMI mixins applied, 0 EMI WARN/ERROR; instance restored hash-equal, git status identical, lock removed) |
 | DOC6a | CHANGELOG/README perf2 + parallel entries, mobs eggless tooltip fix | Sonnet short | done (merged; 1 follow-up: same list in MobsSettings @Comment + javadoc) |
-| DOC6b | CHANGELOG/README structure cache + real-pack numbers | Sonnet short | in progress |
+| DOC6b | CHANGELOG/README structure cache + real-pack numbers | Sonnet short | done (merged; estimate bullets replaced by measured numbers) |
+- Session 9 (2026-10-26): Phase 5 DONE. Head built (483 tests), jar a388815d installed and checked in the real pack (PACK-REAL3); report section 8.

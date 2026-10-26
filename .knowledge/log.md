@@ -141,3 +141,4 @@
 2026-10-26 | X-CACHE correction accepted, merged 04479dc3, build 483 green, pushed; PACK-REAL3 re-run (Opus long) delegated with jar a388815d
 2026-10-26 | jar a388815d installed in pack under lock (lead); PACK-REAL3 (Opus long) delegated: miss + hit launches, mixins, timings, run4 folder
 2026-10-26 | PACK-REAL3 review | accepted; lead verified lock gone, 4 hashes equal, instance git status identical (29 lines, owner added 4 mods), no test save/cache left; game window became foreground 12x in launch A (watcher minimised it, no input); DOC6b (Sonnet short) delegated
+2026-10-26 | DOC6b review | accepted (before-join phrased as measured result), merged; final build 483 green, jar a388815d = installed + pack-checked; report section 8 written; session 9 done

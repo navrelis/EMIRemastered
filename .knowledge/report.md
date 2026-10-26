@@ -1,8 +1,10 @@
 # Report: EMI Remastered 2.0.0+1.21.1
 
-Final state 2026-10-19 ~23:50, branch `remastered` (navrelis/EMIRemastered), pushed. One jar
-`EMIRemastered-1.21.1-2.0.0-Fabric.jar` (sha256 829b63e1...) replaces the 8 old jars in the Nytheria pack (old jars in
-`<pack>\mods_backup\`). Build incl. 381 JUnit tests green.
+Final state 2026-10-26 (session 9), branch `remastered` (navrelis/EMIRemastered), pushed. One jar
+`EMIRemastered-1.21.1-2.0.0-Fabric.jar` (sha256 a388815d...) replaces the 8 old jars in the Nytheria pack (old jars in
+`<pack>/mods_backup/`) and is installed there; it is the exact jar checked in the real pack on 2026-10-26 (PACK-REAL3).
+Build incl. 483 JUnit tests green. Sessions 8-9 (owner extras) are summarised in section 8; sections 1-7 describe 2.0.0
+as of session 7, with numbers updated where newer measurements exist.
 
 ## 1. Requirements and what was implemented
 | Requirement | Result |
@@ -10,7 +12,7 @@ Final state 2026-10-19 ~23:50, branch `remastered` (navrelis/EMIRemastered), pus
 | Fork EMI 1.1.24 + 7 add-ons into ONE Fabric 1.21.1 mod | Done. Mod id `emi` (D1), version `2.0.0+1.21.1`; add-ons are modules under `dev.emi.remastered.<module>` with their old resource namespaces and plugin ids (D3); `provides` the 7 old ids so a leftover add-on jar fails loudly. fzzy_config, TXNI Lib, Architectury, ForgeConfigAPIPort no longer needed (D4). |
 | Compatible with every mod of the pack | Done and checked in the real pack twice (PACK-REAL, PACK-REAL2): 640 mods, world reached, clean exit; mixins of sporran, ali, hollowhorizon, clientsort, polymorph into EMI apply; 38 EMI plugins, 0 plugin errors; production dedicated server with 560 pack mods clean (PACK-SRV). All `dev.emi.emi` names/signatures kept. |
 | Bugs fixed | EMI core: reload after world gone (KB1), unreadable saved entries kept, unknown stack types one WARN (FX-SER), category-less recipe, repair recipe error, fill-max overflow (KB9), tag search, favourites remainders (KB7) and more. Let's Do compat crash on every reload (Vinery 1.5.5 / Meadow renames) fixed. Module fixes listed in `CHANGELOG.md` "Fixes". |
-| Faster | Warm reload -40..58 % on a 92k-recipe bench, plugin phase -49..66 %, join -21 %, ~60 MB less heap (Q3). Real pack: EMI reload 22.98 s (was 30.0 s), emiffect 133 ms (was 1077 ms), emi_loot 2036 ms (was 5631 ms); join no longer blocked by the structure lookup (4 s instead of ~24 s, LOOT-ASYNC). |
+| Faster | Warm reload -40..58 % on a 92k-recipe bench, plugin phase -49..66 %, join -21 %, ~60 MB less heap (Q3). Real pack (2026-10-26): EMI join reload 18.1 s (30.0 s with the old jars, 23.0 s on 2026-10-19), emi_enchanting 134 ms (was 2261), emi_loot 151 ms (was 5631 with the old add-on), emiffect 133 ms (was 1077); login -> joined 2.3 s (was ~24 s before LOOT-ASYNC); chest structure lookup 1.6 s (0.6 s from the cache) instead of 10-45 s. |
 | Many info features (A1-A12, tier B, more) | Item Info screen (I) with How to Get / Used For / Details + provider API; enchantment max level, incompatibilities, sources; effect sources; villager trades per profession and level; food, fuel, compost, tool/weapon/armour stats; mob pages; loot structure/dimension filters, condition icons, Lootr note; ores in modded dimensions, Y-range highlight; distraction-free extras; one config screen with module switches and plugin manager; biome and structure pages; tag browser (T); copy recipe as text/JSON (Ctrl+C); advancement links; `/emiexport`. Details: `CHANGELOG.md`, `docs/MODULES.md`, `docs/INFO_PROVIDERS.md`. |
 | Owner session-6 additions: verify with the pack, description + summary, pixel-art logo | Pack verified (above). `docs/DESCRIPTION.md` (summary EN 187 chars, DE 181, tagline, CurseForge/Modrinth text), `fabric.mod.json` description. Logo: `scripts/logo/make_logo.py` (deterministic), `docs/logo/icon.png`, `icon-400.png`, `banner.png`, mod icon `src/main/resources/icon.png`. |
 | Translations | English + German for all new strings. |
@@ -55,9 +57,6 @@ Work units (short 1, long 2): Opus 35 / Sonnet 121 -> about 22 % Opus. Precision
 - KB13: Sodium's optimised vertex path is not used for batched unlit items (needs pack measurement).
 - KB21: drops that mods give in code (not loot tables) and ore features of custom feature types (e.g. Mekanism) are not shown; modded code-placed structure chests have no structure.
 - KB28/D14: enchanted books above the listed range (> max+5 or > 10) do not open the enchantment page.
-- Structure lookup takes 10-45 s in this pack (off-thread now; chest structure info appears a few seconds after the EMI reload). Recommendation: parallel template reads.
-- The lookup summary log line counts 433 of 789 "chest" tables while 563 tables are delivered (narrower set in the summary); cosmetic.
-- Item Info screen: right-aligned counts ("x2", "100%") sit flush at the scroll area edge (`info/client/EntryImpl.java` ~line 104); one-line padding change recommended.
 - Flying mobs show the raw flying-speed attribute (no verified blocks/s conversion); mobs that never set a walking speed show none.
 - GUI scale 3 at 1280x720: only the "Modules" jump fits next to EMI's jumps; tooltip overlap at scale 3 accepted (R7). EMI config header glyphs (R6) and T1-29 "item(s)" are EMI core strings, untouched.
 - Visible-window mode of dev clients (`-PdevtourVisible`) was never launched (owner focus rule).
@@ -65,3 +64,37 @@ Work units (short 1, long 2): Opus 35 / Sonnet 121 -> about 22 % Opus. Precision
 - Other pack mods: `certain_questing_additions` (InvalidInjectionException into FTB Quests client code) and `miningspeedtooltips` (client API in the main entrypoint) crash any dedicated server. Not ours; tell their authors or keep them client-only.
 - Old worlds list the data packs `emi_loot` and `emi_letsdo_compat`: one-time "Missing data pack" note per world.
 - Release on CurseForge/Modrinth waits for the owner's OK.
+
+## 8. Sessions 8-9: owner extras (2026-10-20 / 2026-10-26)
+Owner: structure cache "do that", extra sources, search by source, "one keybind and a menu with tabs", optimisations, "finish so it fully works on Fabric 1.21.1".
+
+| Item | Result |
+|---|---|
+| Search by source (X-SEARCH) | `~stronghold`, `~cleric`, `~nosource`, `-~crafting`; labels from producing recipes + `SourceLabels` API; index built in the background (1.7 s in the pack, ready 0.9 s after the reload). `docs/SEARCH.md`. |
+| Extra sources (X-SOURCES) | "Other Sources" category from `assets/*/emi_sources/**.json` (resource packs, no networking) + 4 vanilla built-ins; `docs/SOURCES.md`. |
+| One-key item view (X-HUB) | Tab bar Info / Recipes N / Uses N on EMI's recipe screen and Item Info; R/U fall back to Info; settings `info.tab-bar`, `info.primary-view`, `info.tooltip-hint`. Mixins only; the 5 third-party EMI mixins still apply in the pack. |
+| Mob/biome stacks, world info (X-UX) | `emi_mobs:mob` stacks for egg-less mobs (ender dragon, wither, giant, illusioner, armor stand), biome stacks rule, world Item Info provider, trial tab only when split. |
+| Optimisations (X-PERF, X-PERF2, X-PARALLEL) | Merge Enchantments shared columns + lazy index, mob loot prestart, identical faster suffix-array build (4 in parallel), async source index, EmiHidden fast path, parallel structure lookup with a lean NBT reader (pack server 10.2 s -> 1.7 s, identical results as sets). Skipped as unprovable: remainder cache, professions cache, item groups off the render thread (D25). |
+| Structure cache (X-CACHE) | `emi_remastered/cache/structure-lookup.dat`, jigsaw walks only, fingerprint per D26, setting `loot.structure-cache`; pack client miss 1.6 s + 5 ms save (54 KB), hit 0.6 s; pack server hit ~0.2 s. |
+| Polish (X-PAD, X-SUMMARY) | Item Info right padding; summary line "Chest loot pages with a known structure: 563 of 1196 (chest loot tables by path: 433 of 789)". |
+| Docs (DOC5, DOC6a/b) | CHANGELOG/README keys table and performance numbers measured in the real pack; egg-less mob examples corrected. |
+
+Checks (session 9): `gradlew build` with 483 tests green on the head; dev servers for X-PARALLEL/X-CACHE clean; production pack server (560 mods): 993 structures, 433 of 789, cache miss/hit with identical counts; real pack PACK-REAL3 (run4, 2 launches, copied world, offline, muted): miss + hit identical (998 structures with the owner's new mods, 563 of 1196), 39 EMI plugins with 0 errors, all own mixins (incl. hub, suffix array, resource pack accessors) and the third-party EMI mixins (sporran, ali, certain_questing_additions, clientsort, polymorph) applied, 0 EMI WARN/ERROR apart from the known informational taint report and the one-time "Missing data pack emi_loot / emi_letsdo_compat" of old worlds; instance restored (4 hashes equal, git status identical, lock removed).
+
+Manual checklist additions:
+- [ ] Item view: R/left click -> Recipes tab, U -> Uses, I -> Info; switching tabs; Backspace; bedrock -> Info; with ali: scroll/drag on the recipe screen; certain_questing_additions "show recipe" -> back to the quest screen (known: the return link is lost when going through the Info tab).
+- [ ] Search `~stronghold`, `~cleric`, `~nosource`, `-~crafting`.
+- [ ] Other Sources pages (turtle scute, dragon egg).
+- [ ] Ender dragon / wither stacks in the index; a favourite survives a restart.
+- [ ] Second start of the same world: chest "Found in" lines right away, log "Loaded ... from the cache".
+
+Model usage (lead tally, work units short 1 / long 2): Opus 49 / Sonnet 131 overall -> about 27 % Opus. Session 9 alone: Opus 6 (X-PARALLEL finish, X-CACHE, PACK-REAL3), Sonnet 2 (DOC6a, DOC6b). Precision overrides: X-PERF, X-PERF2 (identical-output perf in core, D25), X-HUB (UI hooks shared with pack mods, D23), X-PARALLEL (concurrency, D20), X-CACHE (silent stale-data risk, D26), PACK-REAL3 (owner's real instance).
+
+Known limitations added in sessions 8-9:
+- The structure lookup still runs in the background after server start; in the pack it finished before the join, but a very early join gets the structures by the late update (unchanged, correct).
+- A cache hit on the real client took 0.6 s, mostly reading the identity of ~640 mod jars (0.1-0.4 s, I/O variance).
+- `~nosource` differs from the Item Info marker for third-party OBTAIN providers (docs/SEARCH.md).
+- During launch A of PACK-REAL3 the real game window came to the foreground 12 times (loading and idle); a watcher minimised it at once without input. Real-pack launches cannot use the dev hidden-window mode.
+- Optional: empty data packs under the old ids `emi_loot`/`emi_letsdo_compat` would silence the one-time "Missing data pack" note of old worlds (not done; harmless).
+- Remaining perf hotspots (not provably safe): `EmiRecipes$Manager` byInput, `EmiShapedRecipe.setRemainders`, item groups on the render thread.
+- Graphify not used (owner: "No Graphify").
