@@ -1,6 +1,6 @@
 # Plan
 
-Usage tally (work units: short = 1, long = 2): Opus 47 (session 9: X-PARALLEL finish x2, X-CACHE x2; session 8 lead: X-PERF x2, X-HUB x2, X-PERF2 x2, PACK-REAL3 x2; LOOT-ASYNC x2, PACK-REAL x2, PACK-REAL2 x2, F1, F2, Q3 x6, A1 x2, FX1 x4, FOCUS1 x4 = two delegations, PACK-CLI x2, LOGO x2) / Sonnet 130 (session 9: DOC6a x1; session 8 lead: X-SOURCES x2, X-SEARCH x2, X-UX x2, DOC5 x1, key map x1; session 7: POLISH x2, DOC4 x1) -> Opus 25 % (follow-up session's X-PAD/X-SUMMARY/X-PARALLEL/X-CACHE tallied there) (sessions 4+5 re-delegations counted again)
+Usage tally (work units: short = 1, long = 2): Opus 49 (session 9: X-PARALLEL finish x2, X-CACHE x2, PACK-REAL3 rerun x2; session 8 lead: X-PERF x2, X-HUB x2, X-PERF2 x2, PACK-REAL3 x2; LOOT-ASYNC x2, PACK-REAL x2, PACK-REAL2 x2, F1, F2, Q3 x6, A1 x2, FX1 x4, FOCUS1 x4 = two delegations, PACK-CLI x2, LOGO x2) / Sonnet 130 (session 9: DOC6a x1; session 8 lead: X-SOURCES x2, X-SEARCH x2, X-UX x2, DOC5 x1, key map x1; session 7: POLISH x2, DOC4 x1) -> Opus 25 % (follow-up session's X-PAD/X-SUMMARY/X-PARALLEL/X-CACHE tallied there) (sessions 4+5 re-delegations counted again)
 
 Status: open / in progress / in review / done. `||` = can run in parallel.
 
@@ -96,7 +96,7 @@ Owner: "1. do that (structure cache) 2. sure (extra sources) 3. sure (search by 
 |---|---|---|---|
 | X-PAD / X-SUMMARY | Item Info right padding / lookup summary count (follow-up session) | Sonnet short | done (merged) |
 | X-PARALLEL | Parallel structure template reads (follow-up session) | Opus long | done (merged bbd28d2f; pack server lookup 10.2 s -> 1.7 s, 433 of 789, 563 of 1196 pages, dumps equal as sets; build abandoned on server stop; 453 tests) |
-| X-CACHE | Structure lookup disk cache, fingerprinted (D26) | Opus long | in progress |
+| X-CACHE | Structure lookup disk cache, fingerprinted (D26) | Opus long | done (merged 04479dc3 after 1 correction: no save with failed walks; pack server hit 199-238 ms vs walk 1.4-1.55 s, same counts; 483 tests) |
 | X-SEARCH | `~` source search + `~nosource`, SourceLabels API, index at bake (async since X-PERF2), late chest structures refresh | Sonnet long | done (merged a736e2cc; tours ok, ~1.5 % bake) |
 | X-SOURCES | Other Sources category from `assets/*/emi_sources` resource files, 4 vanilla code-only built-ins, plugin `emi_info` (entrypoint, mixin removed after review) | Sonnet long | done (merged 8612fb91) |
 | X-PERF | Merge Enchantments shared columns + lazy index; mob loot data prestart | Opus long | done (merged fa32dad4; dev emi_enchanting 348->52 ms join with ME, emi_loot 436->49; identical dumps) |
@@ -104,6 +104,6 @@ Owner: "1. do that (structure cache) 2. sure (extra sources) 3. sure (search by 
 | X-UX | Mob stacks (emi_mobs:mob) for egg-less mobs, trial tab only when split, biome stacks rule, world Item Info provider | Sonnet long | done (merged a141b16b after 1 correction: namespaced serializer) |
 | DOC5 | CHANGELOG/README keys table/MODULES/DEVTOUR/KB21 | Sonnet short | done (merged cdc2531f; placeholder for perf2 + cache) |
 | X-PERF2 | Identical faster suffix-array build (parallel), source index async, EmiHidden fast path; skipped: remainders cache, professions cache, item groups (unsafe) | Opus long | done (merged 7dad04db; search bake -45..-75 %, 58 queries identical) |
-| PACK-REAL3 | Real pack with jar 7c8a9a56: reload times, new mixins vs ali/CQA/hollowhorizon | Opus long | open (interrupted by handoff before world; lead completed cleanup, instance restored; re-run after X-CACHE) |
+| PACK-REAL3 | Real pack with jar a388815d (04479dc3): reload times, new mixins vs ali/CQA/hollowhorizon, cache miss then hit | Opus long | in progress (session 9 re-run) |
 | DOC6a | CHANGELOG/README perf2 + parallel entries, mobs eggless tooltip fix | Sonnet short | done (merged; 1 follow-up: same list in MobsSettings @Comment + javadoc) |
 | DOC6b | CHANGELOG/README structure cache + real-pack numbers | Sonnet short | open (after X-CACHE, PACK-REAL3) |

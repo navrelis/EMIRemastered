@@ -137,3 +137,5 @@
 2026-10-26 | X-PARALLEL review | accepted (ordered merge, no interrupts, read-once retry on failure, abort on server stop, 28 new tests); lead build 453 tests green; merged bbd28d2f; X-CACHE (Opus long) delegated, D26
 2026-10-26 | DOC6a (Sonnet short) delegated in parallel with X-CACHE (disjoint files)
 2026-10-26 | DOC6a review | accepted after 1 follow-up (2 more wrong mob lists), merged, build green
+2026-10-26 | X-CACHE review | design accepted (walk-only cache, D26 updated); 1 correction: do not save builds with failed walks
+2026-10-26 | X-CACHE correction accepted, merged 04479dc3, build 483 green, pushed; PACK-REAL3 re-run (Opus long) delegated with jar a388815d
