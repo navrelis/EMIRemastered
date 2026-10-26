@@ -1,4 +1,4 @@
-## 2.0.0+1.21.1 (2026-10-19)
+## 2.0.0+1.21.1 (2026-10-26)
 
 EMI Remastered: EMI 1.1.24 and seven add-ons merged into one Fabric 1.21.1 mod (mod id `emi`, jar
 `EMIRemastered-1.21.1-2.0.0-Fabric.jar`). **Remove the jars of EMI and of the seven add-ons when you install it**: the mod
