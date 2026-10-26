@@ -170,14 +170,31 @@ identical to stock EMI. Numbers on your pack will differ; they depend on the rec
 alone went from about 1.1 s (EMIffect 2.1.5, cold) to 63-93 ms on the dev world.
 
 In packs with Merge Enchantments (every enchantment accepts every item) the enchanting plugin builds the item list of
-enchantments that share the same item set once, and the mob loot data is started while the plugins initialise. Dev
-benchmark estimates for the test pack: the enchanting plugin about 2.3 s to 0.3 s, the mob loot plugin about 2.0 s to
-0.15 s on the first join, together about 3.8 s less of a 23 s join reload.
+enchantments that share the same item set once, and the mob loot data is started while the plugins initialise.
 
 The search index of the item list is built 45 to 75 % faster in the dev benchmark (same results; 58 test queries
 returned identical lists). The "Found in" lines of chest loot are looked up in the background on a few worker threads:
 10.2 s to 1.7 s on a production server with a pack of 560 mods, with the same result as before.
-<!-- DOC6: structure cache + real-pack numbers pending -->
+
+The structures a chest is found in are saved to a cache file (`emi_remastered/cache/structure-lookup.dat` in the game
+directory, setting `loot.structure-cache`, on by default). While your mods and data packs stay the same, the next start
+loads them from the file instead of reading every structure again; any change makes the next start look them up again
+and replace the file.
+
+Measured on a real pack of about 640 mods (a client joining a copied world, 2026-10-26, compared with a run of
+2026-10-19):
+
+| | Before | After |
+|---|---|---|
+| Reload when joining a world | 23.0 s | 18.1 s |
+| Enchanting plugin | 2261 ms | 134 ms |
+| Loot plugin (mob loot data) | 2036 ms | 151 ms |
+| Search index bake | about 5.1 s | about 4.0 s |
+| Chest structure lookup | 45.4 s | 1.6 s (0.6 s from the cache file) |
+| Login until joined | 4.6 s | 2.3 s |
+
+The structure lookup is now finished before you join, so chest pages show their structures right away. The chest pages
+with a structure are the same as before (563 of 1196), and all 39 EMI plugins load without errors.
 
 
 ## Compatibility
