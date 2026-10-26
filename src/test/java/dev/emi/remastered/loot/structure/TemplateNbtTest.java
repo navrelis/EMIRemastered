@@ -2,6 +2,7 @@ package dev.emi.remastered.loot.structure;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -382,6 +383,151 @@ class TemplateNbtTest {
 		assertNotEquals("FAIL", expected);
 		assertEquals(expected, partial(file));
 		assertEquals(TemplateNbt.containerNbt(root), TemplateNbt.read(new ByteArrayInputStream(file)));
+	}
+
+	/** One value of every tag type, with non-ASCII text, long arrays, nested and empty lists. */
+	private static void everyType(NbtCompound nbt, String suffix) {
+		nbt.putByte("byte" + suffix, (byte) -3);
+		nbt.putShort("short" + suffix, (short) -300);
+		nbt.putInt("int" + suffix, -70_000);
+		nbt.putLong("long" + suffix, Long.MIN_VALUE);
+		nbt.putFloat("float" + suffix, 1.5f);
+		nbt.putDouble("double" + suffix, -2.25);
+		nbt.putByteArray("bytes" + suffix, new byte[] {1, -2, 3});
+		nbt.putIntArray("ints" + suffix, new int[] {Integer.MAX_VALUE, -1});
+		nbt.putLongArray("longs" + suffix, new long[] {Long.MAX_VALUE, -1L, 0L});
+		nbt.putString("text" + suffix, "Grüße 中 \u0000 😀");
+		nbt.putString("schlüssel_ä" + suffix, "x");
+		nbt.put("empty" + suffix, new NbtList());
+		NbtList lists = new NbtList();
+		lists.add(ints(1, 2));
+		lists.add(ints(3));
+		nbt.put("lists" + suffix, lists);
+		NbtList longs = new NbtList();
+		longs.add(net.minecraft.nbt.NbtLong.of(7L));
+		nbt.put("longList" + suffix, longs);
+		NbtCompound inner = new NbtCompound();
+		inner.putString("LootTable", "mod:chests/inner" + suffix);
+		NbtList compounds = new NbtList();
+		compounds.add(inner);
+		nbt.put("compounds" + suffix, compounds);
+	}
+
+	@Test
+	void everyTagTypeIsSkippedAndReadLikeTheFullRead() throws IOException {
+		NbtCompound root = template(new Random(3));
+		everyType(root, "_root");
+		NbtList blocks = root.getList("blocks", NbtElement.COMPOUND_TYPE);
+		for (int i = 0; i < blocks.size(); i += 7) {
+			NbtCompound block = blocks.getCompound(i);
+			everyType(block, "_block");
+			NbtCompound nbt = block.contains("nbt", NbtElement.COMPOUND_TYPE) ? block.getCompound("nbt") : new NbtCompound();
+			everyType(nbt, "_" + i);
+			block.put("nbt", nbt);
+		}
+		byte[] file = compress(root);
+		String expected = full(file);
+		assertNotEquals("FAIL", expected);
+		assertEquals(expected, partial(file));
+		assertEquals(TemplateNbt.containerNbt(root), TemplateNbt.read(new ByteArrayInputStream(file)));
+	}
+
+	@Test
+	void oddListHeadersInSkippedPlacesAreJudgedLikeTheFullRead() throws IOException {
+		// an empty list of an unknown element type is fine, a non-empty one and a negative length are not
+		assertSame(root(out -> {
+			key(out, NbtElement.LIST_TYPE, "palette");
+			out.writeByte(42);
+			out.writeInt(0);
+			blocks("blocks", 1, o -> chestNbt(o, "a:chests/x")).write(out);
+		}), "[a:chests/x] []");
+		for (int[] header : new int[][] {{42, 1}, {NbtElement.INT_TYPE, -1}, {0, -1}}) {
+			byte[] file = root(out -> {
+				blocks("blocks", 1, o -> chestNbt(o, "a:chests/x")).write(out);
+				key(out, NbtElement.LIST_TYPE, "palette");
+				out.writeByte(header[0]);
+				out.writeInt(header[1]);
+				out.writeInt(0);
+			});
+			assertSame(file, "FAIL");
+		}
+		// "blocks" itself: an empty list of an unknown type has nothing, a negative length fails
+		assertSame(root(out -> {
+			key(out, NbtElement.LIST_TYPE, "blocks");
+			out.writeByte(42);
+			out.writeInt(0);
+		}), "[] []");
+		assertSame(root(out -> {
+			key(out, NbtElement.LIST_TYPE, "blocks");
+			out.writeByte(NbtElement.COMPOUND_TYPE);
+			out.writeInt(-5);
+		}), "FAIL");
+	}
+
+	@Test
+	void theDepthLimitIsWhereTheFullReadHasIt() throws IOException {
+		// nested lists in a skipped place and inside a block's "nbt": both readers agree at every depth around 512
+		for (boolean insideNbt : new boolean[] {false, true}) {
+			boolean passed = false;
+			boolean failed = false;
+			for (int depth = 500; depth <= 515; depth++) {
+				int levels = depth;
+				Body deep = out -> {
+					key(out, NbtElement.LIST_TYPE, "deep");
+					for (int i = 0; i < levels; i++) {
+						out.writeByte(NbtElement.LIST_TYPE);
+						out.writeInt(1);
+					}
+					out.writeByte(NbtElement.INT_TYPE);
+					out.writeInt(0);
+				};
+				byte[] file = insideNbt
+					? root(blocks("blocks", 1, out -> {
+						key(out, NbtElement.COMPOUND_TYPE, "nbt");
+						key(out, NbtElement.STRING_TYPE, "LootTable");
+						out.writeUTF("a:chests/x");
+						deep.write(out);
+						out.writeByte(0);
+					}))
+					: root(out -> {
+						blocks("blocks", 1, o -> chestNbt(o, "a:chests/x")).write(out);
+						deep.write(out);
+					});
+				String expected = full(file);
+				assertEquals(expected, partial(file), "depth " + depth + (insideNbt ? " in nbt" : ""));
+				passed |= !expected.equals("FAIL");
+				failed |= expected.equals("FAIL");
+			}
+			assertTrue(passed && failed, "the limit was not between 500 and 515");
+		}
+	}
+
+	@Test
+	void aFileThatIsNotGzipFailsBothWays() throws IOException {
+		NbtCompound root = template(new Random(4));
+		ByteArrayOutputStream plain = new ByteArrayOutputStream();
+		NbtIo.writeCompound(root, new DataOutputStream(plain));
+		assertSame(plain.toByteArray(), "FAIL");
+		assertSame(new byte[0], "FAIL");
+		assertSame(new byte[] {0x1F}, "FAIL");
+		assertSame(file(out -> { }), "FAIL");
+	}
+
+	@Test
+	void aFileCutOffAnywhereFailsBothWays() throws IOException {
+		byte[] whole = compress(template(new Random(6)));
+		byte[] raw;
+		try (var in = new java.util.zip.GZIPInputStream(new ByteArrayInputStream(whole))) {
+			raw = in.readAllBytes();
+		}
+		Random random = new Random(6);
+		for (int i = 0; i < 150; i++) {
+			int length = i < 20 ? i : random.nextInt(raw.length);
+			byte[] cut = java.util.Arrays.copyOf(raw, length);
+			byte[] file = file(out -> out.write(cut));
+			assertEquals("FAIL", full(file), "cut at " + length);
+			assertEquals("FAIL", partial(file), "cut at " + length);
+		}
 	}
 
 	@Test

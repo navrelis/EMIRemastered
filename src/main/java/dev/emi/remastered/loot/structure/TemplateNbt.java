@@ -26,11 +26,12 @@ import java.util.zip.GZIPInputStream;
  * inflated bytes without building it, and reads each "nbt" compound with the game's own compound reader, so those
  * compounds are the very same as in the full read (same keys in the same order).
  * <p>
- * It fails where the full read fails: keys and skipped strings are checked as modified UTF-8; lists without an element
- * type, negative lengths, unknown tag types, a truncated file and a depth over 512 throw, as they do there; like the
- * full read it inflates only as far as the data goes, so what follows the data (the gzip trailer) is not looked at.
- * When a key repeats, the last one counts, as in a compound. (Only a corrupt array length too large for memory
- * differs: the full read runs out of memory, this one finds the file too short.)
+ * It fails where the full read fails: a file that is not gzip compressed, keys and skipped strings that are no modified
+ * UTF-8, lists without an element type, negative lengths, unknown tag types, a truncated file and a depth over 512
+ * throw, as they do there; like the full read it inflates only as far as the data goes, so what follows the data (the
+ * gzip trailer) is not looked at. When a key repeats, the last one counts, as in a compound. (Only a corrupt array or
+ * list length too large for memory outside the "nbt" compounds differs: the full read runs out of memory, which the
+ * lookup did not catch, this one finds the file too short and the template has no loot tables.)
  */
 final class TemplateNbt {
 	private static final int END = NbtElement.END_TYPE;
