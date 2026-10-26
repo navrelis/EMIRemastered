@@ -3,7 +3,7 @@
   "id": "emi",
   "version": "${version}",
   "name": "EMI Remastered",
-  "description": "EMI 1.1.24 and seven EMI add-ons (Loot, Ores, Effects, Enchanting, Professions, Let's Do, Distraction Free) merged into one Fabric 1.21.1 mod, plus pages that show where things come from.",
+  "description": "EMI 1.1.24 and seven EMI add-ons (Loot, Ores, Effects, Enchanting, Professions, Let's Do, Distraction Free) merged into one Fabric 1.21.1 mod, plus Item Info pages and search by source.",
   "authors": [
     "Emi",
     "navrelis"
