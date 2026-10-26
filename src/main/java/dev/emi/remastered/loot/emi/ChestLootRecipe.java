@@ -10,6 +10,8 @@ import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.SlotWidget;
 import dev.emi.emi.api.widget.WidgetHolder;
+import dev.emi.remastered.info.search.SourceLabels;
+import dev.emi.remastered.info.search.SourceText;
 import dev.emi.remastered.loot.EMILoot;
 import dev.emi.remastered.loot.client.ClientChestLootTable;
 import dev.emi.remastered.loot.structure.StructureRef;
@@ -39,7 +41,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static dev.emi.remastered.loot.util.FloatTrimmer.trimFloatString;
 
-public class ChestLootRecipe implements EmiRecipe {
+public class ChestLootRecipe implements EmiRecipe, SourceLabels {
 
     public ChestLootRecipe(ChestLootRecipeData data) {
         this.loot = data.loot;
@@ -78,6 +80,33 @@ public class ChestLootRecipe implements EmiRecipe {
 
     public List<StructureRef> getStructures() {
         return loot.getStructures();
+    }
+
+    private record SearchLabels(List<StructureRef> source, List<String> labels) {
+    }
+
+    private volatile SearchLabels searchLabels;
+
+    /** Source search ({@code ~}): the table id and, once the server sent them, the structures and dimensions of the chest. */
+    @Override
+    public List<String> sourceLabels() {
+        List<StructureRef> structures = loot.getStructures();
+        SearchLabels current = searchLabels;
+        if (current == null || current.source() != structures) {
+            List<String> labels = new ArrayList<>();
+            labels.add(loot.id.getPath());
+            labels.add(SourceText.spaced(loot.id.getPath()));
+            for (StructureRef ref : structures) {
+                labels.add(StructureText.structureName(ref.structure()));
+                labels.add(SourceText.spaced(ref.structure().getPath()));
+                for (Identifier dimension : ref.dimensions()) {
+                    labels.add(StructureText.dimensionName(dimension));
+                }
+            }
+            current = new SearchLabels(structures, List.copyOf(labels));
+            searchLabels = current;
+        }
+        return current.labels();
     }
 
     public Text getTitle() {

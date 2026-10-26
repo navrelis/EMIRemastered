@@ -21,6 +21,8 @@ import net.minecraft.util.Formatting;
 /** Entry row: icon, label, example slots, detail; clicking the row opens its link. */
 final class EntryImpl implements InfoEntry, InfoElement {
 	private static final int HEIGHT = 18;
+	/** Gap between the right-aligned detail / example slots and the edge of the scroll area. */
+	private static final int RIGHT_PAD = 3;
 	private final EmiRenderable icon;
 	private final Text label;
 	private @Nullable Text detail;
@@ -75,7 +77,7 @@ final class EntryImpl implements InfoEntry, InfoElement {
 		lastWidth = width;
 		lastMax = max;
 		TextRenderer font = Elements.font();
-		int right = width - (detail == null ? 0 : font.getWidth(detail) + 4);
+		int right = width - RIGHT_PAD - (detail == null ? 0 : font.getWidth(detail) + 4);
 		int labelMin = Math.min(font.getWidth(label), 64);
 		int fit = Math.max(0, (right - 20 - labelMin - 4) / 18);
 		int n = Math.min(Math.min(max, fit), stacks.size());
@@ -101,7 +103,7 @@ final class EntryImpl implements InfoEntry, InfoElement {
 		icon.render(draw, 1, 1, delta);
 		draw.drawText(Elements.font(), Elements.trim(label, labelWidth), 20, 5, Elements.TEXT, false);
 		if (detail != null) {
-			draw.drawText(Elements.font(), detail, width - Elements.font().getWidth(detail), 5, Elements.MUTED, false);
+			draw.drawText(Elements.font(), detail, width - RIGHT_PAD - Elements.font().getWidth(detail), 5, Elements.MUTED, false);
 		}
 		grid.render(draw, mouseX, mouseY, delta);
 	}

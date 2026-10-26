@@ -2,6 +2,8 @@ package dev.emi.emi.search;
 
 import java.util.function.Function;
 
+import dev.emi.remastered.info.search.RegexSourceQuery;
+import dev.emi.remastered.info.search.SourceQuery;
 import net.minecraft.text.Style;
 
 public enum QueryType {
@@ -9,6 +11,8 @@ public enum QueryType {
 	MOD(    "@", 0x5555ff, 0x5555ff, 0x9b5cdb, 0xf22bf2, ModQuery::new, RegexModQuery::new),
 	TOOLTIP("$", 0xffff55, 0xffff55, 0xbdf486, 0xf4bd86, TooltipQuery::new, RegexTooltipQuery::new),
 	TAG(    "#", 0x55ff55, 0x55ff55, 0x41eace, 0x0098ea, TagQuery::new, RegexTagQuery::new),
+	// EMI Remastered: `~` searches the sources of a stack (info module); last, so fromString's reverse scan stays unambiguous
+	SOURCE( "~", 0xffaa00, 0xffaa00, 0xffd37a, 0xff7a3d, SourceQuery::new, RegexSourceQuery::new),
 	;
 
 	public final String prefix;

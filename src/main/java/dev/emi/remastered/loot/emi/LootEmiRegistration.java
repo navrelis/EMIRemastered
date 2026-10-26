@@ -5,6 +5,7 @@ import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.remastered.loot.EMILoot;
+import dev.emi.remastered.loot.LootSettings;
 import dev.emi.remastered.loot.client.ClientArchaeologyLootTable;
 import dev.emi.remastered.loot.client.ClientBlockLootTable;
 import dev.emi.remastered.loot.client.ClientChestLootTable;
@@ -47,22 +48,78 @@ public class LootEmiRegistration {
     private static CompletableFuture<List<GameplayLootRecipe.GameplayLootRecipeData>> gameplayFuture;
     private static CompletableFuture<List<ArchaeologyLootRecipe.ArchaeologyLootRecipeData>> archaeologyFuture;
 
+    private static final Function<LootReceiver, MobLootRecipe.MobLootRecipeData> MOB_DATA = lr -> MobLootRecipe.MobLootRecipeData.of((ClientMobLootTable) lr);
+    /** Mob recipe data started early by {@link #prestart()}, with the tables it was started for; only touched by EMI's reload thread. */
+    private static Prestarted<MobLootRecipe.MobLootRecipeData> mobPrestart;
+
+    private record Prestarted<D>(List<LootReceiver> tables, CompletableFuture<List<D>> data) {
+    }
+
+    /**
+     * Called from the plugin's initialize step, seconds before {@link #register}: starts the mob recipe data off the
+     * reload thread already. It creates one entity per mob table, which on the first load of a game session is by far
+     * the slowest part of the loot plugin (entity classes are loaded and transformed); started here it runs while the
+     * other plugins register. {@link #register} only uses the result if the received mob tables are still exactly the
+     * same; otherwise it waits for it and builds the data again (then with the entity classes already loaded).
+     */
+    public static void prestart() {
+        Prestarted<MobLootRecipe.MobLootRecipeData> previous = mobPrestart;
+        mobPrestart = null;
+        if (previous != null) {
+            // never two builds of the same tables at once (a reload that restarted before it registered)
+            previous.data().join();
+        }
+        if (worldGone()) {
+            return;
+        }
+        List<LootReceiver> tables = new ArrayList<>(ClientLootTables.INSTANCE.mobLoots);
+        if (!tables.isEmpty()) {
+            mobPrestart = new Prestarted<>(tables, startData("Mob", tables, MOB_DATA));
+        }
+    }
+
     /**
      * Starts converting the received loot tables into recipe data off the reload thread.
      */
     private static void startAll() {
         ClientLootTables tables = ClientLootTables.INSTANCE;
-        chestFuture = startData("Chest", tables.chestLoots, lr -> ChestLootRecipe.ChestLootRecipeData.of((ClientChestLootTable) lr));
-        blockFuture = startData("Block", tables.blockLoots, lr -> new BlockLootRecipe(BlockLootRecipe.BlockLootRecipeData.of((ClientBlockLootTable) lr)));
-        mobFuture = startData("Mob", tables.mobLoots, lr -> MobLootRecipe.MobLootRecipeData.of((ClientMobLootTable) lr));
-        gameplayFuture = startData("Gameplay", tables.gameplayLoots, lr -> GameplayLootRecipe.GameplayLootRecipeData.of((ClientGameplayLootTable) lr));
-        archaeologyFuture = startData("Archaeology", tables.archaeologyLoots, lr -> ArchaeologyLootRecipe.ArchaeologyLootRecipeData.of((ClientArchaeologyLootTable) lr));
+        chestFuture = startData("Chest", new ArrayList<>(tables.chestLoots), lr -> ChestLootRecipe.ChestLootRecipeData.of((ClientChestLootTable) lr));
+        blockFuture = startData("Block", new ArrayList<>(tables.blockLoots), lr -> new BlockLootRecipe(BlockLootRecipe.BlockLootRecipeData.of((ClientBlockLootTable) lr)));
+        mobFuture = mobData(new ArrayList<>(tables.mobLoots));
+        gameplayFuture = startData("Gameplay", new ArrayList<>(tables.gameplayLoots), lr -> GameplayLootRecipe.GameplayLootRecipeData.of((ClientGameplayLootTable) lr));
+        archaeologyFuture = startData("Archaeology", new ArrayList<>(tables.archaeologyLoots), lr -> ArchaeologyLootRecipe.ArchaeologyLootRecipeData.of((ClientArchaeologyLootTable) lr));
     }
 
-    private static <D> CompletableFuture<List<D>> startData(String name, List<LootReceiver> source, Function<LootReceiver, D> factory) {
+    private static CompletableFuture<List<MobLootRecipe.MobLootRecipeData>> mobData(List<LootReceiver> tables) {
+        Prestarted<MobLootRecipe.MobLootRecipeData> early = mobPrestart;
+        mobPrestart = null;
+        if (early != null) {
+            if (sameTables(early.tables(), tables)) {
+                EMILoot.LOGGER.info("Using the mob loot recipe data of {} tables started while the EMI plugins were initialized", tables.size());
+                return early.data();
+            }
+            early.data().join();
+            EMILoot.LOGGER.info("The mob loot tables changed after the EMI plugins were initialized ({} -> {}); building their recipe data again", early.tables().size(), tables.size());
+        }
+        return startData("Mob", tables, MOB_DATA);
+    }
+
+    /** Same table objects in the same order. */
+    private static boolean sameTables(List<?> a, List<?> b) {
+        if (a.size() != b.size()) {
+            return false;
+        }
+        for (int i = 0; i < a.size(); i++) {
+            if (a.get(i) != b.get(i)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static <D> CompletableFuture<List<D>> startData(String name, List<LootReceiver> snapshot, Function<LootReceiver, D> factory) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                List<LootReceiver> snapshot = new ArrayList<>(source);
                 List<D> result = new ArrayList<>(snapshot.size());
                 BatchFailureLog failures = new BatchFailureLog(EMILoot.LOGGER, name + " loot recipe data");
                 for (LootReceiver lr : snapshot) {
@@ -121,7 +178,10 @@ public class LootEmiRegistration {
     }
 
     public static void register(EmiRegistry registry) {
-        registry.addCategory(TRIAL_CATEGORY);
+        if (LootSettings.splitChestLootByTrial) {
+            // without the split no recipe belongs to it, and an empty tab would be listed
+            registry.addCategory(TRIAL_CATEGORY);
+        }
         registry.addCategory(CHEST_CATEGORY);
         registry.addCategory(BLOCK_CATEGORY);
         registry.addCategory(MOB_CATEGORY);

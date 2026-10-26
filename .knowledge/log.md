@@ -119,3 +119,16 @@
 2026-10-19 | DOC4 review (lead) | accepted, committed on wip/doc4; merge after POLISH (mobs speed wording may change)
 2026-10-19 | PACK-REAL2 review (lead) | accepted: LOOT-ASYNC verified in real pack (join 4 s); cleanup verified; cosmetic: summary log counts 433/789 chestTables while 563 tables delivered (report only)
 2026-10-19 | POLISH review (lead) | accepted, merged; DOC4 merged; build 381 tests green; final jar 829b63e1 installed (lock); report written
+2026-10-20 | session 8 (follow-ups): worktrees x-pad, x-summary, x-parallel from remastered 63649db5; delegated X-PAD (Sonnet short), X-SUMMARY (Sonnet short), X-PARALLEL (Opus long, precision: concurrency in the server-side lookup, D20)
+2026-10-20 | X-SUMMARY review (lead) | accepted: summary via Build.whenReady on the server thread (no race with reload refilling chestSenders, stale/failed builds skipped), counts chest senders = encode's set + by-path numbers; dev server 'pages 50 of 59 (by path 53 of 56)', 50 = non-empty dev lines; 382 tests green; committed on wip/x-summary
+2026-10-20 | X-PAD review (lead) | accepted: RIGHT_PAD 3 in EntryImpl (detail + slots via layout right) and BarElement values; 381 tests green, x-pad tour 31/31; lead viewed golden apple scroll-end shot (x2/x1/100% inset); committed on wip/x-pad
+2026-10-20 | lead session 8: owner approved structure cache (-> follow-up session as X-CACHE), extra sources, source search; delegated X-SOURCES, X-SEARCH (Sonnet long), key-map research (Sonnet, read-only)
+2026-10-20 | X-PERF (Opus long) delegated; owner asked for one-key item view -> X-HUB (Opus long)
+2026-10-20 | X-SEARCH review | accepted, merged, pushed
+2026-10-20 | X-SOURCES review | 1 correction (mixin -> emi entrypoint), accepted, merged, pushed
+2026-10-20 | X-PERF review | accepted (identical dumps, thread-safe lazy index), merged, pushed
+2026-10-20 | X-HUB review | 1 correction (unreadable micro-font counts, labels -> Info/Recipes/Uses); lang/InfoSettings merge conflicts resolved by the agent; merged, pushed
+2026-10-20 | X-UX (Sonnet long) + X-PERF2 (Opus long) delegated; X-UX 1 correction (serializer emi_mobs:mob), merged, pushed
+2026-10-20 | DOC5 (Sonnet short) | accepted, merged, pushed
+2026-10-20 | X-PERF2 review | accepted (fallback + self-check + exact-array tests), merged 7dad04db, pushed; jar 7c8a9a56 installed (lock); PACK-REAL3 (Opus long) delegated
+2026-10-20 | /handoff: PACK-REAL3 stopped during loading, lead cleanup done (WM_CLOSE, backups restored hash-equal, test save deleted, traces + bivrik restored, lock removed); see F:\Coding\EMI_Remastered\handoff-2026-10-20-lead-session8.md

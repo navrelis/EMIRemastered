@@ -4,6 +4,7 @@ import dev.emi.remastered.loot.info.LootInfoProvider;
 import dev.emi.remastered.loot.networking.ArchaeologyLootPayload;
 import dev.emi.remastered.loot.networking.BlockLootPayload;
 import dev.emi.remastered.loot.networking.ChestLootPayload;
+import dev.emi.remastered.info.search.SourceIndex;
 import dev.emi.remastered.loot.networking.ChestStructuresPayload;
 import dev.emi.remastered.loot.networking.ClearPayload;
 import dev.emi.remastered.loot.networking.GameplayLootPayload;
@@ -27,6 +28,7 @@ public class ClientLootTablesReceiver {
 			if (ClientLootTables.INSTANCE.receiveChestStructures(new PacketByteBuf(Unpooled.wrappedBuffer(payload.data()))) > 0) {
 				// chest pages read the structures when they are built; Item Info pages are cached and need a refresh
 				LootInfoProvider.refresh();
+				SourceIndex.refreshAsync(); // the `~` search names the structures of chests
 			}
 		});
 		ClientPlayNetworking.registerGlobalReceiver(BlockLootPayload.TYPE, (payload, ctx) -> receive(payload.data(), ClientLootTables.INSTANCE::receiveBlockSender));

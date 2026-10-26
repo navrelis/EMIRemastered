@@ -1,0 +1,201 @@
+{
+  "description": "X-SOURCES: category Other Sources (emi_info:other_sources) from emi_sources resource files: dev tour test file (command block with from stacks, long literal text with chance, barrier without from stacks, one invalid entry that logs a WARN) and the built-in vanilla.json (turtle scute, translated text). R page, uses page (spawn egg as from stack), Item Info How to Get, the piglin head that the loot module already covers (no duplicate). Then the plugin manager: switching emi_info off removes the category (turtle scute shows No Known Source), on again brings it back.",
+  "warmupTicks": 60,
+  "settleTicks": 10,
+  "stepTimeoutSeconds": 30,
+  "worldJoinTimeoutSeconds": 180,
+  "timeoutSeconds": 300,
+  "steps": [
+    {
+      "type": "resize",
+      "w": 1280,
+      "h": 720
+    },
+    {
+      "type": "set_gui_scale",
+      "n": 2
+    },
+    {
+      "type": "emi_wait_loaded"
+    },
+    {
+      "type": "open_inventory"
+    },
+    {
+      "type": "emi_recipes",
+      "item": "minecraft:command_block"
+    },
+    {
+      "type": "screenshot",
+      "name": "r-command-block"
+    },
+    {
+      "type": "hover",
+      "x": 300,
+      "y": 135
+    },
+    {
+      "type": "screenshot",
+      "name": "r-command-block-tooltip"
+    },
+    {
+      "type": "emi_recipes",
+      "item": "minecraft:barrier"
+    },
+    {
+      "type": "screenshot",
+      "name": "r-barrier"
+    },
+    {
+      "type": "emi_recipes",
+      "item": "minecraft:turtle_scute"
+    },
+    {
+      "type": "screenshot",
+      "name": "r-turtle-scute"
+    },
+    {
+      "type": "emi_recipes",
+      "item": "minecraft:dragon_egg"
+    },
+    {
+      "type": "screenshot",
+      "name": "r-dragon-egg"
+    },
+    {
+      "type": "emi_uses",
+      "item": "minecraft:piglin_spawn_egg"
+    },
+    {
+      "type": "screenshot",
+      "name": "uses-piglin-egg"
+    },
+    {
+      "type": "close_screen"
+    },
+    {
+      "type": "open_inventory"
+    },
+    {
+      "type": "emi_stack_key",
+      "item": "minecraft:command_block",
+      "key": "I"
+    },
+    {
+      "type": "screenshot",
+      "name": "info-command-block"
+    },
+    {
+      "type": "close_screen"
+    },
+    {
+      "type": "open_inventory"
+    },
+    {
+      "type": "emi_stack_key",
+      "item": "minecraft:turtle_scute",
+      "key": "I"
+    },
+    {
+      "type": "screenshot",
+      "name": "info-turtle-scute"
+    },
+    {
+      "type": "close_screen"
+    },
+    {
+      "type": "open_inventory"
+    },
+    {
+      "type": "emi_stack_key",
+      "item": "minecraft:piglin_head",
+      "key": "I"
+    },
+    {
+      "type": "screenshot",
+      "name": "info-piglin-head"
+    },
+    {
+      "type": "close_screen"
+    },
+    {
+      "type": "open_inventory"
+    },
+    {
+      "type": "emi_stack_key",
+      "item": "minecraft:bedrock",
+      "key": "I"
+    },
+    {
+      "type": "screenshot",
+      "name": "info-bedrock-no-source"
+    },
+    {
+      "type": "close_screen"
+    },
+    {
+      "type": "open_plugin_manager"
+    },
+    {
+      "type": "screenshot",
+      "name": "plugin-manager"
+    },
+    {
+      "type": "plugin_toggle",
+      "id": "emi_info",
+      "state": "off"
+    },
+    {
+      "type": "screen_close"
+    },
+    {
+      "type": "screen_close"
+    },
+    {
+      "type": "emi_wait_loaded"
+    },
+    {
+      "type": "open_inventory"
+    },
+    {
+      "type": "emi_stack_key",
+      "item": "minecraft:turtle_scute",
+      "key": "I"
+    },
+    {
+      "type": "screenshot",
+      "name": "info-turtle-scute-plugin-off"
+    },
+    {
+      "type": "close_screen"
+    },
+    {
+      "type": "open_plugin_manager"
+    },
+    {
+      "type": "plugin_toggle",
+      "id": "emi_info",
+      "state": "on"
+    },
+    {
+      "type": "screen_close"
+    },
+    {
+      "type": "screen_close"
+    },
+    {
+      "type": "emi_wait_loaded"
+    },
+    {
+      "type": "open_inventory"
+    },
+    {
+      "type": "emi_recipes",
+      "item": "minecraft:turtle_scute"
+    },
+    {
+      "type": "screenshot",
+      "name": "r-turtle-scute-plugin-on-again"
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "description": "X-SEARCH: the source query ~ in EMI's search bar. ~nosource, ~chest, ~stronghold (after the chest structures arrived), ~cleric, ~\"ore generation\", -~crafting, ~/village|desert/ and a combination; the result count is recorded for every search.",
+  "warmupTicks": 60,
+  "settleTicks": 15,
+  "stepTimeoutSeconds": 30,
+  "worldJoinTimeoutSeconds": 180,
+  "timeoutSeconds": 300,
+  "steps": [
+    { "type": "resize", "w": 1280, "h": 720 },
+    { "type": "set_gui_scale", "n": 2 },
+    { "type": "emi_wait_loaded" },
+    { "type": "open_inventory" },
+    { "type": "wait", "ticks": 300 },
+    { "type": "note", "text": "chest structures should have arrived (log: Received the structures of ... chest loot tables)" },
+
+    { "type": "emi_search", "text": "~nosource" },
+    { "type": "screenshot", "name": "nosource" },
+    { "type": "emi_search", "text": "~chest" },
+    { "type": "screenshot", "name": "chest" },
+    { "type": "emi_search", "text": "~stronghold" },
+    { "type": "screenshot", "name": "stronghold" },
+    { "type": "emi_search", "text": "~cleric" },
+    { "type": "screenshot", "name": "cleric" },
+    { "type": "emi_search", "text": "~\"ore generation\"" },
+    { "type": "screenshot", "name": "ore-generation" },
+    { "type": "emi_search", "text": "-~crafting" },
+    { "type": "screenshot", "name": "not-crafting" },
+    { "type": "emi_search", "text": "~/village|desert/" },
+    { "type": "screenshot", "name": "regex-village-desert" },
+    { "type": "emi_search", "text": "~stronghold diamond | ~cleric emerald" },
+    { "type": "screenshot", "name": "combined" },
+    { "type": "emi_search", "text": "~mob" },
+    { "type": "screenshot", "name": "mob" },
+    { "type": "emi_search", "text": "" },
+    { "type": "close_screen" }
+  ]
+}

@@ -23,6 +23,7 @@ import com.google.gson.JsonObject;
 import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.JsonOps;
 
+import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.recipe.EmiRecipeManager;
@@ -40,6 +41,7 @@ import dev.emi.emi.runtime.EmiPersistentData;
 import dev.emi.emi.runtime.EmiSidebars;
 import dev.emi.emi.runtime.EmiTagKey;
 import dev.emi.emi.search.EmiSearch;
+import dev.emi.remastered.info.search.SourceIndex;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.component.ComponentChanges;
 import net.minecraft.registry.Registry;
@@ -51,7 +53,14 @@ import net.minecraft.registry.Registry;
  */
 public final class StateDump {
 	private static final String[] QUERIES = {"iron", "sword", "@minecraft", "#minecraft:logs", "$sharpness", "item_00",
-		"-stone", "a", "pick | axe", "emi_bench"};
+		"-stone", "a", "pick | axe", "emi_bench",
+		// search identity check (X-PERF2): names, ids, tooltips, mods, aliases, regex, long quoted text, sources
+		"e", "_", "x", "diamond pickaxe", "\"diamond pickaxe\"", "\"netherite upgrade smithing template\"",
+		"\"smithing template\"", "glass", "wool", "dye", "rail", "potion", "book", "tool", "armor", "helmet",
+		"item_01", "tool_0", "armor_1", "minecraft:stone", "-a", "-e iron", "$durability", "$when in main hand",
+		"$attack damage", "$\"attack speed\"", "$enchant", "$e", "$curse", "$/dam.ge/", "$minecraft", "-$e",
+		"@emi_bench", "@emi", "@/^mine/", "@a", "/^iron.*ingot$/", "/sword|axe/", "#c:ingots", "#minecraft:planks",
+		"iron | gold | diamond", "~crafting", "~smelting", "~chest", "~villager", "~nosource", "~a", "~/smith/"};
 
 	private final DynamicOps<JsonElement> ops;
 	private final Map<ComponentChanges, String> componentCache = new java.util.HashMap<>();
@@ -194,6 +203,21 @@ public final class StateDump {
 		}
 		section("search", search);
 
+		// the labels a `~` query computes while the source index is being built must be the index's (as label sets:
+		// the index was built from the unsorted recipe manager of the reload, this check reads the current one)
+		SourceIndex.Snapshot ready = SourceIndex.current();
+		if (ready.active() && ready.building() == null) {
+			SourceIndex.Snapshot building = new SourceIndex.Snapshot(true, Map.of(), java.util.Set.of(), ready.stacks(),
+				EmiApi.getRecipeManager());
+			int differ = 0;
+			for (EmiStack s : ready.stacks()) {
+				if (!labelSet(ready.labelsOf(s)).equals(labelSet(building.labelsOf(s))) || ready.isNoSource(s) != building.isNoSource(s)) {
+					differ++;
+				}
+			}
+			section("source_live", List.of("stacks " + ready.stacks().size() + " differing " + differ));
+		}
+
 		// what EmiPersistentData.save() would write to emi.json (built in memory, the file is not touched)
 		JsonObject persistent = new JsonObject();
 		persistent.add("favorites", EmiFavorites.save());
@@ -205,6 +229,10 @@ public final class StateDump {
 		List<String> summary = new ArrayList<>();
 		hashes.forEach((k, v) -> summary.add(k + " " + v));
 		Files.write(dir.resolve("hashes.txt"), summary, StandardCharsets.UTF_8);
+	}
+
+	private static java.util.Set<String> labelSet(String joined) {
+		return new java.util.TreeSet<>(List.of(joined.split("\n")));
 	}
 
 	/**

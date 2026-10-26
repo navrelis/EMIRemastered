@@ -5,6 +5,7 @@ import org.lwjgl.glfw.GLFW;
 import dev.emi.emi.config.EmiConfig.Comment;
 import dev.emi.emi.config.EmiConfig.ConfigValue;
 import dev.emi.emi.input.EmiBind;
+import dev.emi.remastered.info.client.hub.HubPrimaryView;
 
 /**
  * Settings of the {@code info} module (group {@code info}); the switch is {@link InfoModule#enabled}.
@@ -21,7 +22,7 @@ public final class InfoSettings {
 
 	@Comment("Adds a line with the Item Info key to item tooltips.")
 	@ConfigValue("info.tooltip-hint")
-	public static boolean tooltipHint = false;
+	public static boolean tooltipHint = true;
 
 	@Comment("Example stacks shown next to each recipe category.")
 	@ConfigValue("info.example-stacks")
@@ -34,6 +35,19 @@ public final class InfoSettings {
 	@Comment("Lists advancements whose icon is the item in the Item Info screen.")
 	@ConfigValue("info.show-advancements")
 	public static boolean showAdvancements = true;
+
+	@Comment("Shows the tab bar \"Info | Recipes | Uses\" on the recipe and Item Info screens of a stack. "
+		+ "When off, EMI's binds behave as in plain EMI.")
+	@ConfigValue("info.tab-bar")
+	public static boolean tabBar = true;
+
+	@Comment("The tab that EMI's \"view recipes\" bind (R, left click) opens while the tab bar is on.")
+	@ConfigValue("info.primary-view")
+	public static HubPrimaryView primaryView = HubPrimaryView.RECIPES;
+
+	@Comment("Adds the Other Sources category from the emi_sources resource files.")
+	@ConfigValue("info.extra-sources")
+	public static boolean extraSources = true;
 
 	private InfoSettings() {
 	}

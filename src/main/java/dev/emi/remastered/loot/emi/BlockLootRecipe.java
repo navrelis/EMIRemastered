@@ -10,6 +10,8 @@ import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.SlotWidget;
 import dev.emi.emi.api.widget.WidgetHolder;
+import dev.emi.remastered.info.search.SourceLabels;
+import dev.emi.remastered.info.search.SourceText;
 import dev.emi.remastered.loot.EMILoot;
 import dev.emi.remastered.loot.client.ClientBlockLootTable;
 import dev.emi.remastered.loot.client.ClientBuiltPool;
@@ -34,7 +36,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-public class BlockLootRecipe implements EmiRecipe {
+public class BlockLootRecipe implements EmiRecipe, SourceLabels {
 
     public BlockLootRecipe(BlockLootRecipeData data) {
         this.id = data.id;
@@ -56,6 +58,28 @@ public class BlockLootRecipe implements EmiRecipe {
         outputStacks.init();
         inputStacks = inputStack.get().getItemStack().isEmpty() ? List.of() : List.of(inputStack.get());
         return this;
+    }
+
+    private volatile List<String> searchLabels;
+
+    /** Source search ({@code ~}): the name and id of the block that drops the items. */
+    @Override
+    public List<String> sourceLabels() {
+        List<String> labels = searchLabels;
+        if (labels == null) {
+            labels = new ArrayList<>();
+            EmiStack block = inputStack.get();
+            if (block != null) {
+                labels.add(block.getName().getString());
+                Identifier blockId = block.getId();
+                if (blockId != null) {
+                    labels.add(SourceText.spaced(blockId.getPath()));
+                }
+            }
+            labels = List.copyOf(labels);
+            searchLabels = labels;
+        }
+        return labels;
     }
 
     /** Every pool the recipe shows, for the Item Info sections. */

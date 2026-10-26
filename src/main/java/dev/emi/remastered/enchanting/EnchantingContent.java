@@ -1,9 +1,13 @@
 package dev.emi.remastered.enchanting;
 
 import java.util.ArrayList;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Map;
 
 import dev.emi.emi.api.EmiRegistry;
+import dev.emi.emi.api.stack.EmiIngredient;
+import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.runtime.EmiLog;
 import dev.emi.emi.runtime.EmiReloadLog;
 import dev.emi.remastered.enchanting.info.EnchantmentInfoProvider;
@@ -50,9 +54,10 @@ public final class EnchantingContent {
 		List<EnchantmentInfo> infos = EnchantmentCatalog.build(world.getRegistryManager(),
 			world.getEnabledFeatures().contains(FeatureFlags.TRADE_REBALANCE));
 		List<EnchantmentInfo> added = new ArrayList<>();
+		Map<List<EmiStack>, EmiIngredient> columnIngredients = new IdentityHashMap<>();
 		for (EnchantmentInfo info : infos) {
 			try {
-				registry.addRecipe(new EnchantmentRecipe(info));
+				registry.addRecipe(new EnchantmentRecipe(info, columnIngredients));
 				added.add(info);
 			} catch (Throwable t) {
 				EmiReloadLog.warn("EMI Enchanting: could not add the recipe of " + info.id(), t);

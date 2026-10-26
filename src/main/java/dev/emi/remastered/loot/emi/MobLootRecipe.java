@@ -9,6 +9,8 @@ import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.SlotWidget;
 import dev.emi.emi.api.widget.WidgetHolder;
+import dev.emi.remastered.info.search.SourceLabels;
+import dev.emi.remastered.info.search.SourceText;
 import dev.emi.remastered.loot.EMILoot;
 import dev.emi.remastered.loot.client.ClientBuiltPool;
 import dev.emi.remastered.loot.client.ClientMobLootTable;
@@ -16,6 +18,8 @@ import dev.emi.remastered.loot.client.ClientResourceData;
 import dev.emi.remastered.loot.util.*;
 import dev.emi.remastered.loot.util.stack.EntityEmiStack;
 import dev.emi.remastered.loot.util.stack.MobLootEmiStack;
+import dev.emi.remastered.mobs.emi.MobEmiStack;
+import dev.emi.remastered.module.Modules;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
@@ -40,7 +44,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-public class MobLootRecipe implements EmiRecipe {
+public class MobLootRecipe implements EmiRecipe, SourceLabels {
 
     //private final static Map<EntityType<?>, Integer> needsElevating;
     private static final Identifier ARROW_ID = Identifier.of(EMILoot.MOD_ID, "textures/gui/downturn_arrow.png");
@@ -70,6 +74,8 @@ public class MobLootRecipe implements EmiRecipe {
         outputStacks = list;
 
         this.egg = data.spawnEggItem != null ? EmiStack.of(data.spawnEggItem) : null;
+        // the mob stack of the mobs module is an input too: a mob whose spawn egg is not in the index is found through it
+        this.mobStack = data.entity != null && Modules.MOBS.isEnabled() ? MobEmiStack.of(data.entity.getType()) : EmiStack.EMPTY;
         this.lootStack = new MobLootEmiStack(lootId);
         this.name = data.name;
         this.type = data.entity != null ? data.entity.getType() : null;
@@ -77,6 +83,7 @@ public class MobLootRecipe implements EmiRecipe {
 
     private final Identifier lootId;
     private final EmiStack inputStack;
+    private final EmiStack mobStack;
     private final List<EmiStack> outputStacks;
     private final TrimmedTitle name;
     private final EntityType<?> type;
@@ -100,6 +107,26 @@ public class MobLootRecipe implements EmiRecipe {
         addWidgetBuilders(opt.get(), true);
     }
 
+    private volatile List<String> searchLabels;
+
+    /** Source search ({@code ~}): the mob's name and the loot table id. */
+    @Override
+    public List<String> sourceLabels() {
+        List<String> labels = searchLabels;
+        if (labels == null) {
+            labels = new ArrayList<>();
+            labels.add(lootId.getPath());
+            labels.add(SourceText.spaced(lootId.getPath()));
+            if (type != null) {
+                labels.add(type.getName().getString());
+                labels.add(Registries.ENTITY_TYPE.getId(type).getPath());
+            }
+            labels = List.copyOf(labels);
+            searchLabels = labels;
+        }
+        return labels;
+    }
+
     /** Every pool the recipe shows, for the Item Info sections. */
     public List<ClientBuiltPool> getPools() {
         List<ClientBuiltPool> pools = new ArrayList<>();
@@ -121,7 +148,10 @@ public class MobLootRecipe implements EmiRecipe {
 
     @Override
     public List<EmiIngredient> getInputs() {
-        return egg != null ? List.of(egg) : Collections.emptyList();
+        if (egg != null) {
+            return mobStack.isEmpty() ? List.of(egg) : List.of(egg, mobStack);
+        }
+        return mobStack.isEmpty() ? Collections.emptyList() : List.of(mobStack);
     }
 
     @Override

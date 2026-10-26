@@ -58,7 +58,7 @@
 
   "config.emi.group.ores": "Erze",
   "config.emi.ores.add_biomes_to_index": "Biome zum Index hinzufügen",
-  "config.emi.tooltip.ores.add_biomes_to_index": "Ob alle Biome zum EMI-Index hinzugefügt werden sollen. Wirkt nach einem EMI-Reload.",
+  "config.emi.tooltip.ores.add_biomes_to_index": "Ob alle Biome zum EMI-Index hinzugefügt werden sollen. Wirkt nach einem EMI-Reload.\nIst dies aus, fügt das Welt-Modul sie stattdessen hinzu (Welt: Biome im Index).",
   "config.emi.ores.show_height_values_for_current_dimension_by_default": "Höhen der aktuellen Dimension als Standard",
   "config.emi.tooltip.ores.show_height_values_for_current_dimension_by_default": "Ob die Verteilungsdiagramme der Erze standardmäßig die für die aktuelle Dimension berechneten Höhenwerte statt Werte relativ zu Weltboden und Obergrenze zeigen. UMSCHALT halten kehrt dies um.",
   "config.emi.ores.compact_biome_list": "Kompakte Biomlisten",

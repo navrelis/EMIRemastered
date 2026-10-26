@@ -2,6 +2,8 @@ package dev.emi.remastered.loot.structure;
 
 import dev.emi.remastered.loot.EMILoot;
 import dev.emi.remastered.loot.LootSettings;
+import dev.emi.remastered.loot.parser.LootTableParser;
+import dev.emi.remastered.loot.server.ChestLootTableSender;
 import com.mojang.datafixers.util.Either;
 import dev.emi.remastered.loot.mixin.CombinedEntryAccessor;
 import dev.emi.remastered.loot.mixin.JigsawStructureAccessor;
@@ -197,6 +199,8 @@ public final class StructureLookup {
 			Thread thread = new Thread(() -> run(context, gen, future), "EMI Loot structure lookup");
 			thread.setDaemon(true);
 			thread.start();
+			// on the server thread, so the chest senders are not read while a reload replaces them
+			build.whenReady(lookup -> logSummary(lookup, context.chestTables()));
 		} catch (Throwable e) {
 			EMILoot.LOGGER.error("Could not look up the structures of chest loot tables, chest pages will not show where a chest is found", e);
 			future.complete(EMPTY);
@@ -245,18 +249,23 @@ public final class StructureLookup {
 		}
 		EMILoot.LOGGER.info("Looked up {} structures and the loot tables of their pieces in {}ms", lookup.structureDimensions.size(), System.currentTimeMillis() - start);
 		future.complete(lookup);
-		boolean dev = LootSettings.isDevelopment();
-		int resolvedTables = 0;
-		for (Identifier table : context.chestTables()) {
-			List<StructureRef> refs = lookup.structuresOf(table);
-			if (!refs.isEmpty()) {
-				resolvedTables++;
-			}
-			if (dev) {
-				EMILoot.LOGGER.info("chest structures {} -> {}", table, refs.stream().map(r -> r.structure() + " " + r.dimensions()).toList());
+	}
+
+	/**
+	 * Server thread, once per build: the chest loot pages that ChestStructureSync sends with a structure. A lookup
+	 * that failed to build (empty) is not summarised; a stale build never gets here.
+	 */
+	private static void logSummary(StructureLookup lookup, List<Identifier> chestTablesByPath) {
+		if (lookup == EMPTY) {
+			return;
+		}
+		List<Identifier> pageTables = LootTableParser.chestSenders().stream().map(ChestLootTableSender::getTableId).toList();
+		if (LootSettings.isDevelopment()) {
+			for (Identifier table : pageTables) {
+				EMILoot.LOGGER.info("chest structures {} -> {}", table, lookup.structuresOf(table).stream().map(r -> r.structure() + " " + r.dimensions()).toList());
 			}
 		}
-		EMILoot.LOGGER.info("Chest loot tables with a known structure: {} of {}", resolvedTables, context.chestTables().size());
+		EMILoot.LOGGER.info(ChestSummary.of(pageTables, chestTablesByPath, lookup::structuresOf).describe());
 	}
 
 	private static void devDelay() throws InterruptedException {
