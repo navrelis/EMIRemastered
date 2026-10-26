@@ -189,11 +189,9 @@ provides their ids, and a leftover jar stops the game at start-up. Credits and l
   pack); it runs on a background thread and the result is sent to players when it is ready.
 * Packs with Merge Enchantments (every enchantment accepts every item): the enchantments that share the same item set
   build their item columns once, and the item index for enchantments is built on first use. The enchanting plugin
-  (`emi_enchanting`) went from about 2.3 s to an estimated 0.3 s in the test pack.
+  (`emi_enchanting`) went from 2261 ms to 134 ms in the real-pack run below.
 * The mob loot recipe data (`emi_loot`) is started while the plugins initialise instead of when the loot plugin
-  registers: about 2.0 s to an estimated 0.15 s on the first join of the test pack.
-* Together an estimated 3.8 s less of a 23 s join reload in the test pack. All three figures are estimates from
-  dev benchmarks, not measured on a player's pack.
+  registers: 2036 ms to 151 ms in the real-pack run below.
 * Search bake: the suffix arrays of the item search (names, tooltips, mods, aliases) are built by a faster sort that
   gives exactly the same arrays, and the four arrays are built at the same time. If the fast build is unavailable, the
   original build is used, and a check at start-up tests the faster sort against the original. The index for `~` source
@@ -206,7 +204,24 @@ provides their ids, and a leftover jar stops the game at start-up. Credits and l
   560 mods it went from 10.2 s to 1.7 s (993 structures; 433 of 789 chest loot tables are placed in a structure and
   563 of 1196 chest loot pages show a structure, the same as before). It always ran off the server thread, so joining a
   world was never blocked by it.
-<!-- DOC6: structure cache + real-pack numbers pending -->
+* Loot: the structure lookup cache (new setting `loot.structure-cache`, on by default). The expensive part of the lookup,
+  which loot tables the pieces of each jigsaw structure contain, is saved to `emi_remastered/cache/structure-lookup.dat`
+  in the game directory (one file for all worlds of that game directory) and used again while a fingerprint matches: the
+  mods (id, version, and the size and date of the jar file), the data packs in their order (and their files), and the
+  structures and template pools. Everything else (dimensions, chests that are placed by code, tables reached through
+  other tables) is computed fresh on every start. A build in which a structure could not be read is not saved, and files
+  that change while the game runs switch the cache off for that run. A dedicated server always uses the default (on),
+  like the other loot settings. In the real pack below a start without the file took 1.6 s for the lookup plus 5 ms to
+  save the file (54 KB), a start with it 0.6 s; on a production server with a pack of 560 mods a hit takes about 0.2 s
+  instead of 1.5 s.
+* Real pack: the owner's pack (about 640 mods), a client joining a copied world, run of 2026-10-26, compared with the
+  run of 2026-10-19 of the same version line. EMI reload at join 23.0 s to 18.1 s, with `emi_enchanting` 2261 to 134 ms
+  and `emi_loot` 2036 to 151 ms (the Merge Enchantments and mob loot entries above); search bake about 5.1 s to 4.0 s;
+  the `~` source index is built in the background in 1.7 s and is ready 0.9 s after the reload; structure lookup 45.4 s
+  to 1.6 s (0.6 s from the cache), which now ends before the player joins, so chest pages get their structures right
+  away instead of by a late update; login to joined 4.6 s to 2.3 s. The chest counts are unchanged (563 of 1196 chest
+  loot pages with a structure). 39 EMI plugins, 0 errors, and the five third-party mods that mix into EMI (sporran, ali,
+  certain_questing_additions, clientsort, polymorph) still apply.
 * Method: `docs/DEVTOUR.md`, "EMI reload benchmark".
 
 ### Known limits
