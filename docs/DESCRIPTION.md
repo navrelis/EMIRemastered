@@ -19,7 +19,7 @@ EMI and its seven add-ons in one jar, for Fabric 1.21.1
 
 ## Description
 
-![EMI Remastered](https://raw.githubusercontent.com/navrelis/EMIRemastered/remastered/docs/logo/banner.png)
+![EMI Remastered](https://raw.githubusercontent.com/navrelis/EMIRemastered/mc/1.21.1/docs/logo/banner.png)
 
 **EMI Remastered** is [EMI](https://github.com/emilyploszaj/emi), the item and recipe viewer, with seven popular EMI add-ons built in. It is **one Fabric mod for Minecraft 1.21.1** instead of eight jars. It adds pages and tools that show you where items, effects, enchantments, mobs, biomes and structures come from, and one view per item with the tabs **Info | Recipes | Uses**.
 
@@ -61,9 +61,9 @@ Every add-on is a module you can switch on or off. Modules keep the names of the
 - `-~crafting`: everything that cannot be crafted
 - `~nether ~chest`: chest loot found in the Nether (space is AND, `|` is OR)
 
-The labels come from recipe categories and, for loot, mobs, blocks, trades and ore generation, from loot table, mob, block, profession, structure and dimension names. Syntax: [docs/SEARCH.md](https://github.com/navrelis/EMIRemastered/blob/remastered/docs/SEARCH.md).
+The labels come from recipe categories and, for loot, mobs, blocks, trades and ore generation, from loot table, mob, block, profession, structure and dimension names. Syntax: [docs/SEARCH.md](https://github.com/navrelis/EMIRemastered/blob/mc/1.21.1/docs/SEARCH.md).
 
-**Other Sources.** Some items are handed out in code (a mob head from a charged creeper's explosion, a mod's reward in an event handler), so no loot table or recipe shows them. Pack makers and mod authors can list such sources in `assets/<namespace>/emi_sources/*.json` of a resource pack or mod. EMI shows them as the category **Other Sources**, under "How to Get" on the Item Info page, and the item no longer counts as "No Known Source". Built in: turtle scute, armadillo scute, dragon's breath and the dragon egg. File format: [docs/SOURCES.md](https://github.com/navrelis/EMIRemastered/blob/remastered/docs/SOURCES.md).
+**Other Sources.** Some items are handed out in code (a mob head from a charged creeper's explosion, a mod's reward in an event handler), so no loot table or recipe shows them. Pack makers and mod authors can list such sources in `assets/<namespace>/emi_sources/*.json` of a resource pack or mod. EMI shows them as the category **Other Sources**, under "How to Get" on the Item Info page, and the item no longer counts as "No Known Source". Built in: turtle scute, armadillo scute, dragon's breath and the dragon egg. File format: [docs/SOURCES.md](https://github.com/navrelis/EMIRemastered/blob/mc/1.21.1/docs/SOURCES.md).
 
 ### Modules
 
@@ -121,7 +121,7 @@ Hover a stack and press the key. Every key can be changed in EMI's config screen
 - Searching `#<block tag>` finds blocks, and Shift+fill on crafting tables no longer clears the grid.
 - Ores: no more "Invalid player data" kick when a mod registers an unbound feature.
 
-All known bugs and their status: [docs/KNOWN_BUGS.md](https://github.com/navrelis/EMIRemastered/blob/remastered/docs/KNOWN_BUGS.md).
+All known bugs and their status: [docs/KNOWN_BUGS.md](https://github.com/navrelis/EMIRemastered/blob/mc/1.21.1/docs/KNOWN_BUGS.md).
 
 ### Performance
 
@@ -168,7 +168,7 @@ English and German for all texts, plus EMI's existing translations.
 
 ### Credits and licences
 
-Built on the work of Emi (EMI), fzzyhmstrs (EMI Loot, EMI Enchanting), Abbie (EMI Ores), Flamarine and Prismwork (EMIffect), Mrbysco and ShyNieke (EMI Professions), Pandaismyname1 (Let's Do EMI Compat), Toni/txnimc (Distraction Free Recipes), lxly9, unilock and aMelonRind. Repositories, exact commits and licences: [CREDITS.md](https://github.com/navrelis/EMIRemastered/blob/remastered/CREDITS.md). The author of EMI Remastered asked the authors of the merged mods for permission to use and change their code.
+Built on the work of Emi (EMI), fzzyhmstrs (EMI Loot, EMI Enchanting), Abbie (EMI Ores), Flamarine and Prismwork (EMIffect), Mrbysco and ShyNieke (EMI Professions), Pandaismyname1 (Let's Do EMI Compat), Toni/txnimc (Distraction Free Recipes), lxly9, unilock and aMelonRind. Repositories, exact commits and licences: [CREDITS.md](https://github.com/navrelis/EMIRemastered/blob/mc/1.21.1/CREDITS.md).
 
 Most of the code is MIT. The ores module (from EMI Ores by Abbie) is LGPL-3.0-only. The vanilla biome icons are CC BY-NC-SA 3.0 (Minecraft Fandom Wiki contributors) and are not covered by the MIT or LGPL licence. The complete source code is public.
 
@@ -201,6 +201,6 @@ Most of the code is MIT. The ores module (from EMI Ores by Abbie) is LGPL-3.0-on
   - Distraction Free Recipes (EMI / REI / JEI) (Txni)
 - Licence: the repository `LICENSE` file is the original EMI MIT licence ("Copyright (c) 2022 Emi"). `fabric.mod.json` declares `MIT` and `LGPL-3.0-only`, and CREDITS.md adds CC BY-NC-SA 3.0 for the 64 biome icons. A single dropdown choice cannot express all three. Recommended: **Custom License** with the text "MIT for the code, LGPL-3.0-only for the ores module, CC BY-NC-SA 3.0 for the biome icons. See CREDITS.md and LICENSE in https://github.com/navrelis/EMIRemastered". If you want a plain dropdown choice, pick MIT, which covers most of the code. CurseForge moderation follows the licence shown on the project page when licences conflict.
 - Summary (CurseForge limit not stated in its docs, see the report; 255 characters is the practical limit): use the English summary above. The German text is only for Modrinth or a localised page; CurseForge requires English first and allows other languages after it.
-- Changelog for the file: the "2.0.0+1.21.1" section of `CHANGELOG.md`.
+- Changelog for the file: paste `docs/CURSEFORGE_CHANGELOG.md` (everything below its first comment line) with the editor in Markdown mode. The full technical list stays in `CHANGELOG.md`.
 - Description: switch the editor to Markdown before pasting the "Description" text. Check that the banner image shows after pasting.
 - Source and issues links: set the issue tracker to https://github.com/navrelis/EMIRemastered/issues and the source to https://github.com/navrelis/EMIRemastered.
