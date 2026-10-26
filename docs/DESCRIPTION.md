@@ -1,7 +1,7 @@
 # EMI Remastered: project page text
 
 Text for the CurseForge and Modrinth pages. Every statement comes from `README.md`, `CHANGELOG.md`, `CREDITS.md`,
-`docs/KNOWN_BUGS.md`, `docs/SEARCH.md`, `docs/SOURCES.md` and `fabric.mod.json`. The English summary is also the
+`docs/KNOWN_BUGS.md`, `docs/SEARCH.md`, `docs/SOURCES.md`, `docs/THEMING.md` and `fabric.mod.json`. The English summary is also the
 `description` in `fabric.mod.json`. The page text below uses lists instead of tables because the CurseForge Markdown
 editor does not document table support.
 
@@ -90,6 +90,8 @@ The labels come from recipe categories and, for loot, mobs, blocks, trades and o
 - Tag browser (**T**) for items, blocks, fluids and entity types.
 - Copy a recipe as readable text or JSON (**Ctrl+C**, Shift for the other format).
 - `/emiexport` writes recipes, items, sources and tags as JSON or CSV for pack developers.
+
+**Resource pack text colours.** A resource pack that recolours EMI's panels to a dark colour can also recolour the panel text with one file, `assets/emi_remastered/text_colors.json`. Without such a pack nothing looks different. File format: [docs/THEMING.md](https://github.com/navrelis/EMIRemastered/blob/mc/1.21.1/docs/THEMING.md).
 
 **One config screen.** A **Modules** group with an on/off switch per module and a section for each module's settings. A **plugin manager** (the Plugins button) lists every EMI plugin of every mod and can switch any of them off, for example a second loot viewer.
 
@@ -186,7 +188,7 @@ Most of the code is MIT. The ores module (from EMI Ores by Abbie) is LGPL-3.0-on
 
 ## Upload checklist (for the owner, not part of the page text)
 
-- File: `build/libs/EMIRemastered-1.21.1-2.0.0-Fabric.jar` (name `EMIRemastered-1.21.1-2.0.0-Fabric.jar`, version `2.0.0+1.21.1`).
+- File: `build/libs/EMIRemastered-1.21.1-2.1.0-Fabric.jar` (name `EMIRemastered-1.21.1-2.1.0-Fabric.jar`, version `2.1.0+1.21.1`).
 - Project name: "EMI Remastered" (CurseForge asks for no version numbers or class names in the name). Logo: `docs/logo/icon.png` (400x400 PNG, the size CurseForge asks for). Banner in the description: `docs/logo/banner.png`.
 - Game version: 1.21.1. Loader: Fabric. Java: 21. Environment: client and server (`fabric.mod.json` has `environment: *`).
 - Release type: Release (CurseForge syncs only Release files to the app by default and needs at least one).

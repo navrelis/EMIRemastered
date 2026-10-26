@@ -1,6 +1,6 @@
 # Plan
 
-Usage tally (work units: short = 1, long = 2): Opus 51 (session 11: none yet; session 9: LOGO2 x2, X-PARALLEL finish x2, X-CACHE x2, PACK-REAL3 rerun x2; session 8 lead: X-PERF x2, X-HUB x2, X-PERF2 x2, PACK-REAL3 x2; LOOT-ASYNC x2, PACK-REAL x2, PACK-REAL2 x2, F1, F2, Q3 x6, A1 x2, FX1 x4, FOCUS1 x4 = two delegations, PACK-CLI x2, LOGO x2) / Sonnet 141 (session 11: MAP1, MAP2, TC x2, PK1 x2, VER x2; session 10: CL1 x1; session 9: DOC6a x1, DOC6b x1, DESC2 x1; session 8 lead: X-SOURCES x2, X-SEARCH x2, X-UX x2, DOC5 x1, key map x1; session 7: POLISH x2, DOC4 x1) -> Opus 25 % (follow-up session's X-PAD/X-SUMMARY/X-PARALLEL/X-CACHE tallied there) (sessions 4+5 re-delegations counted again)
+Usage tally (work units: short = 1, long = 2): Opus 51 (session 11: none yet; session 9: LOGO2 x2, X-PARALLEL finish x2, X-CACHE x2, PACK-REAL3 rerun x2; session 8 lead: X-PERF x2, X-HUB x2, X-PERF2 x2, PACK-REAL3 x2; LOOT-ASYNC x2, PACK-REAL x2, PACK-REAL2 x2, F1, F2, Q3 x6, A1 x2, FX1 x4, FOCUS1 x4 = two delegations, PACK-CLI x2, LOGO x2) / Sonnet 142 (session 11: MAP1, MAP2, TC x2, PK1 x2, VER x2, DOC7; session 10: CL1 x1; session 9: DOC6a x1, DOC6b x1, DESC2 x1; session 8 lead: X-SOURCES x2, X-SEARCH x2, X-UX x2, DOC5 x1, key map x1; session 7: POLISH x2, DOC4 x1) -> Opus 25 % (follow-up session's X-PAD/X-SUMMARY/X-PARALLEL/X-CACHE tallied there) (sessions 4+5 re-delegations counted again)
 
 Status: open / in progress / in review / done. `||` = can run in parallel.
 
@@ -131,4 +131,5 @@ Owner: "1. do that (structure cache) 2. sure (extra sources) 3. sure (search by 
 | TC | Colour remap hook (D29): TextColors class, reload listener, funnels, raw sites, tests, docs/THEMING.md, version 2.1.0, CHANGELOG | Sonnet long | done (498 tests green; funnels TextWidget + EmiDrawContext, 13 raw sites; tooltips untouched) |
 | PK1 | Nytheria pack 2.2.0: text_colors.json (D30), widgets/background fixes (D31), recipe jar, version/changelog/page | Sonnet long | done (Nytheria repo a980b89 on v2.2.0; 69 py tests; 1 correction: lighter hues >= 4.4:1; owner greys kept) |
 | VER | Dev client screenshots with and without the pack (hidden, muted) | Sonnet long | in progress |
+| DOC7 | CF file changelog 2.1.0 (works as first release), DESCRIPTION theming line + version | Sonnet short | done (accepted first pass) |
 | REL2 | Mod 2.0.1 + pack 2.2.0: build, install in instance, push, CF upload | lead | open |

@@ -6,8 +6,8 @@ plugins {
 	id "fabric-loom" version "1.11.8"
 }
 
-// mod_version = "2.0.0+1.21.1" goes into fabric.mod.json; the jar is named
-// EMIRemastered-1.21.1-2.0.0-Fabric.jar
+// mod_version = "2.1.0+1.21.1" goes into fabric.mod.json; the jar is named
+// EMIRemastered-1.21.1-2.1.0-Fabric.jar
 def modBaseVersion = project.mod_version.split("\\+")[0]
 
 version = project.mod_version

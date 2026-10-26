@@ -1,9 +1,17 @@
 <!-- Paste everything below this line into the CurseForge file changelog (Markdown editor). -->
-## EMI Remastered 2.0.0 for Minecraft 1.21.1 (Fabric)
-
-First release. EMI 1.1.24 and seven add-ons in one mod.
+## EMI Remastered 2.1.0 for Minecraft 1.21.1 (Fabric)
 
 **Important: remove the jars of EMI and of the seven merged add-ons before you install this mod. A leftover jar stops the game at start-up. Requires Fabric API, Fabric Loader 0.16.14 or newer and Java 21.**
+
+This file also contains everything from 2.0.0. It is listed below, so you can use it as a first install.
+
+### New
+- Resource packs can now change the colour of EMI's panel text. If a pack recolours EMI's panels to a dark colour, the dark grey text is hard to read, and the pack can now make it light. Without such a pack nothing looks different.
+- For pack authors: add one file, `assets/emi_remastered/text_colors.json`, to your resource pack. It maps old text colours to new ones, with no code and no config. Format and colour list: https://github.com/navrelis/EMIRemastered/blob/mc/1.21.1/docs/THEMING.md
+
+## 2.0.0 (first release)
+
+First release. EMI 1.1.24 and seven add-ons in one mod.
 
 ### Included mods
 - EMI 1.1.24 (the base)

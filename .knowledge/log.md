@@ -155,3 +155,5 @@
 2026-10-26 | MAP1, MAP2 reviews | accepted (reports read; design D29-D31). TC (Sonnet long, EMI repo) and PK1 (Sonnet long, Nytheria repo) delegated in parallel
 2026-10-26 | PK1 review | accepted after 1 correction (hue colours lightened to >= 4.4:1 on #326089; owner's #9FA5A6 kept at 2.65:1); pixel diff verified (124 + 93 px), previews viewed, 69 tests, zip c2537870; committed a980b89 in Nytheria repo (branch v2.2.0)
 2026-10-26 | TC review | accepted first pass (full diff read; build 498 tests 0 failures; jar 2.1.0 has theme classes + empty text_colors.json)
+2026-10-26 | VER (Sonnet long, dev tour theme.json with/without pack) and DOC7 (Sonnet short) delegated in parallel; pack CF changelog extracted to scratchpad
+2026-10-26 | DOC7 review | accepted first pass (diff read)
